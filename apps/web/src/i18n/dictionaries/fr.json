@@ -173,5 +173,118 @@
       "sessaoCriada": "Session créée ! Code : {code}",
       "backendPendente": "Backend encore en construction — session affichée localement."
     }
+  },
+  "jogador": {
+    "topbarTitulo": "Plateau",
+    "semChaveAtiva": "— aucune clé active —",
+    "sair": "Se déconnecter",
+    "score": {
+      "label": "Points d'investigation",
+      "unidade": "pts",
+      "verResumo": "Voir le résumé"
+    },
+    "timer": { "label": "Temps de la phase" },
+    "cenario": {
+      "titulo": "Session d'investigation",
+      "sub": "Vous êtes un agent de transformation."
+    },
+    "membros": {
+      "titulo": "Membres de l'équipe",
+      "voce": "vous",
+      "ativo": "actif"
+    },
+    "comm": {
+      "equipe": "Équipe",
+      "individual": "Individuel",
+      "registro": "Journal",
+      "placeholderEquipe": "Parlez à toute l'équipe…",
+      "placeholderIndividual": "Message privé…",
+      "soDestinatario": "🔒 Seul le destinataire le lit",
+      "enviar": "Envoyer →",
+      "paraQuem": "Pour qui ?",
+      "semMensagens": "Pas encore de messages",
+      "historico": "Historique de la session · visible par le formateur"
+    },
+    "chave": {
+      "concluida": "✓ Fait",
+      "ativa": "⏱ Active",
+      "disponivel": "▶ Disponible",
+      "padrao": "○ Disponible",
+      "iniciar": "Démarrer {nome}",
+      "bloqueadaPorProblema": "🔒 Terminez Problème d'abord",
+      "clique": "touchez",
+      "bloqueada": "🔒"
+    },
+    "fase": {
+      "tituloModal": "Phase {numero} — {nome}",
+      "label": "Contenu investigué par l'équipe",
+      "placeholder": "Décrivez ce que l'équipe a découvert…",
+      "vazio": "Décrivez ce que l'équipe a découvert",
+      "cancelar": "Annuler",
+      "concluir": "✓ Terminer la phase",
+      "salvar": "✓ Enregistrer la modification"
+    },
+    "congrats": {
+      "chaveConcluida": "Clé terminée ! 🎉",
+      "faseConcluidaTpl": "Phase {numero} terminée !",
+      "todasFasesCompletas": "toutes les phases terminées",
+      "continuar": "Continuer l'investigation →",
+      "pontos": "points d'investigation"
+    },
+    "fases": {
+      "problema": [
+        { "nome": "Contexte", "pergunta": "Où le problème se produit-il ?" },
+        {
+          "nome": "Caractéristiques",
+          "pergunta": "Comment le problème affecte-t-il le contexte ?"
+        },
+        {
+          "nome": "Motivation",
+          "pergunta": "Pourquoi vaut-il la peine d'étudier ce problème ?"
+        }
+      ],
+      "solucao": [
+        {
+          "nome": "Caractéristiques",
+          "pergunta": "À quoi ressemblera la solution ?"
+        },
+        {
+          "nome": "Coûts",
+          "pergunta": "Quelles dépenses sont nécessaires pour mettre en œuvre la solution ?"
+        },
+        {
+          "nome": "Risques",
+          "pergunta": "Quels obstacles pourraient entraver ou empêcher la mise en œuvre de la solution ?"
+        }
+      ],
+      "parcerias": [
+        {
+          "nome": "Ressources",
+          "pergunta": "Qui peut fournir les services ou produits localement ?"
+        },
+        {
+          "nome": "Caractéristiques",
+          "pergunta": "Quelle sera la responsabilité de chaque partenaire ?"
+        },
+        {
+          "nome": "Délai",
+          "pergunta": "Combien de temps entre la formalisation et l'exécution ?"
+        }
+      ],
+      "oportunidades": [
+        {
+          "nome": "Caractéristiques",
+          "pergunta": "Qu'est-ce que l'opportunité et comment a-t-elle été identifiée ?"
+        },
+        {
+          "nome": "Différenciation",
+          "pergunta": "En quoi l'idée est-elle innovante par rapport aux activités existantes ?"
+        },
+        {
+          "nome": "Applicabilité",
+          "pergunta": "Comment cette opportunité peut-elle être développée dans le contexte étudié ?"
+        }
+      ]
+    }
   }
 }

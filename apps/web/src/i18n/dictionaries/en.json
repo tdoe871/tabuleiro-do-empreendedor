@@ -173,5 +173,114 @@
       "sessaoCriada": "Session created! Code: {code}",
       "backendPendente": "Backend still in progress — session shown locally."
     }
+  },
+  "jogador": {
+    "topbarTitulo": "Board",
+    "semChaveAtiva": "— no active key —",
+    "sair": "Sign out",
+    "score": {
+      "label": "Investigation points",
+      "unidade": "pts",
+      "verResumo": "View summary"
+    },
+    "timer": { "label": "Phase time" },
+    "cenario": {
+      "titulo": "Investigation session",
+      "sub": "You are a change agent."
+    },
+    "membros": { "titulo": "Team members", "voce": "you", "ativo": "active" },
+    "comm": {
+      "equipe": "Team",
+      "individual": "Individual",
+      "registro": "Log",
+      "placeholderEquipe": "Talk to the whole team…",
+      "placeholderIndividual": "Private message…",
+      "soDestinatario": "🔒 Only the recipient reads it",
+      "enviar": "Send →",
+      "paraQuem": "To whom?",
+      "semMensagens": "No messages yet",
+      "historico": "Session history · visible to the educator"
+    },
+    "chave": {
+      "concluida": "✓ Done",
+      "ativa": "⏱ Active",
+      "disponivel": "▶ Available",
+      "padrao": "○ Available",
+      "iniciar": "Start {nome}",
+      "bloqueadaPorProblema": "🔒 Complete Problem first",
+      "clique": "tap",
+      "bloqueada": "🔒"
+    },
+    "fase": {
+      "tituloModal": "Phase {numero} — {nome}",
+      "label": "Content investigated by the team",
+      "placeholder": "Describe what the team discovered…",
+      "vazio": "Describe what the team discovered",
+      "cancelar": "Cancel",
+      "concluir": "✓ Complete phase",
+      "salvar": "✓ Save edit"
+    },
+    "congrats": {
+      "chaveConcluida": "Key completed! 🎉",
+      "faseConcluidaTpl": "Phase {numero} completed!",
+      "todasFasesCompletas": "all phases complete",
+      "continuar": "Keep investigating →",
+      "pontos": "investigation points"
+    },
+    "fases": {
+      "problema": [
+        { "nome": "Context", "pergunta": "Where does the problem happen?" },
+        {
+          "nome": "Characteristics",
+          "pergunta": "How does the problem affect the context?"
+        },
+        {
+          "nome": "Motivation",
+          "pergunta": "Why is it worth investigating this problem?"
+        }
+      ],
+      "solucao": [
+        {
+          "nome": "Characteristics",
+          "pergunta": "What will the solution look like?"
+        },
+        {
+          "nome": "Costs",
+          "pergunta": "What expenses are involved in implementing the solution?"
+        },
+        {
+          "nome": "Risks",
+          "pergunta": "What barriers could hinder or prevent implementing the solution?"
+        }
+      ],
+      "parcerias": [
+        {
+          "nome": "Resources",
+          "pergunta": "Who can provide the services or products locally?"
+        },
+        {
+          "nome": "Characteristics",
+          "pergunta": "What will each partner's responsibility be?"
+        },
+        {
+          "nome": "Timeline",
+          "pergunta": "How long between formalizing and executing?"
+        }
+      ],
+      "oportunidades": [
+        {
+          "nome": "Characteristics",
+          "pergunta": "What is the opportunity and how was it identified?"
+        },
+        {
+          "nome": "Differentiation",
+          "pergunta": "How is the idea innovative compared to existing activities?"
+        },
+        {
+          "nome": "Applicability",
+          "pergunta": "How can this opportunity be developed in the investigated context?"
+        }
+      ]
+    }
   }
 }

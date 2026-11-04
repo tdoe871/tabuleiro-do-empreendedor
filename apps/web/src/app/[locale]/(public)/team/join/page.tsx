@@ -3,11 +3,13 @@
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
 
 export default function JoinTeamPage() {
   const t = useTranslations("team");
   const toast = useToast();
+  const router = useRouter();
   const params = useSearchParams();
   const nickname = params.get("nickname") ?? "";
   const [joinCode, setJoinCode] = useState(params.get("code") ?? "");
@@ -20,13 +22,22 @@ export default function JoinTeamPage() {
       body: JSON.stringify({ teamJoinCode: joinCode, nickname }),
     });
     if (res.status === 501) {
-      toast("info", "Unirse a equipo: backend en construcción.");
+      toast(
+        "info",
+        "Unirse a equipo: backend en construcción — abriendo tablero en modo preview.",
+      );
+      router.push(
+        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
+      );
       return;
     }
-    toast(
-      res.ok ? "ok" : "err",
-      res.ok ? "Te uniste al equipo" : "Código de equipo inválido",
-    );
+    if (res.ok) {
+      router.push(
+        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
+      );
+      return;
+    }
+    toast("err", "Código de equipo inválido");
   }
 
   return (

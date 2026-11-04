@@ -173,5 +173,115 @@
       "sessaoCriada": "¡Sesión creada! Código: {code}",
       "backendPendente": "Backend en construcción — sesión mostrada localmente."
     }
+  },
+  "jogador": {
+    "topbarTitulo": "Tablero",
+    "semChaveAtiva": "— sin clave activa —",
+    "sair": "Salir",
+    "score": {
+      "label": "Puntos de investigación",
+      "unidade": "pts",
+      "verResumo": "Ver resumen"
+    },
+    "timer": { "label": "Tiempo de la fase" },
+    "cenario": {
+      "titulo": "Sesión de investigación",
+      "sub": "Eres un agente de transformación."
+    },
+    "membros": {
+      "titulo": "Miembros del equipo",
+      "voce": "tú",
+      "ativo": "activo"
+    },
+    "comm": {
+      "equipe": "Equipo",
+      "individual": "Individual",
+      "registro": "Registro",
+      "placeholderEquipe": "Habla con todo el equipo…",
+      "placeholderIndividual": "Mensaje privado…",
+      "soDestinatario": "🔒 Solo el destinatario lo lee",
+      "enviar": "Enviar →",
+      "paraQuem": "¿Para quién?",
+      "semMensagens": "Todavía no hay mensajes",
+      "historico": "Historial de la sesión · visible para el educador"
+    },
+    "chave": {
+      "concluida": "✓ Hecha",
+      "ativa": "⏱ Activa",
+      "disponivel": "▶ Disponible",
+      "padrao": "○ Disponible",
+      "iniciar": "Iniciar {nome}",
+      "bloqueadaPorProblema": "🔒 Completa Problema primero",
+      "clique": "toca",
+      "bloqueada": "🔒"
+    },
+    "fase": {
+      "tituloModal": "Fase {numero} — {nome}",
+      "label": "Contenido investigado por el equipo",
+      "placeholder": "Describe lo que descubrió el equipo…",
+      "vazio": "Describe lo que descubrió el equipo",
+      "cancelar": "Cancelar",
+      "concluir": "✓ Completar fase",
+      "salvar": "✓ Guardar edición"
+    },
+    "congrats": {
+      "chaveConcluida": "¡Clave completada! 🎉",
+      "faseConcluidaTpl": "¡Fase {numero} completada!",
+      "todasFasesCompletas": "todas las fases completas",
+      "continuar": "Seguir investigando →",
+      "pontos": "puntos de investigación"
+    },
+    "fases": {
+      "problema": [
+        { "nome": "Contexto", "pergunta": "¿Dónde ocurre el problema?" },
+        {
+          "nome": "Características",
+          "pergunta": "¿Cómo afecta el problema al contexto?"
+        },
+        {
+          "nome": "Motivación",
+          "pergunta": "¿Por qué vale la pena investigar este problema?"
+        }
+      ],
+      "solucao": [
+        { "nome": "Características", "pergunta": "¿Cómo será la solución?" },
+        {
+          "nome": "Costos",
+          "pergunta": "¿Cuáles son los gastos para implementar la solución?"
+        },
+        {
+          "nome": "Riesgos",
+          "pergunta": "¿Qué barreras pueden dificultar o inviabilizar la implementación de la solución?"
+        }
+      ],
+      "parcerias": [
+        {
+          "nome": "Recursos",
+          "pergunta": "¿Quién puede ofrecer los servicios o productos en la localidad?"
+        },
+        {
+          "nome": "Características",
+          "pergunta": "¿Cuál será la responsabilidad de cada socio?"
+        },
+        {
+          "nome": "Tiempo",
+          "pergunta": "¿Cuánto tiempo pasa entre la formalización y la ejecución?"
+        }
+      ],
+      "oportunidades": [
+        {
+          "nome": "Características",
+          "pergunta": "¿Qué es y cómo se identificó la oportunidad?"
+        },
+        {
+          "nome": "Diferenciación",
+          "pergunta": "¿Cómo es innovadora la idea respecto a las actividades existentes?"
+        },
+        {
+          "nome": "Aplicabilidad",
+          "pergunta": "¿Cómo se puede desarrollar esta oportunidad en el contexto investigado?"
+        }
+      ]
+    }
   }
 }

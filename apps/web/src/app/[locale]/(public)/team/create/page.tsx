@@ -3,11 +3,13 @@
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
 
 export default function CreateTeamPage() {
   const t = useTranslations("team");
   const toast = useToast();
+  const router = useRouter();
   const params = useSearchParams();
   const eventCode = params.get("code") ?? "";
   const nickname = params.get("nickname") ?? "";
@@ -84,6 +86,18 @@ export default function CreateTeamPage() {
               onFocus={(e) => e.target.select()}
             />
           </div>
+          <button
+            type="button"
+            className="btn btn-primary w100"
+            style={{ marginTop: 14 }}
+            onClick={() =>
+              router.push(
+                `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
+              )
+            }
+          >
+            Entrar al tablero (preview) →
+          </button>
         </div>
       </div>
     );
