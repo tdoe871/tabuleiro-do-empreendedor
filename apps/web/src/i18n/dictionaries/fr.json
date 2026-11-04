@@ -24,7 +24,17 @@
     "deployLink": "Lien de déploiement (Vercel, Netlify, etc.)",
     "repoLink": "Lien du dépôt",
     "fileOrImage": "Présentation ou image",
-    "none": "Aucune soumission de code"
+    "none": "Aucune soumission de code",
+    "chooseType": "Type de soumission",
+    "urlLabel": "Lien",
+    "urlPlaceholder": "https://votre-projet.vercel.app",
+    "descriptionLabel": "Description (optionnel)",
+    "descriptionPlaceholder": "Décrivez brièvement le projet…",
+    "submit": "Enregistrer la soumission →",
+    "saved": "Soumission enregistrée localement — il faut encore la connecter au backend.",
+    "editar": "✏️ Modifier la soumission",
+    "abrir": "📦 Soumettre le projet",
+    "status": "Soumission enregistrée"
   },
   "keys": {
     "problema": {

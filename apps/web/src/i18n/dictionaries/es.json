@@ -24,7 +24,17 @@
     "deployLink": "Link del deployment (Vercel, Netlify, etc.)",
     "repoLink": "Link del repositorio",
     "fileOrImage": "Presentación o imagen",
-    "none": "Sin entrega de código"
+    "none": "Sin entrega de código",
+    "chooseType": "Tipo de entrega",
+    "urlLabel": "Link",
+    "urlPlaceholder": "https://tu-proyecto.vercel.app",
+    "descriptionLabel": "Descripción (opcional)",
+    "descriptionPlaceholder": "Cuenta brevemente sobre el proyecto…",
+    "submit": "Guardar entrega →",
+    "saved": "Entrega guardada localmente — falta conectar con el backend.",
+    "editar": "✏️ Editar entrega",
+    "abrir": "📦 Entregar proyecto",
+    "status": "Entrega registrada"
   },
   "keys": {
     "problema": {
