@@ -1,0 +1,36 @@
+# legacy prototype — kept on disk as reference, not part of this repo's history
+/tdoe/
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+
+# turborepo
+.turbo/
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# prisma
+packages/db/src/generated/
+
+# testing
+coverage/
+test-results/
+playwright-report/
+
+# build artifacts
+dist/
+*.tsbuildinfo
+
+# misc
+.DS_Store
+*.log
+.swc/

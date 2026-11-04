@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Staff (the "maestro" / event host). A Student/Participant does NOT need a
+// password — they join with an event code + nickname, matching the flow
+// redesign in docs/architecture/DECISIONS-UX.md.
+// ---------------------------------------------------------------------------
+model Staff {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  hashedPassword String
+  events         Event[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum EventStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  FINISHED
+}
+
+// Per UX fix #3: a hackathon needs ONE countdown for the whole event, not a
+// countdown per phase. GLOBAL uses Event.durationMinutes from Event.startedAt;
+// PER_PHASE uses each Phase.durationMinutes, like the original prototype.
+enum TimerMode {
+  GLOBAL
+  PER_PHASE
+}
+
+model Event {
+  id              String      @id @default(uuid())
+  code            String      @unique // short code to join as a participant
+  name            String
+  status          EventStatus @default(DRAFT)
+  timerMode       TimerMode   @default(GLOBAL)
+  durationMinutes Int? // used when timerMode = GLOBAL
+  maxTeams        Int         @default(60)
+  maxTeamSize     Int         @default(5)
+  startedAt       DateTime?
+  endsAt          DateTime?
+  hostId          String
+  host            Staff       @relation(fields: [hostId], references: [id])
+  phases          Phase[]
+  teams           Team[]
+  alerts          Alert[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([code])
+}
+
+model Phase {
+  id              String          @id @default(uuid())
+  eventId         String
+  event           Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order           Int
+  name            String
+  prompt          String? // "carta-desafio" — the challenge question/card
+  durationMinutes Int? // only relevant when Event.timerMode = PER_PHASE
+  teamProgress    TeamPhase[]
+
+  @@unique([eventId, order])
+}
+
+// Per UX fix #2: a team has a real name chosen at creation, plus its own
+// short joinCode (and an invite link built from it) so members join THAT
+// team instead of guessing a raw number. The first participant to create a
+// team becomes its leader automatically.
+model Team {
+  id             String       @id @default(uuid())
+  eventId        String
+  event          Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name           String
+  joinCode       String       @unique
+  score          Int          @default(0)
+  participants   Participant[]
+  phaseProgress  TeamPhase[]
+  submission     Submission?
+  createdAt      DateTime     @default(now())
+
+  @@unique([eventId, name])
+  @@index([joinCode])
+}
+
+enum ParticipantRole {
+  LEADER
+  MEMBER
+}
+
+model Participant {
+  id        String          @id @default(uuid())
+  teamId    String
+  team      Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  nickname  String
+  role      ParticipantRole @default(MEMBER)
+  rpgRole   String? // optional gamification role, kept from the original prototype
+  joinedAt  DateTime        @default(now())
+
+  @@unique([teamId, nickname])
+}
+
+model TeamPhase {
+  id            String    @id @default(uuid())
+  teamId        String
+  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  phaseId       String
+  phase         Phase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  keyActivated  Boolean   @default(false)
+  completedAt   DateTime?
+  pointsAwarded Int       @default(0)
+
+  @@unique([teamId, phaseId])
+}
+
+// Per UX fix #1: teams need a place to deliver their project. Most hackathon
+// teams will paste a deployment link (Vercel/Netlify/etc.); teams without
+// code can instead attach a presentation/image. "If the deploy link doesn't
+// work, that's on the team" — no file execution happens on our side.
+enum SubmissionType {
+  DEPLOY_LINK
+  REPO_LINK
+  FILE_OR_IMAGE
+  NONE
+}
+
+model Submission {
+  id            String         @id @default(uuid())
+  teamId        String         @unique
+  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  type          SubmissionType @default(NONE)
+  url           String? // deploy link or repo link
+  fileUrl       String? // Supabase Storage URL for a presentation/image
+  description   String?
+  submittedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+model Alert {
+  id         String        @id @default(uuid())
+  eventId    String
+  event      Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  severity   AlertSeverity @default(INFO)
+  message    String
+  resolvedAt DateTime?
+  createdAt  DateTime      @default(now())
+}

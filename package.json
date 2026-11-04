@@ -1,0 +1,35 @@
+{
+  "name": "tabuleiro-do-empreendedor",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "pnpm --filter @tdoe/db generate",
+    "db:migrate": "pnpm --filter @tdoe/db migrate",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.5",
+    "prettier": "^3.6.2",
+    "turbo": "^2.6.1",
+    "typescript": "^5"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": [
+      "pnpm --filter @tdoe/web exec eslint --fix"
+    ],
+    "**/*.{ts,tsx,json,md,css}": [
+      "prettier --write --ignore-unknown"
+    ]
+  }
+}

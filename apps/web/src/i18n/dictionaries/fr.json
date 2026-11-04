@@ -1,0 +1,29 @@
+{
+  "common": {
+    "appName": "Tabuleiro do Empreendedor",
+    "continue": "Continuer",
+    "back": "Retour"
+  },
+  "join": {
+    "title": "Rejoindre l'événement",
+    "codeLabel": "Code de l'événement",
+    "nicknameLabel": "Votre nom",
+    "submit": "Rejoindre"
+  },
+  "team": {
+    "chooseAction": "Que voulez-vous faire ?",
+    "createTeam": "Créer une équipe",
+    "joinTeam": "Rejoindre une équipe existante",
+    "createNameLabel": "Nom de l'équipe",
+    "joinCodeLabel": "Code de l'équipe (ou utilisez le lien envoyé par le chef)",
+    "youAreLeader": "Vous êtes le chef de cette équipe",
+    "shareLink": "Partagez ce lien avec votre équipe"
+  },
+  "submission": {
+    "title": "Soumission du projet",
+    "deployLink": "Lien de déploiement (Vercel, Netlify, etc.)",
+    "repoLink": "Lien du dépôt",
+    "fileOrImage": "Présentation ou image",
+    "none": "Aucune soumission de code"
+  }
+}
