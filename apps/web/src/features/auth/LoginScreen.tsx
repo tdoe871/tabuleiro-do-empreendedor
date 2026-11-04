@@ -51,10 +51,18 @@ export function LoginScreen() {
       senha: loginSenha,
     });
     if (res.status === 501) {
-      toast("info", "Login de educador: backend em construção.");
+      toast(
+        "info",
+        "Login de educador: backend em construção — abrindo painel em modo de visualização.",
+      );
+      router.push("/mestre/dashboard");
       return;
     }
-    toast(res.ok ? "ok" : "err", res.ok ? "Login ok" : "Credenciais inválidas");
+    if (res.ok) {
+      router.push("/mestre/dashboard");
+      return;
+    }
+    toast("err", "Credenciais inválidas");
   }
 
   async function handleCadastro(e: FormEvent) {
@@ -70,13 +78,18 @@ export function LoginScreen() {
       senha: cadSenha,
     });
     if (res.status === 501) {
-      toast("info", "Cadastro de educador: backend em construção.");
+      toast(
+        "info",
+        "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
+      );
+      router.push("/mestre/dashboard");
       return;
     }
-    toast(
-      res.ok ? "ok" : "err",
-      res.ok ? "Conta criada" : "Não foi possível criar a conta",
-    );
+    if (res.ok) {
+      router.push("/mestre/dashboard");
+      return;
+    }
+    toast("err", "Não foi possível criar a conta");
   }
 
   function handleCodigo(e: FormEvent) {

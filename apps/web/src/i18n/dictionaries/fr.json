@@ -81,5 +81,97 @@
       "codeHint1": "Code fourni par le formateur",
       "codeHint2": "Demandez le code à 6 lettres pour commencer"
     }
+  },
+  "educador": {
+    "painelTitulo": "Panneau du formateur",
+    "status": {
+      "aguardando": "En attente",
+      "ativa": "Active",
+      "pausada": "En pause",
+      "finalizada": "Terminée"
+    },
+    "extensoes": "Extensions",
+    "acao": {
+      "iniciar": "Démarrer la session",
+      "pausar": "Mettre en pause",
+      "retomar": "Reprendre la session"
+    },
+    "socializar": "Partager",
+    "sair": "Se déconnecter",
+    "nenhumaSessao": "Pas encore de session",
+    "sidebar": {
+      "sessoes": "Sessions",
+      "acoes": "Actions",
+      "novaSessao": "Nouvelle session",
+      "verificarAlertas": "Vérifier les alertes",
+      "exportar": "Exporter",
+      "relatorio": "Rapport d'interaction",
+      "exportarPropostas": "Exporter les propositions"
+    },
+    "metrics": {
+      "equipesAtivas": "Équipes actives",
+      "participantes": "Participants",
+      "chavesConcluidas": "Clés complétées",
+      "codigoAcesso": "Code d'accès"
+    },
+    "right": {
+      "alertasMediacao": "Alertes de médiation",
+      "nenhumAlerta": "Aucune alerte active",
+      "controlesSessao": "Contrôles de la session",
+      "iniciar": "Démarrer",
+      "pausar": "Pause",
+      "retomar": "Reprendre",
+      "alertas": "Alertes"
+    },
+    "timer": {
+      "titulo": "Horloge de la phase",
+      "duracao": "Durée",
+      "definir": "Définir",
+      "iniciar": "Démarrer",
+      "parar": "Arrêter",
+      "mostrarEstudantes": "Afficher le minuteur aux étudiants"
+    },
+    "carta": {
+      "titulo": "Carte-défi",
+      "ativa": "Carte active",
+      "remover": "Retirer la carte",
+      "enviar": "Envoyer la carte",
+      "launcherSub": {
+        "problema": "Approfondir l'investigation",
+        "solucao": "Revoir la proposition",
+        "parcerias": "Élargir les alliances",
+        "oportunidades": "Découvrir une nouvelle voie"
+      },
+      "prompts": {
+        "problema": "Identifiez un problème encore plus spécifique dans le contexte étudié et proposez une nouvelle perspective.",
+        "solucao": "Revoyez la solution proposée en tenant compte de nouveaux critères de faisabilité et d'impact.",
+        "parcerias": "Repérez au moins trois nouveaux partenaires stratégiques et justifiez le rôle de chacun.",
+        "oportunidades": "Identifiez une opportunité de marché inexploitée et décrivez comment en tirer parti."
+      }
+    },
+    "modalSessao": {
+      "titulo": "Nouvelle session",
+      "sub": "Configurez la session d'investigation entrepreneuriale",
+      "tituloLabel": "Titre de la session",
+      "tituloPlaceholder": "Ex : Quartier Novo Horizonte — éducation des adultes",
+      "modoLabel": "Mode d'investigation",
+      "modoEscolar": "🌱 Scolaire — les équipes définissent le problème",
+      "modoPersonalizado": "✏️ Personnalisé — le formateur définit le contexte",
+      "contextoLabel": "Contexte d'investigation",
+      "contextoPlaceholder": "Ex : Vous êtes des agents de transformation du quartier Novo Horizonte…",
+      "contextoAjuda": "Ce texte sera affiché aux équipes au démarrage de la session.",
+      "numEquipesLabel": "Nombre d'équipes (jusqu'à 80 — sans limite de 10)",
+      "integrantesLabel": "Membres par équipe",
+      "cancelar": "Annuler",
+      "criar": "Créer la session →"
+    },
+    "toasts": {
+      "selecioneSessao": "Sélectionnez une session",
+      "nenhumAlertaNovo": "Aucune nouvelle alerte",
+      "tituloObrigatorio": "Saisissez un titre pour la session",
+      "contextoObrigatorio": "Décrivez le contexte d'investigation",
+      "sessaoCriada": "Session créée ! Code : {code}",
+      "backendPendente": "Backend encore en construction — session affichée localement."
+    }
   }
 }

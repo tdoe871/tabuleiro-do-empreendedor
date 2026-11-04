@@ -81,5 +81,97 @@
       "codeHint1": "Código proporcionado por el educador",
       "codeHint2": "Pide el código de 6 letras para empezar"
     }
+  },
+  "educador": {
+    "painelTitulo": "Panel del educador",
+    "status": {
+      "aguardando": "En espera",
+      "ativa": "Activa",
+      "pausada": "Pausada",
+      "finalizada": "Finalizada"
+    },
+    "extensoes": "Extensiones",
+    "acao": {
+      "iniciar": "Iniciar partida",
+      "pausar": "Pausar partida",
+      "retomar": "Reanudar partida"
+    },
+    "socializar": "Socializar",
+    "sair": "Salir",
+    "nenhumaSessao": "Todavía no hay sesiones",
+    "sidebar": {
+      "sessoes": "Sesiones",
+      "acoes": "Acciones",
+      "novaSessao": "Nueva sesión",
+      "verificarAlertas": "Verificar alertas",
+      "exportar": "Exportar",
+      "relatorio": "Reporte de interacción",
+      "exportarPropostas": "Exportar propuestas"
+    },
+    "metrics": {
+      "equipesAtivas": "Equipos activos",
+      "participantes": "Participantes",
+      "chavesConcluidas": "Claves completadas",
+      "codigoAcesso": "Código de acceso"
+    },
+    "right": {
+      "alertasMediacao": "Alertas de mediación",
+      "nenhumAlerta": "Sin alertas activas",
+      "controlesSessao": "Controles de la sesión",
+      "iniciar": "Iniciar",
+      "pausar": "Pausar",
+      "retomar": "Reanudar",
+      "alertas": "Alertas"
+    },
+    "timer": {
+      "titulo": "Reloj de la fase",
+      "duracao": "Duración",
+      "definir": "Definir",
+      "iniciar": "Iniciar",
+      "parar": "Detener",
+      "mostrarEstudantes": "Mostrar timer a los estudiantes"
+    },
+    "carta": {
+      "titulo": "Carta-desafío",
+      "ativa": "Carta activa",
+      "remover": "Quitar carta",
+      "enviar": "Enviar carta",
+      "launcherSub": {
+        "problema": "Profundizar investigación",
+        "solucao": "Revisar propuesta",
+        "parcerias": "Ampliar alianzas",
+        "oportunidades": "Descubrir nuevo camino"
+      },
+      "prompts": {
+        "problema": "Identifiquen un problema aún más específico en el contexto investigado y propongan una nueva perspectiva.",
+        "solucao": "Revisen la solución propuesta considerando nuevos criterios de viabilidad e impacto.",
+        "parcerias": "Mapeen al menos tres nuevos socios estratégicos y justifiquen el papel de cada uno.",
+        "oportunidades": "Identifiquen una oportunidad de mercado no explorada y describan cómo aprovecharla."
+      }
+    },
+    "modalSessao": {
+      "titulo": "Nueva sesión",
+      "sub": "Configura la sesión de investigación emprendedora",
+      "tituloLabel": "Título de la sesión",
+      "tituloPlaceholder": "Ej: Barrio Nuevo Horizonte — EJA",
+      "modoLabel": "Modo de investigación",
+      "modoEscolar": "🌱 Escolar — los equipos definen el problema",
+      "modoPersonalizado": "✏️ Personalizado — el educador define el contexto",
+      "contextoLabel": "Contexto de investigación",
+      "contextoPlaceholder": "Ej: Son agentes de transformación del barrio Nuevo Horizonte…",
+      "contextoAjuda": "Este texto se mostrará a los equipos al iniciar la sesión.",
+      "numEquipesLabel": "Número de equipos (hasta 80 — sin límite de 10)",
+      "integrantesLabel": "Integrantes por equipo",
+      "cancelar": "Cancelar",
+      "criar": "Crear sesión →"
+    },
+    "toasts": {
+      "selecioneSessao": "Selecciona una sesión",
+      "nenhumAlertaNovo": "Sin alertas nuevas",
+      "tituloObrigatorio": "Escribe un título para la sesión",
+      "contextoObrigatorio": "Describe el contexto de investigación",
+      "sessaoCriada": "¡Sesión creada! Código: {code}",
+      "backendPendente": "Backend en construcción — sesión mostrada localmente."
+    }
   }
 }

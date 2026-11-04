@@ -81,5 +81,97 @@
       "codeHint1": "Code provided by your educator",
       "codeHint2": "Ask for the 6-letter code to get started"
     }
+  },
+  "educador": {
+    "painelTitulo": "Educator panel",
+    "status": {
+      "aguardando": "Waiting",
+      "ativa": "Active",
+      "pausada": "Paused",
+      "finalizada": "Finished"
+    },
+    "extensoes": "Extensions",
+    "acao": {
+      "iniciar": "Start session",
+      "pausar": "Pause session",
+      "retomar": "Resume session"
+    },
+    "socializar": "Socialize",
+    "sair": "Sign out",
+    "nenhumaSessao": "No sessions yet",
+    "sidebar": {
+      "sessoes": "Sessions",
+      "acoes": "Actions",
+      "novaSessao": "New session",
+      "verificarAlertas": "Check alerts",
+      "exportar": "Export",
+      "relatorio": "Interaction report",
+      "exportarPropostas": "Export proposals"
+    },
+    "metrics": {
+      "equipesAtivas": "Active teams",
+      "participantes": "Participants",
+      "chavesConcluidas": "Keys completed",
+      "codigoAcesso": "Access code"
+    },
+    "right": {
+      "alertasMediacao": "Mediation alerts",
+      "nenhumAlerta": "No active alerts",
+      "controlesSessao": "Session controls",
+      "iniciar": "Start",
+      "pausar": "Pause",
+      "retomar": "Resume",
+      "alertas": "Alerts"
+    },
+    "timer": {
+      "titulo": "Phase clock",
+      "duracao": "Duration",
+      "definir": "Set",
+      "iniciar": "Start",
+      "parar": "Stop",
+      "mostrarEstudantes": "Show timer to students"
+    },
+    "carta": {
+      "titulo": "Challenge card",
+      "ativa": "Active card",
+      "remover": "Remove card",
+      "enviar": "Send card",
+      "launcherSub": {
+        "problema": "Deepen the investigation",
+        "solucao": "Review the proposal",
+        "parcerias": "Expand alliances",
+        "oportunidades": "Discover a new path"
+      },
+      "prompts": {
+        "problema": "Identify an even more specific problem within the investigated context and propose a new perspective.",
+        "solucao": "Review the proposed solution considering new feasibility and impact criteria.",
+        "parcerias": "Map out at least three new strategic partners and justify each one's role.",
+        "oportunidades": "Identify an unexplored market opportunity and describe how to seize it."
+      }
+    },
+    "modalSessao": {
+      "titulo": "New session",
+      "sub": "Configure the entrepreneurial investigation session",
+      "tituloLabel": "Session title",
+      "tituloPlaceholder": "e.g. Novo Horizonte Neighborhood — adult ed.",
+      "modoLabel": "Investigation mode",
+      "modoEscolar": "🌱 School-based — teams define the problem",
+      "modoPersonalizado": "✏️ Custom — educator defines the context",
+      "contextoLabel": "Investigation context",
+      "contextoPlaceholder": "e.g. You are change agents for the Novo Horizonte neighborhood…",
+      "contextoAjuda": "This text will be shown to teams when the session starts.",
+      "numEquipesLabel": "Number of teams (up to 80 — no 10-team cap)",
+      "integrantesLabel": "Members per team",
+      "cancelar": "Cancel",
+      "criar": "Create session →"
+    },
+    "toasts": {
+      "selecioneSessao": "Select a session",
+      "nenhumAlertaNovo": "No new alerts",
+      "tituloObrigatorio": "Enter a title for the session",
+      "contextoObrigatorio": "Describe the investigation context",
+      "sessaoCriada": "Session created! Code: {code}",
+      "backendPendente": "Backend still in progress — session shown locally."
+    }
   }
 }
