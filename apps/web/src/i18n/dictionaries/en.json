@@ -25,5 +25,61 @@
     "repoLink": "Repository link",
     "fileOrImage": "Presentation or image",
     "none": "No code submission"
+  },
+  "keys": {
+    "problema": {
+      "name": "Problem",
+      "icon": "🔍",
+      "desc": "The Problem key represents the start of the dynamic, since its identification results from the interaction of players who, by sharing their experiences, reflect on the investigated context (Landry, 1995; Bianchi; Verganti, 2021), defining and characterizing it based on experiences established with the environment. In this process, the motivation to solve the problem becomes an aspect shared by the team (Hevner et al., 2004; Bianchi; Verganti, 2021).\n\nThe problem can be understood from its identification in the context, being: a negative occurrence, the evaluation of an intervention, unplanned use of resources, and situations of uncertainty (Landry, 1995). Bianchi and Verganti (2021) point out that identifying problems involves components that are not limited to analytical processes, but to the interpretive construction of participants, arising from social, cultural, and technological transformations."
+    },
+    "solucao": {
+      "name": "Solution",
+      "icon": "✓",
+      "desc": "The Solution key corresponds to the investigation path in which participants build a solution applicable to the context, establishing responses or alternatives to the identified problem. At this stage, participants exercise creativity and decision-making when facing viable, value-generating proposals (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).\n\nGiven this, players' behavior influences the possibilities for creating new businesses (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020)."
+    },
+    "parcerias": {
+      "name": "Partnerships",
+      "icon": "🤝",
+      "desc": "Encourages participants to analyze the context and define strategic alliances to implement the entrepreneurial proposal. To do this, combining the knowledge of different actors, who organize around a common goal (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contributes to project development, with defined timelines, responsibilities (Reed; Reed, 2009), resources, and conditions for action (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021)."
+    },
+    "oportunidades": {
+      "name": "Opportunities",
+      "icon": "💡",
+      "desc": "The Opportunities key represents a possibility identified by participants through contextualizing the problem and the solutions built during the investigation. In this way, the opportunity becomes a value-creation process (George et al., 2016), both through the entrepreneur's behavior — using entrepreneurial competencies — and through possible transformations in the investigated context (Wood and Mickinley, 2020).\n\nIn this sense, the authors present opportunity as an umbrella concept for understanding the processes of new business creation (Wood; Mickinley, 2020) and idea development (Matzembacher et al., 2019), through discovery, evaluation, and exploitation (Shane; Venkataraman, 2000; Wood; Mickinley, 2020)."
+    }
+  },
+  "login": {
+    "heroHl": "Your idea",
+    "heroJogo": "in PLAY",
+    "heroTag": "An active methodology that turns real problems into proposals with impact — investigating, building solutions, forming partnerships, and revealing opportunities.",
+    "conceitosTitle": "Learn about the keys",
+    "footer": "Platform developed as part of a doctoral research project in Business Administration\nat the Federal University of Lavras (UFLA)",
+    "tabs": {
+      "login": "Sign in",
+      "cadastro": "Create account",
+      "codigo": "Code"
+    },
+    "form": {
+      "titleEdu": "Welcome back",
+      "subEdu": "Sign in to your educator account",
+      "email": "Email",
+      "senha": "Password",
+      "enter": "Sign in →",
+      "titleCad": "Create account",
+      "subCad": "Fill in to get started",
+      "nome": "First name",
+      "sobrenome": "Last name",
+      "confirmar": "Confirm",
+      "criarConta": "Create account →",
+      "titleCod": "Join with a code",
+      "subCod": "For players — no sign-up needed",
+      "seuNome": "Your name",
+      "comoChamado": "What should we call you",
+      "codigoSessao": "Session code",
+      "codigoPlaceholder": "e.g. A7X3K2",
+      "entrarJogo": "Join the game →",
+      "codeHint1": "Code provided by your educator",
+      "codeHint2": "Ask for the 6-letter code to get started"
+    }
   }
 }

@@ -25,5 +25,61 @@
     "repoLink": "Link del repositorio",
     "fileOrImage": "Presentación o imagen",
     "none": "Sin entrega de código"
+  },
+  "keys": {
+    "problema": {
+      "name": "Problema",
+      "icon": "🔍",
+      "desc": "La clave Problema representa el inicio de la dinámica, ya que su identificación es resultado de la interacción de los jugadores que, al compartir sus experiencias, reflexionan sobre el contexto investigado (Landry, 1995; Bianchi; Verganti, 2021), delimitándolo y caracterizándolo a partir de vivencias establecidas con el entorno. En este proceso, la motivación para resolver el problema se vuelve un aspecto compartido por el equipo (Hevner et al., 2004; Bianchi; Verganti, 2021).\n\nEl problema puede comprenderse a partir de su identificación en el contexto, siendo: ocurrencia negativa, evaluación de una intervención, uso de recursos sin planificación y situaciones de incertidumbre (Landry, 1995). Bianchi y Verganti (2021) destacan que la identificación de problemas involucra componentes que no se limitan a procesos analíticos, sino a la construcción interpretativa de los participantes, derivada de transformaciones sociales, culturales y tecnológicas."
+    },
+    "solucao": {
+      "name": "Solución",
+      "icon": "✓",
+      "desc": "La clave Solución corresponde al camino de investigación en el que los participantes construyen una solución aplicable al contexto, estableciendo respuestas o alternativas para el problema identificado. En esta etapa, los participantes ejercitan la creatividad y la toma de decisiones frente a propuestas viables y generadoras de valor (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).\n\nAnte esto, el comportamiento de los jugadores influye en las posibilidades de creación de nuevos negocios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020)."
+    },
+    "parcerias": {
+      "name": "Alianzas",
+      "icon": "🤝",
+      "desc": "Estimula a los participantes a analizar el contexto y definir alianzas estratégicas para la implementación de la propuesta emprendedora. Para esto, la combinación de los conocimientos de diferentes actores, que se organizan alrededor de un objetivo común (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contribuye al desarrollo de proyectos, con definición de plazos, responsabilidades (Reed; Reed, 2009), recursos y condiciones de actuación (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021)."
+    },
+    "oportunidades": {
+      "name": "Oportunidades",
+      "icon": "💡",
+      "desc": "La clave Oportunidades representa una posibilidad identificada por los participantes a través de la contextualización del problema y de las soluciones construidas durante la investigación. De esta forma, la oportunidad se vuelve un proceso de creación de valor (George et al., 2016), tanto por el comportamiento del emprendedor, que utiliza competencias emprendedoras, como por las posibles transformaciones en el contexto investigado (Wood y Mickinley, 2020).\n\nEn este sentido, los autores presentan la oportunidad como un paraguas que permite comprender procesos de creación de nuevos negocios (Wood; Mickinley, 2020) y el desarrollo de ideas (Matzembacher et al., 2019), a partir del descubrimiento, evaluación y explotación (Shane; Venkataraman, 2000; Wood; Mickinley, 2020)."
+    }
+  },
+  "login": {
+    "heroHl": "Tu idea",
+    "heroJogo": "en JUEGO",
+    "heroTag": "Una metodología activa que transforma problemas reales en propuestas de impacto — investigando, construyendo soluciones, formando alianzas y revelando oportunidades.",
+    "conceitosTitle": "Conoce las claves",
+    "footer": "Plataforma desarrollada como parte de una investigación de doctorado en Administración\nde la Universidad Federal de Lavras (UFLA)",
+    "tabs": {
+      "login": "Entrar",
+      "cadastro": "Crear cuenta",
+      "codigo": "Código"
+    },
+    "form": {
+      "titleEdu": "Bienvenido de nuevo",
+      "subEdu": "Accede a tu cuenta de educador",
+      "email": "Correo",
+      "senha": "Contraseña",
+      "enter": "Entrar →",
+      "titleCad": "Crear cuenta",
+      "subCad": "Completa para empezar",
+      "nome": "Nombre",
+      "sobrenome": "Apellido",
+      "confirmar": "Confirmar",
+      "criarConta": "Crear cuenta →",
+      "titleCod": "Entrar con código",
+      "subCod": "Para jugadores — sin registro",
+      "seuNome": "Tu nombre",
+      "comoChamado": "Cómo quieres que te llamen",
+      "codigoSessao": "Código de la sesión",
+      "codigoPlaceholder": "Ej: A7X3K2",
+      "entrarJogo": "Entrar al juego →",
+      "codeHint1": "Código proporcionado por el educador",
+      "codeHint2": "Pide el código de 6 letras para empezar"
+    }
   }
 }

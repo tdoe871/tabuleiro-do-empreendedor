@@ -25,5 +25,61 @@
     "repoLink": "Lien du dépôt",
     "fileOrImage": "Présentation ou image",
     "none": "Aucune soumission de code"
+  },
+  "keys": {
+    "problema": {
+      "name": "Problème",
+      "icon": "🔍",
+      "desc": "La clé Problème représente le point de départ de la dynamique, car son identification résulte de l'interaction des joueurs qui, en partageant leurs expériences, réfléchissent sur le contexte étudié (Landry, 1995 ; Bianchi ; Verganti, 2021), en le délimitant et en le caractérisant à partir de vécus établis avec le milieu. Dans ce processus, la motivation à résoudre le problème devient un aspect partagé par l'équipe (Hevner et al., 2004 ; Bianchi ; Verganti, 2021).\n\nLe problème peut être compris à partir de son identification dans le contexte, à savoir : une occurrence négative, l'évaluation d'une intervention, l'utilisation de ressources sans planification et des situations d'incertitude (Landry, 1995). Bianchi et Verganti (2021) soulignent que l'identification des problèmes implique des composantes qui ne se limitent pas à des processus analytiques, mais à la construction interprétative des participants, issue de transformations sociales, culturelles et technologiques."
+    },
+    "solucao": {
+      "name": "Solution",
+      "icon": "✓",
+      "desc": "La clé Solution correspond au parcours d'investigation dans lequel les participants construisent une solution applicable au contexte, en établissant des réponses ou des alternatives au problème identifié. À cette étape, les participants exercent leur créativité et leur prise de décision face à des propositions viables et créatrices de valeur (Kujala et al., 2010 ; Zimmer ; Salonen ; Wangenheim, 2020 ; Vogel et al., 2025).\n\nDe ce fait, le comportement des joueurs influence les possibilités de création de nouvelles entreprises (Leiblein ; Macher, 2009 ; Zimmer ; Salonen ; Wangenheim, 2020)."
+    },
+    "parcerias": {
+      "name": "Partenariats",
+      "icon": "🤝",
+      "desc": "Encourage les participants à analyser le contexte et à définir des alliances stratégiques pour la mise en œuvre de la proposition entrepreneuriale. Pour cela, la combinaison des connaissances de différents acteurs, organisés autour d'un objectif commun (Crowley ; Karim, 1995 ; Seo, 2020 ; Zahoor ; Gabriel Pepple ; Choudrie, 2021), contribue au développement de projets, avec définition des délais, des responsabilités (Reed ; Reed, 2009), des ressources et des conditions d'action (Seo, 2020 ; Zahoor ; Gabriel Pepple ; Choudrie, 2021)."
+    },
+    "oportunidades": {
+      "name": "Opportunités",
+      "icon": "💡",
+      "desc": "La clé Opportunités représente une possibilité identifiée par les participants à travers la contextualisation du problème et des solutions construites pendant l'investigation. Ainsi, l'opportunité devient un processus de création de valeur (George et al., 2016), à la fois par le comportement de l'entrepreneur, qui mobilise des compétences entrepreneuriales, et par les transformations possibles dans le contexte étudié (Wood et Mickinley, 2020).\n\nEn ce sens, les auteurs présentent l'opportunité comme un concept parapluie permettant de comprendre les processus de création de nouvelles entreprises (Wood ; Mickinley, 2020) et le développement d'idées (Matzembacher et al., 2019), à partir de la découverte, de l'évaluation et de l'exploitation (Shane ; Venkataraman, 2000 ; Wood ; Mickinley, 2020)."
+    }
+  },
+  "login": {
+    "heroHl": "Votre idée",
+    "heroJogo": "en JEU",
+    "heroTag": "Une méthodologie active qui transforme des problèmes réels en propositions à impact — en investiguant, en construisant des solutions, en formant des partenariats et en révélant des opportunités.",
+    "conceitosTitle": "Découvrez les clés",
+    "footer": "Plateforme développée dans le cadre d'une recherche doctorale en Administration\nde l'Université Fédérale de Lavras (UFLA)",
+    "tabs": {
+      "login": "Connexion",
+      "cadastro": "Créer un compte",
+      "codigo": "Code"
+    },
+    "form": {
+      "titleEdu": "Content de vous revoir",
+      "subEdu": "Connectez-vous à votre compte formateur",
+      "email": "E-mail",
+      "senha": "Mot de passe",
+      "enter": "Se connecter →",
+      "titleCad": "Créer un compte",
+      "subCad": "Remplissez pour commencer",
+      "nome": "Prénom",
+      "sobrenome": "Nom",
+      "confirmar": "Confirmer",
+      "criarConta": "Créer un compte →",
+      "titleCod": "Rejoindre avec un code",
+      "subCod": "Pour les joueurs — sans inscription",
+      "seuNome": "Votre nom",
+      "comoChamado": "Comment voulez-vous être appelé",
+      "codigoSessao": "Code de session",
+      "codigoPlaceholder": "Ex : A7X3K2",
+      "entrarJogo": "Rejoindre la partie →",
+      "codeHint1": "Code fourni par le formateur",
+      "codeHint2": "Demandez le code à 6 lettres pour commencer"
+    }
   }
 }
