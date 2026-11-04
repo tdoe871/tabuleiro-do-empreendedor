@@ -13,6 +13,13 @@ import {
   type KeyId,
   type KeyTranslation,
 } from "@/features/event/keys";
+import { RolePickerModal } from "./RolePickerModal";
+import {
+  RPG_ROLE_COLOR,
+  RPG_ROLE_ICON,
+  type RpgRoleId,
+  type RpgRoleTranslation,
+} from "./rpgRoles";
 
 type PhaseStatus = "bloqueada" | "disponivel" | "concluida";
 type KeyStatus = "disponivel" | "ativa" | "concluida";
@@ -53,18 +60,22 @@ function initialKeys(): Record<KeyId, KeyState> {
   return keys;
 }
 
-interface BalaoMsg {
+type LogType = "balao" | "sussurro" | "cutucar" | "sistema";
+
+interface LogEvent {
   id: number;
+  type: LogType;
   nome: string;
   texto: string;
   proprio: boolean;
 }
 
-let nextBalaoId = 1;
+let nextLogId = 1;
 
 export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   const t = useTranslations("jogador");
   const tKeys = useTranslations("keys");
+  const tRoles = useTranslations("rpgPapeis");
   const toast = useToast();
   const router = useRouter();
 
@@ -84,13 +95,18 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   const [commTab, setCommTab] = useState<"equipe" | "individual" | "registro">(
     "equipe",
   );
-  const [baloes, setBaloes] = useState<BalaoMsg[]>([]);
+  const [log, setLog] = useState<LogEvent[]>([]);
   const [balaoInput, setBalaoInput] = useState("");
+  const [sussurroTo, setSussurroTo] = useState<string | null>(null);
+  const [sussurroInput, setSussurroInput] = useState("");
+  const [role, setRole] = useState<RpgRoleId | null>(null);
+  const [showRolePicker, setShowRolePicker] = useState(false);
 
   const activeKey = KEY_IDS.find((id) => keys[id].status === "ativa") ?? null;
   const allDone = KEY_IDS.every((id) => keys[id].status === "concluida");
 
   const members = [nickname || "Você", "Ana", "Bruno", "Carla"];
+  const baloes = log.filter((l) => l.type === "balao");
 
   function ativarChave(keyId: KeyId) {
     if (DEPENDENTES.includes(keyId) && keys.problema.status !== "concluida") {
@@ -152,12 +168,12 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
     });
 
     const chaveConcluida = numero >= TOTAL_FASES;
+    const chaveNome = (tKeys.raw(keyId) as unknown as { name: string }).name;
     if (chaveConcluida) {
       setScore((s) => s + PONTOS_POR_CHAVE);
-      const nome = (tKeys.raw(keyId) as unknown as { name: string }).name;
       setCongrats({
         titulo: t("congrats.chaveConcluida"),
-        sub: `${nome} · ${t("congrats.todasFasesCompletas")}`,
+        sub: `${chaveNome} · ${t("congrats.todasFasesCompletas")}`,
         pontos: PONTOS_POR_CHAVE,
       });
     } else {
@@ -167,21 +183,65 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         pontos: null,
       });
     }
+    setLog((prev) => [
+      ...prev,
+      {
+        id: nextLogId++,
+        type: "sistema",
+        nome: "Sistema",
+        texto: t("comm2.faseConcluidaLog", {
+          nome: openPhase.nome,
+          chave: chaveNome,
+        }),
+        proprio: false,
+      },
+    ]);
     setOpenPhase(null);
   }
 
   function enviarBalao() {
     if (!balaoInput.trim()) return;
-    setBaloes((prev) => [
+    setLog((prev) => [
       ...prev,
       {
-        id: nextBalaoId++,
+        id: nextLogId++,
+        type: "balao",
         nome: nickname || "Você",
         texto: balaoInput.trim(),
         proprio: true,
       },
     ]);
     setBalaoInput("");
+  }
+
+  function enviarSussurro() {
+    if (!sussurroTo || !sussurroInput.trim()) return;
+    setLog((prev) => [
+      ...prev,
+      {
+        id: nextLogId++,
+        type: "sussurro",
+        nome: t("comm2.paraDestino", { nome: sussurroTo }),
+        texto: sussurroInput.trim(),
+        proprio: true,
+      },
+    ]);
+    setSussurroInput("");
+    toast("ok", t("comm.enviar"));
+  }
+
+  function cutucar(memberName: string) {
+    setLog((prev) => [
+      ...prev,
+      {
+        id: nextLogId++,
+        type: "cutucar",
+        nome: t("comm2.cutucou", { nome: memberName }),
+        texto: "",
+        proprio: true,
+      },
+    ]);
+    toast("ok", t("comm2.cutucou", { nome: memberName }));
   }
 
   return (
@@ -276,40 +336,64 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               {t("membros.titulo")}
             </div>
             <div className="membros-grid">
-              {members.map((name, i) => (
-                <div
-                  key={name}
-                  className={`membro-card ${i === 0 ? "ativo" : ""}`}
-                >
+              {members.map((name, i) => {
+                const roleInfo =
+                  i === 0 && role
+                    ? (tRoles.raw(role) as RpgRoleTranslation)
+                    : null;
+                return (
                   <div
-                    className="membro-av"
-                    style={{
-                      background: AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length],
-                    }}
+                    key={name}
+                    className={`membro-card ${i === 0 ? "ativo" : ""}`}
+                    style={{ position: "relative" }}
                   >
-                    {name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="membro-nm">{name}</div>
-                  <div
-                    className="membro-st"
-                    style={i === 0 ? { color: "var(--parc)" } : undefined}
-                  >
-                    ● {t("membros.ativo")}
-                  </div>
-                  {i === 0 && (
+                    {i !== 0 && (
+                      <div
+                        className="cutucar-btn"
+                        title="Cutucar"
+                        onClick={() => cutucar(name)}
+                      >
+                        👆
+                      </div>
+                    )}
                     <div
+                      className="membro-av"
                       style={{
-                        fontSize: 8,
-                        color: "var(--parc)",
-                        marginTop: 3,
-                        fontWeight: 600,
+                        background:
+                          roleInfo && role
+                            ? RPG_ROLE_COLOR[role]
+                            : AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length],
                       }}
                     >
-                      {t("membros.voce")}
+                      {role && i === 0
+                        ? RPG_ROLE_ICON[role]
+                        : name.slice(0, 2).toUpperCase()}
                     </div>
-                  )}
-                </div>
-              ))}
+                    <div className="membro-nm">{name}</div>
+                    <div
+                      className="membro-st"
+                      style={i === 0 ? { color: "var(--parc)" } : undefined}
+                    >
+                      {roleInfo ? roleInfo.nome : `● ${t("membros.ativo")}`}
+                    </div>
+                    {i === 0 && (
+                      <div
+                        style={{
+                          fontSize: 8,
+                          color: "var(--parc)",
+                          marginTop: 3,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setShowRolePicker(true)}
+                      >
+                        {t("membros.voce")} ·{" "}
+                        {role ? t("rpg.trocarPapel") : t("rpg.escolherTitulo")}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -396,7 +480,11 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 </div>
                 <div className="membros-chips">
                   {members.slice(1).map((name) => (
-                    <div key={name} className="mchip">
+                    <div
+                      key={name}
+                      className={`mchip ${sussurroTo === name ? "sel" : ""}`}
+                      onClick={() => setSussurroTo(name)}
+                    >
                       {name}
                     </div>
                   ))}
@@ -414,6 +502,8 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                     width: "100%",
                   }}
                   placeholder={t("comm.placeholderIndividual")}
+                  value={sussurroInput}
+                  onChange={(e) => setSussurroInput(e.target.value)}
                 />
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div
@@ -428,7 +518,8 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   </div>
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => toast("ok", t("comm.enviar"))}
+                    onClick={enviarSussurro}
+                    disabled={!sussurroTo}
                   >
                     {t("comm.enviar")}
                   </button>
@@ -439,16 +530,16 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             {commTab === "registro" && (
               <div className="comm-content on">
                 <div className="chat-body">
-                  {baloes.length === 0 && (
+                  {log.length === 0 && (
                     <div style={{ fontSize: 11, color: "var(--t3)" }}>
                       {t("comm.semMensagens")}
                     </div>
                   )}
-                  {baloes.map((b) => (
-                    <div key={b.id} className="chat-msg">
+                  {log.map((b) => (
+                    <div key={b.id} className={`chat-msg chat-${b.type}`}>
                       <div className="chat-bubble">
                         <div className="chat-nm">{b.nome}</div>
-                        <div className="chat-txt">{b.texto}</div>
+                        {b.texto && <div className="chat-txt">{b.texto}</div>}
                       </div>
                     </div>
                   ))}
@@ -715,6 +806,16 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             </button>
           </div>
         </div>
+      )}
+
+      {showRolePicker && (
+        <RolePickerModal
+          onClose={() => setShowRolePicker(false)}
+          onSelect={(r) => {
+            setRole(r);
+            setShowRolePicker(false);
+          }}
+        />
       )}
     </div>
   );

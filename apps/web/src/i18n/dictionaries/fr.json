@@ -285,6 +285,63 @@
           "pergunta": "Comment cette opportunité peut-elle être développée dans le contexte étudié ?"
         }
       ]
+    },
+    "comm2": {
+      "cutucou": "Vous avez interpellé {nome}",
+      "paraDestino": "Vous → {nome}",
+      "faseConcluidaLog": "✓ Phase {nome} de {chave} terminée"
+    },
+    "rpg": {
+      "escolherTitulo": "Choisissez votre rôle",
+      "escolherSub": "Chaque rôle voit le problème différemment",
+      "perspectiva": "Perspective",
+      "confirmar": "Adopter ce rôle",
+      "trocarPapel": "Changer de rôle"
+    }
+  },
+  "socializacao": {
+    "titulo": "Pitchs des équipes",
+    "aoVivo": "En direct",
+    "voltar": "← Retour",
+    "voltarPainel": "← Retour au panneau",
+    "encerrarSessao": "✓ Terminer la session →",
+    "maisAvancada": "★ la plus avancée",
+    "emInvestigacao": "En cours d'investigation...",
+    "investigada": "Investiguée",
+    "proposta": "💡 Proposition",
+    "emConstrucao": "En construction...",
+    "resumo": {
+      "equipes": "Équipes",
+      "chavesConcluidas": "Clés complétées",
+      "contexto": "Contexte",
+      "maisAvancadaLbl": "La plus avancée"
+    },
+    "avisoDemo": "Aperçu — données d'exemple, il faut encore connecter le vrai backend."
+  },
+  "rpgPapeis": {
+    "agente_saude": {
+      "nome": "Agent de Santé",
+      "titulo": "Enquêteur du bien-être",
+      "descricao": "Observe les impacts du problème sur la santé et la qualité de vie.",
+      "perspectiva": "Qui souffre ? Comment cela affecte-t-il le corps et le quotidien ?"
+    },
+    "lider_comunitario": {
+      "nome": "Leader Communautaire",
+      "titulo": "Voix du territoire",
+      "descricao": "Représente les habitants du quartier et connaît les dynamiques locales.",
+      "perspectiva": "Qu'a déjà essayé la communauté ? Qui a du pouvoir ici ?"
+    },
+    "jovem_empreendedor": {
+      "nome": "Jeune Entrepreneur",
+      "titulo": "Créateur de solutions",
+      "descricao": "Réfléchit à la façon de transformer le problème en opportunité durable.",
+      "perspectiva": "Qu'est-ce qui n'existe pas encore ici ? Quelle solution pourrait être reproduite ?"
+    },
+    "pesquisador": {
+      "nome": "Chercheur",
+      "titulo": "Enquêteur de données",
+      "descricao": "Recherche des preuves et des contextes expliquant pourquoi le problème existe.",
+      "perspectiva": "Quelles sont les données ? Qu'a-t-on déjà étudié ? Quelle est la cause profonde ?"
     }
   }
 }

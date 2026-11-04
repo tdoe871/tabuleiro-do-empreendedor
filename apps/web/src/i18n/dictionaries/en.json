@@ -281,6 +281,63 @@
           "pergunta": "How can this opportunity be developed in the investigated context?"
         }
       ]
+    },
+    "comm2": {
+      "cutucou": "You poked {nome}",
+      "paraDestino": "You → {nome}",
+      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed"
+    },
+    "rpg": {
+      "escolherTitulo": "Choose your role",
+      "escolherSub": "Each role sees the problem differently",
+      "perspectiva": "Perspective",
+      "confirmar": "Take on this role",
+      "trocarPapel": "Change role"
+    }
+  },
+  "socializacao": {
+    "titulo": "Team pitches",
+    "aoVivo": "Live",
+    "voltar": "← Back",
+    "voltarPainel": "← Back to panel",
+    "encerrarSessao": "✓ End session →",
+    "maisAvancada": "★ most advanced",
+    "emInvestigacao": "Investigating...",
+    "investigada": "Investigated",
+    "proposta": "💡 Proposal",
+    "emConstrucao": "In progress...",
+    "resumo": {
+      "equipes": "Teams",
+      "chavesConcluidas": "Keys completed",
+      "contexto": "Context",
+      "maisAvancadaLbl": "Most advanced"
+    },
+    "avisoDemo": "Preview — sample data, still needs to connect to the real backend."
+  },
+  "rpgPapeis": {
+    "agente_saude": {
+      "nome": "Health Agent",
+      "titulo": "Wellbeing investigator",
+      "descricao": "Observes the problem's impact on health and quality of life.",
+      "perspectiva": "Who is suffering? How does this affect the body and daily routine?"
+    },
+    "lider_comunitario": {
+      "nome": "Community Leader",
+      "titulo": "Voice of the territory",
+      "descricao": "Represents the neighborhood's people and knows the local dynamics.",
+      "perspectiva": "What has the community already tried? Who holds power here?"
+    },
+    "jovem_empreendedor": {
+      "nome": "Young Entrepreneur",
+      "titulo": "Solution creator",
+      "descricao": "Thinks about how to turn the problem into a sustainable opportunity.",
+      "perspectiva": "What doesn't exist here yet? What solution could be replicated?"
+    },
+    "pesquisador": {
+      "nome": "Researcher",
+      "titulo": "Data investigator",
+      "descricao": "Looks for evidence and context explaining why the problem exists.",
+      "perspectiva": "What does the data say? What has already been studied? What's the root cause?"
     }
   }
 }

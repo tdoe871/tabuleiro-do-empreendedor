@@ -282,6 +282,63 @@
           "pergunta": "¿Cómo se puede desarrollar esta oportunidad en el contexto investigado?"
         }
       ]
+    },
+    "comm2": {
+      "cutucou": "Le diste un toque a {nome}",
+      "paraDestino": "Tú → {nome}",
+      "faseConcluidaLog": "✓ Fase {nome} de {chave} completada"
+    },
+    "rpg": {
+      "escolherTitulo": "Elige tu rol",
+      "escolherSub": "Cada rol ve el problema de una forma distinta",
+      "perspectiva": "Perspectiva",
+      "confirmar": "Asumir este rol",
+      "trocarPapel": "Cambiar rol"
+    }
+  },
+  "socializacao": {
+    "titulo": "Pitch de los equipos",
+    "aoVivo": "En vivo",
+    "voltar": "← Volver",
+    "voltarPainel": "← Volver al panel",
+    "encerrarSessao": "✓ Terminar sesión →",
+    "maisAvancada": "★ más avanzado",
+    "emInvestigacao": "En investigación...",
+    "investigada": "Investigada",
+    "proposta": "💡 Propuesta",
+    "emConstrucao": "En construcción...",
+    "resumo": {
+      "equipes": "Equipos",
+      "chavesConcluidas": "Claves completadas",
+      "contexto": "Contexto",
+      "maisAvancadaLbl": "Más avanzado"
+    },
+    "avisoDemo": "Vista previa — datos de ejemplo, falta conectar con el backend real."
+  },
+  "rpgPapeis": {
+    "agente_saude": {
+      "nome": "Agente de Salud",
+      "titulo": "Investigador del bienestar",
+      "descricao": "Observa los impactos del problema en la salud y la calidad de vida.",
+      "perspectiva": "¿Quién está sufriendo? ¿Cómo afecta esto al cuerpo y a la rutina?"
+    },
+    "lider_comunitario": {
+      "nome": "Líder Comunitario",
+      "titulo": "Voz del territorio",
+      "descricao": "Representa a las personas del barrio y conoce las dinámicas locales.",
+      "perspectiva": "¿Qué ha intentado ya la comunidad? ¿Quién tiene poder aquí?"
+    },
+    "jovem_empreendedor": {
+      "nome": "Joven Emprendedor",
+      "titulo": "Creador de soluciones",
+      "descricao": "Piensa en cómo transformar el problema en una oportunidad sostenible.",
+      "perspectiva": "¿Qué no existe todavía aquí? ¿Qué solución podría replicarse?"
+    },
+    "pesquisador": {
+      "nome": "Investigador",
+      "titulo": "Investigador de datos",
+      "descricao": "Busca evidencias y contextos que expliquen por qué existe el problema.",
+      "perspectiva": "¿Cuáles son los datos? ¿Qué se ha estudiado ya? ¿Cuál es la raíz?"
     }
   }
 }

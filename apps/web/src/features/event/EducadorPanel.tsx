@@ -110,6 +110,14 @@ export function EducadorPanel() {
     toast("info", label);
   }
 
+  function handleSocializar() {
+    if (!selected) {
+      toast("err", t("toasts.selecioneSessao"));
+      return;
+    }
+    router.push(`/mestre/socializacao?numEquipes=${selected.numEquipes}`);
+  }
+
   function openCartaPreview(keyId: string) {
     setPreviewKey(keyId);
     setPreviewText(t(`carta.prompts.${keyId}`));
@@ -183,7 +191,7 @@ export function EducadorPanel() {
               background: "linear-gradient(135deg,var(--parc),#5B6CF0)",
               color: "#fff",
             }}
-            onClick={() => handlePending(t("socializar"))}
+            onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </button>
@@ -242,10 +250,7 @@ export function EducadorPanel() {
           <div className="sidebar-action" onClick={handleVerificarAlertas}>
             🔔 {t("sidebar.verificarAlertas")}
           </div>
-          <div
-            className="sidebar-action"
-            onClick={() => handlePending(t("socializar"))}
-          >
+          <div className="sidebar-action" onClick={handleSocializar}>
             ↗ {t("socializar")}
           </div>
           <div className="sidebar-divider" />
