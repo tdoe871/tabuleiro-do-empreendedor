@@ -24,7 +24,17 @@
     "deployLink": "Deployment link (Vercel, Netlify, etc.)",
     "repoLink": "Repository link",
     "fileOrImage": "Presentation or image",
-    "none": "No code submission"
+    "none": "No code submission",
+    "chooseType": "Submission type",
+    "urlLabel": "Link",
+    "urlPlaceholder": "https://your-project.vercel.app",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Briefly describe the project…",
+    "submit": "Save submission →",
+    "saved": "Submission saved locally — still needs to connect to the backend.",
+    "editar": "✏️ Edit submission",
+    "abrir": "📦 Submit project",
+    "status": "Submission recorded"
   },
   "keys": {
     "problema": {

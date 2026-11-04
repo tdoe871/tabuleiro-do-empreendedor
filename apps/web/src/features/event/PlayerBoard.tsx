@@ -14,6 +14,7 @@ import {
   type KeyTranslation,
 } from "@/features/event/keys";
 import { RolePickerModal } from "./RolePickerModal";
+import { SubmissionModal, type SubmissionData } from "./SubmissionModal";
 import {
   RPG_ROLE_COLOR,
   RPG_ROLE_ICON,
@@ -101,6 +102,9 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   const [sussurroInput, setSussurroInput] = useState("");
   const [role, setRole] = useState<RpgRoleId | null>(null);
   const [showRolePicker, setShowRolePicker] = useState(false);
+  const [showSubmission, setShowSubmission] = useState(false);
+  const [submission, setSubmission] = useState<SubmissionData | null>(null);
+  const tSubmission = useTranslations("submission");
 
   const activeKey = KEY_IDS.find((id) => keys[id].status === "ativa") ?? null;
   const allDone = KEY_IDS.every((id) => keys[id].status === "concluida");
@@ -288,6 +292,12 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
           </div>
         </div>
         <div style={{ flex: 1 }} />
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => setShowSubmission(true)}
+        >
+          {submission ? tSubmission("editar") : tSubmission("abrir")}
+        </button>
         {allDone && (
           <button
             className="btn btn-sm"
@@ -815,6 +825,14 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             setRole(r);
             setShowRolePicker(false);
           }}
+        />
+      )}
+
+      {showSubmission && (
+        <SubmissionModal
+          onClose={() => setShowSubmission(false)}
+          initial={submission}
+          onSaved={setSubmission}
         />
       )}
     </div>
