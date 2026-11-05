@@ -7,6 +7,7 @@
 export type EventStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "FINISHED";
 export type TimerMode = "GLOBAL" | "PER_PHASE";
 export type ParticipantRole = "LEADER" | "MEMBER";
+export type BoardKey = "PROBLEMA" | "SOLUCAO" | "PARCERIAS" | "OPORTUNIDADES";
 export type SubmissionType =
   "DEPLOY_LINK" | "REPO_LINK" | "FILE_OR_IMAGE" | "NONE";
 
