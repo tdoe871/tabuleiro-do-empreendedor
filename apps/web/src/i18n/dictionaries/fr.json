@@ -2,7 +2,10 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continuer",
-    "back": "Retour"
+    "back": "Retour",
+    "toasts": {
+      "featurePendente": "{feature} : encore en construction"
+    }
   },
   "join": {
     "title": "Rejoindre l'événement",
@@ -17,7 +20,15 @@
     "createNameLabel": "Nom de l'équipe",
     "joinCodeLabel": "Code de l'équipe (ou utilisez le lien envoyé par le chef)",
     "youAreLeader": "Vous êtes le chef de cette équipe",
-    "shareLink": "Partagez ce lien avec votre équipe"
+    "shareLink": "Partagez ce lien avec votre équipe",
+    "enterBoardPreview": "Entrer dans le plateau (aperçu) →",
+    "toasts": {
+      "backendPendingCreate": "Créer une équipe : backend en construction — aperçu local.",
+      "created": "Équipe créée",
+      "createError": "Impossible de créer l'équipe",
+      "backendPendingJoin": "Rejoindre l'équipe : backend en construction — ouverture du plateau en mode aperçu.",
+      "invalidCode": "Code d'équipe invalide"
+    }
   },
   "submission": {
     "title": "Soumission du projet",
@@ -96,6 +107,14 @@
       "entrarJogo": "Rejoindre la partie →",
       "codeHint1": "Code fourni par le formateur",
       "codeHint2": "Demandez le code à 6 lettres pour commencer"
+    },
+    "toasts": {
+      "backendPendingLogin": "Connexion formateur : backend en construction — ouverture du panneau en mode aperçu.",
+      "invalidCredentials": "Identifiants invalides",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "backendPendingRegister": "Inscription formateur : backend en construction — ouverture du panneau en mode aperçu.",
+      "registerError": "Impossible de créer le compte",
+      "missingFields": "Renseignez votre nom et le code"
     }
   },
   "educador": {
@@ -187,8 +206,10 @@
       "tituloObrigatorio": "Saisissez un titre pour la session",
       "contextoObrigatorio": "Décrivez le contexte d'investigation",
       "sessaoCriada": "Session créée ! Code : {code}",
-      "backendPendente": "Backend encore en construction — session affichée localement."
-    }
+      "backendPendente": "Backend encore en construction — session affichée localement.",
+      "erroCriar": "Impossible de créer la session"
+    },
+    "equipesVazio": "Aucune équipe dans cette session pour l'instant. Partagez le code {codigo} avec les participants pour qu'ils rejoignent."
   },
   "jogador": {
     "topbarTitulo": "Plateau",
@@ -199,7 +220,9 @@
       "unidade": "pts",
       "verResumo": "Voir le résumé"
     },
-    "timer": { "label": "Temps de la phase" },
+    "timer": {
+      "label": "Temps de la phase"
+    },
     "cenario": {
       "titulo": "Session d'investigation",
       "sub": "Vous êtes un agent de transformation."
@@ -249,7 +272,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Contexte", "pergunta": "Où le problème se produit-il ?" },
+        {
+          "nome": "Contexte",
+          "pergunta": "Où le problème se produit-il ?"
+        },
         {
           "nome": "Caractéristiques",
           "pergunta": "Comment le problème affecte-t-il le contexte ?"
@@ -305,7 +331,8 @@
     "comm2": {
       "cutucou": "Vous avez interpellé {nome}",
       "paraDestino": "Vous → {nome}",
-      "faseConcluidaLog": "✓ Phase {nome} de {chave} terminée"
+      "faseConcluidaLog": "✓ Phase {nome} de {chave} terminée",
+      "cutucarTitle": "Interpeller"
     },
     "rpg": {
       "escolherTitulo": "Choisissez votre rôle",

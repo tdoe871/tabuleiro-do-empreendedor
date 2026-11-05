@@ -28,10 +28,7 @@ export default function CreateTeamPage() {
       body: JSON.stringify({ eventCode, name, nickname }),
     });
     if (res.status === 501) {
-      toast(
-        "info",
-        "Crear equipo: backend en construcción — vista previa local.",
-      );
+      toast("info", t("toasts.backendPendingCreate"));
       setCreated({
         name,
         joinCode:
@@ -43,7 +40,7 @@ export default function CreateTeamPage() {
     }
     toast(
       res.ok ? "ok" : "err",
-      res.ok ? "Equipo creado" : "No se pudo crear el equipo",
+      res.ok ? t("toasts.created") : t("toasts.createError"),
     );
   }
 
@@ -96,7 +93,7 @@ export default function CreateTeamPage() {
               )
             }
           >
-            Entrar al tablero (preview) →
+            {t("enterBoardPreview")}
           </button>
         </div>
       </div>

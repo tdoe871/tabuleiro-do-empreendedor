@@ -22,10 +22,7 @@ export default function JoinTeamPage() {
       body: JSON.stringify({ teamJoinCode: joinCode, nickname }),
     });
     if (res.status === 501) {
-      toast(
-        "info",
-        "Unirse a equipo: backend en construcción — abriendo tablero en modo preview.",
-      );
+      toast("info", t("toasts.backendPendingJoin"));
       router.push(
         `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
       );
@@ -37,7 +34,7 @@ export default function JoinTeamPage() {
       );
       return;
     }
-    toast("err", "Código de equipo inválido");
+    toast("err", t("toasts.invalidCode"));
   }
 
   return (

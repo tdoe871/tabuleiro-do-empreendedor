@@ -58,6 +58,7 @@ export function SocializacaoPanel({
 }) {
   const t = useTranslations("socializacao");
   const tKeys = useTranslations("keys");
+  const tCommon = useTranslations("common");
   const toast = useToast();
   const router = useRouter();
 
@@ -309,7 +310,14 @@ export function SocializacaoPanel({
           </button>
           <button
             className="btn btn-primary btn-sm"
-            onClick={() => toast("ok", t("encerrarSessao"))}
+            onClick={() =>
+              toast(
+                "info",
+                tCommon("toasts.featurePendente", {
+                  feature: t("encerrarSessao"),
+                }),
+              )
+            }
           >
             {t("encerrarSessao")}
           </button>

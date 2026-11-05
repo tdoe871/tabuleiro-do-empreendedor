@@ -57,11 +57,10 @@ export function CreateSessionModal({
     const codigo = randomCode();
     if (res.status === 501) {
       toast("info", tToast("backendPendente"));
+    } else if (res.ok) {
+      toast("ok", tToast("sessaoCriada", { code: codigo }));
     } else {
-      toast(
-        res.ok ? "ok" : "err",
-        tToast(res.ok ? "sessaoCriada" : "tituloObrigatorio", { code: codigo }),
-      );
+      toast("err", tToast("erroCriar"));
     }
     onCreated({
       id: crypto.randomUUID(),

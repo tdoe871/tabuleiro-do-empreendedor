@@ -2,7 +2,10 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "toasts": {
+      "featurePendente": "{feature}: still under construction"
+    }
   },
   "join": {
     "title": "Join the event",
@@ -17,7 +20,15 @@
     "createNameLabel": "Team name",
     "joinCodeLabel": "Team code (or use the link your leader sent you)",
     "youAreLeader": "You are this team's leader",
-    "shareLink": "Share this link with your team"
+    "shareLink": "Share this link with your team",
+    "enterBoardPreview": "Enter the board (preview) →",
+    "toasts": {
+      "backendPendingCreate": "Create team: backend under construction — local preview.",
+      "created": "Team created",
+      "createError": "Couldn't create the team",
+      "backendPendingJoin": "Join team: backend under construction — opening the board in preview mode.",
+      "invalidCode": "Invalid team code"
+    }
   },
   "submission": {
     "title": "Project submission",
@@ -96,6 +107,14 @@
       "entrarJogo": "Join the game →",
       "codeHint1": "Code provided by your educator",
       "codeHint2": "Ask for the 6-letter code to get started"
+    },
+    "toasts": {
+      "backendPendingLogin": "Educator login: backend under construction — opening the panel in preview mode.",
+      "invalidCredentials": "Invalid credentials",
+      "passwordMismatch": "Passwords don't match",
+      "backendPendingRegister": "Educator sign-up: backend under construction — opening the panel in preview mode.",
+      "registerError": "Couldn't create the account",
+      "missingFields": "Fill in your name and the code"
     }
   },
   "educador": {
@@ -187,8 +206,10 @@
       "tituloObrigatorio": "Enter a title for the session",
       "contextoObrigatorio": "Describe the investigation context",
       "sessaoCriada": "Session created! Code: {code}",
-      "backendPendente": "Backend still in progress — session shown locally."
-    }
+      "backendPendente": "Backend still in progress — session shown locally.",
+      "erroCriar": "Couldn't create the session"
+    },
+    "equipesVazio": "No teams in this session yet. Share the code {codigo} with participants so they can join."
   },
   "jogador": {
     "topbarTitulo": "Board",
@@ -199,12 +220,18 @@
       "unidade": "pts",
       "verResumo": "View summary"
     },
-    "timer": { "label": "Phase time" },
+    "timer": {
+      "label": "Phase time"
+    },
     "cenario": {
       "titulo": "Investigation session",
       "sub": "You are a change agent."
     },
-    "membros": { "titulo": "Team members", "voce": "you", "ativo": "active" },
+    "membros": {
+      "titulo": "Team members",
+      "voce": "you",
+      "ativo": "active"
+    },
     "comm": {
       "equipe": "Team",
       "individual": "Individual",
@@ -245,7 +272,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Context", "pergunta": "Where does the problem happen?" },
+        {
+          "nome": "Context",
+          "pergunta": "Where does the problem happen?"
+        },
         {
           "nome": "Characteristics",
           "pergunta": "How does the problem affect the context?"
@@ -301,7 +331,8 @@
     "comm2": {
       "cutucou": "You poked {nome}",
       "paraDestino": "You → {nome}",
-      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed"
+      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed",
+      "cutucarTitle": "Nudge"
     },
     "rpg": {
       "escolherTitulo": "Choose your role",

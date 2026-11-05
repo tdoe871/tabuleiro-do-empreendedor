@@ -2,7 +2,10 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continuar",
-    "back": "Voltar"
+    "back": "Voltar",
+    "toasts": {
+      "featurePendente": "{feature}: ainda em construção"
+    }
   },
   "join": {
     "title": "Entrar no evento",
@@ -17,7 +20,15 @@
     "createNameLabel": "Nome da equipe",
     "joinCodeLabel": "Código da equipe (ou use o link que o líder te enviou)",
     "youAreLeader": "Você é o líder desta equipe",
-    "shareLink": "Compartilhe este link com sua equipe"
+    "shareLink": "Compartilhe este link com sua equipe",
+    "enterBoardPreview": "Entrar no tabuleiro (prévia) →",
+    "toasts": {
+      "backendPendingCreate": "Criar equipe: backend em construção — prévia local.",
+      "created": "Equipe criada",
+      "createError": "Não foi possível criar a equipe",
+      "backendPendingJoin": "Entrar na equipe: backend em construção — abrindo tabuleiro em modo prévia.",
+      "invalidCode": "Código de equipe inválido"
+    }
   },
   "submission": {
     "title": "Entrega do projeto",
@@ -96,6 +107,14 @@
       "entrarJogo": "Entrar no jogo →",
       "codeHint1": "Código fornecido pelo educador",
       "codeHint2": "Peça o código de 6 letras para começar"
+    },
+    "toasts": {
+      "backendPendingLogin": "Login de educador: backend em construção — abrindo painel em modo de visualização.",
+      "invalidCredentials": "Credenciais inválidas",
+      "passwordMismatch": "As senhas não coincidem",
+      "backendPendingRegister": "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
+      "registerError": "Não foi possível criar a conta",
+      "missingFields": "Preencha seu nome e o código"
     }
   },
   "educador": {
@@ -187,8 +206,10 @@
       "tituloObrigatorio": "Digite um título para a sessão",
       "contextoObrigatorio": "Descreva o contexto de investigação",
       "sessaoCriada": "Sessão criada! Código: {code}",
-      "backendPendente": "Backend em construção — sessão mostrada localmente."
-    }
+      "backendPendente": "Backend em construção — sessão mostrada localmente.",
+      "erroCriar": "Não foi possível criar a sessão"
+    },
+    "equipesVazio": "Nenhuma equipe nesta sessão ainda. Compartilhe o código {codigo} com os participantes para que entrem."
   },
   "jogador": {
     "topbarTitulo": "Tabuleiro",
@@ -199,7 +220,9 @@
       "unidade": "pts",
       "verResumo": "Ver resumo"
     },
-    "timer": { "label": "Tempo da fase" },
+    "timer": {
+      "label": "Tempo da fase"
+    },
     "cenario": {
       "titulo": "Sessão de investigação",
       "sub": "Você é um agente de transformação."
@@ -249,7 +272,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Contexto", "pergunta": "Onde o problema acontece?" },
+        {
+          "nome": "Contexto",
+          "pergunta": "Onde o problema acontece?"
+        },
         {
           "nome": "Características",
           "pergunta": "Como o problema afeta o contexto?"
@@ -260,7 +286,10 @@
         }
       ],
       "solucao": [
-        { "nome": "Características", "pergunta": "Como será a solução?" },
+        {
+          "nome": "Características",
+          "pergunta": "Como será a solução?"
+        },
         {
           "nome": "Custos",
           "pergunta": "Quais são as despesas envolvidas para implementar a solução?"
@@ -302,7 +331,8 @@
     "comm2": {
       "cutucou": "Você cutucou {nome}",
       "paraDestino": "Você → {nome}",
-      "faseConcluidaLog": "✓ Fase {nome} de {chave} concluída"
+      "faseConcluidaLog": "✓ Fase {nome} de {chave} concluída",
+      "cutucarTitle": "Cutucar"
     },
     "rpg": {
       "escolherTitulo": "Escolha seu papel",

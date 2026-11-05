@@ -41,6 +41,7 @@ const AVATAR_COLORS = ["#2E80F0", "#22C97A", "#A040E0", "#0FD4B0", "#F0BC40"];
 export function EducadorPanel() {
   const t = useTranslations("educador");
   const tKeys = useTranslations("keys");
+  const tCommon = useTranslations("common");
   const toast = useToast();
   const router = useRouter();
 
@@ -107,7 +108,7 @@ export function EducadorPanel() {
   }
 
   function handlePending(label: string) {
-    toast("info", label);
+    toast("info", tCommon("toasts.featurePendente", { feature: label }));
   }
 
   function handleSocializar() {
@@ -394,6 +395,21 @@ export function EducadorPanel() {
             {!selected && (
               <div style={{ fontSize: 11, color: "var(--t3)" }}>
                 {t("toasts.selecioneSessao")}
+              </div>
+            )}
+            {selected && (
+              <div
+                className="card card-pad"
+                style={{
+                  gridColumn: "1 / -1",
+                  textAlign: "center",
+                  border: "1px dashed var(--border2)",
+                }}
+              >
+                <div style={{ fontSize: 24, marginBottom: 6 }}>👥</div>
+                <div style={{ fontSize: 12, color: "var(--t2)" }}>
+                  {t("equipesVazio", { codigo: selected.codigo })}
+                </div>
               </div>
             )}
           </div>

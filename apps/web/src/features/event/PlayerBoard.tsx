@@ -49,10 +49,15 @@ const AVATAR_GRADIENTS = [
 function initialKeys(): Record<KeyId, KeyState> {
   const keys = {} as Record<KeyId, KeyState>;
   for (const id of KEY_IDS) {
+    // Solução/Parcerias/Oportunidades depend on Problema being completed
+    // first (enforced in ativarChave/abrirFase) — their phase 1 must start
+    // locked, otherwise a player could open and submit it directly from the
+    // card without ever clearing that dependency.
+    const startsUnlocked = !DEPENDENTES.includes(id);
     keys[id] = {
       status: "disponivel",
       phases: {
-        1: { status: "disponivel" },
+        1: { status: startsUnlocked ? "disponivel" : "bloqueada" },
         2: { status: "bloqueada" },
         3: { status: "bloqueada" },
       },
@@ -136,6 +141,12 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   }
 
   function abrirFase(keyId: KeyId, numero: number) {
+    // Defense in depth: even if a phase's own status were ever left
+    // "disponivel" by mistake, the Problema dependency must still hold.
+    if (DEPENDENTES.includes(keyId) && keys.problema.status !== "concluida") {
+      toast("err", t("chave.bloqueadaPorProblema"));
+      return;
+    }
     const phase = keys[keyId].phases[numero] ?? {
       status: "bloqueada" as const,
     };
@@ -360,7 +371,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                     {i !== 0 && (
                       <div
                         className="cutucar-btn"
-                        title="Cutucar"
+                        title={t("comm2.cutucarTitle")}
                         onClick={() => cutucar(name)}
                       >
                         👆

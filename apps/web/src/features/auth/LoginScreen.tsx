@@ -51,10 +51,7 @@ export function LoginScreen() {
       senha: loginSenha,
     });
     if (res.status === 501) {
-      toast(
-        "info",
-        "Login de educador: backend em construção — abrindo painel em modo de visualização.",
-      );
+      toast("info", t("toasts.backendPendingLogin"));
       router.push("/mestre/dashboard");
       return;
     }
@@ -62,13 +59,13 @@ export function LoginScreen() {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", "Credenciais inválidas");
+    toast("err", t("toasts.invalidCredentials"));
   }
 
   async function handleCadastro(e: FormEvent) {
     e.preventDefault();
     if (cadSenha !== cadConf) {
-      toast("err", "As senhas não coincidem");
+      toast("err", t("toasts.passwordMismatch"));
       return;
     }
     const res = await postJson("/api/auth/register", {
@@ -78,10 +75,7 @@ export function LoginScreen() {
       senha: cadSenha,
     });
     if (res.status === 501) {
-      toast(
-        "info",
-        "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
-      );
+      toast("info", t("toasts.backendPendingRegister"));
       router.push("/mestre/dashboard");
       return;
     }
@@ -89,13 +83,13 @@ export function LoginScreen() {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", "Não foi possível criar a conta");
+    toast("err", t("toasts.registerError"));
   }
 
   function handleCodigo(e: FormEvent) {
     e.preventDefault();
     if (!jogNome.trim() || !jogCodigo.trim()) {
-      toast("err", "Preencha seu nome e o código");
+      toast("err", t("toasts.missingFields"));
       return;
     }
     const params = new URLSearchParams({
