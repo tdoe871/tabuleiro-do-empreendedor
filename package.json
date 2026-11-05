@@ -15,6 +15,7 @@
     "typecheck": "turbo run typecheck",
     "db:generate": "pnpm --filter @tdoe/db generate",
     "db:migrate": "pnpm --filter @tdoe/db migrate",
+    "db:seed": "pnpm --filter @tdoe/db seed",
     "prepare": "husky"
   },
   "devDependencies": {
