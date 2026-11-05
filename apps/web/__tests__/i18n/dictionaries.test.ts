@@ -4,9 +4,9 @@ import fr from "@/i18n/dictionaries/fr.json";
 import ptBR from "@/i18n/dictionaries/pt-BR.json";
 import { locales, routing } from "@/i18n/routing";
 
-type Dict = { [key: string]: string | Dict };
+type Dict = { [key: string]: string | Dict | Dict[] } | Dict[];
 
-// Flattens { a: { b: "x" } } into { "a.b": "x" }
+// Flattens { a: { b: "x" }, c: [{ d: "y" }] } into { "a.b": "x", "c.0.d": "y" }
 function flatten(dict: Dict, prefix = ""): Record<string, string> {
   return Object.entries(dict).reduce<Record<string, string>>(
     (acc, [key, value]) => {

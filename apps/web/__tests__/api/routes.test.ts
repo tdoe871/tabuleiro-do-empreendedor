@@ -1,6 +1,8 @@
 /**
  * @jest-environment node
  */
+import { POST as loginPOST } from "@/app/api/auth/login/route";
+import { POST as registerPOST } from "@/app/api/auth/register/route";
 import { GET as healthGET } from "@/app/api/health/route";
 import { POST as eventsPOST } from "@/app/api/events/route";
 import { POST as participantsPOST } from "@/app/api/participants/route";
@@ -23,6 +25,8 @@ describe("GET /api/health", () => {
 // this test will fail — move it out of here and write real tests for it.
 describe("not-yet-implemented endpoints", () => {
   const stubs: [string, () => Promise<Response>][] = [
+    ["POST /api/auth/login", loginPOST],
+    ["POST /api/auth/register", registerPOST],
     ["POST /api/events", eventsPOST],
     ["POST /api/participants", participantsPOST],
     ["GET /api/phases", phasesGET],
