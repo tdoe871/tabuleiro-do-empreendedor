@@ -1,9 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-const locales = ["pt-BR", "es", "en", "fr"];
+import en from "../src/i18n/dictionaries/en.json";
+import es from "../src/i18n/dictionaries/es.json";
+import fr from "../src/i18n/dictionaries/fr.json";
+import ptBR from "../src/i18n/dictionaries/pt-BR.json";
+
+const locales = [
+  ["pt-BR", ptBR],
+  ["es", es],
+  ["en", en],
+  ["fr", fr],
+] as const;
 
 test.describe("smoke", () => {
-  for (const locale of locales) {
+  for (const [locale, dict] of locales) {
     test(`/${locale} renders without console errors`, async ({ page }) => {
       const errors: string[] = [];
       page.on("console", (msg) => {
@@ -13,7 +23,10 @@ test.describe("smoke", () => {
 
       const res = await page.goto(`/${locale}`);
       expect(res?.status()).toBe(200);
-      await expect(page.locator("h1")).toHaveText("Tabuleiro do Empreendedor");
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      await expect(page.getByText(dict.common.appName).first()).toBeVisible();
+      // Proves the page is actually translated, not just served at /<locale>
+      await expect(page.getByText(dict.login.heroTag)).toBeVisible();
       expect(errors).toEqual([]);
     });
   }
