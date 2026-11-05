@@ -250,9 +250,9 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
   return (
     <div id="tela-jogadores">
-      <div className="topbar">
+      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
         <div className="tb-logo">
-          <div className="tb-gem">
+          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>
@@ -283,7 +283,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
       </div>
 
-      <div className="score-strip">
+      <div className="score-strip bg-white/[0.03] backdrop-blur-md border-b border-white/10">
         <div>
           <div className="score-label">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
@@ -320,7 +320,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
       <div className="jog-layout">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card">
+          <div className="cenario-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
             <div className="cen-icon">⌖</div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>
@@ -354,7 +354,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 return (
                   <div
                     key={name}
-                    className={`membro-card ${i === 0 ? "ativo" : ""}`}
+                    className={`membro-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${i === 0 ? "ativo" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {i !== 0 && (
@@ -407,7 +407,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             </div>
           </div>
 
-          <div className="card card-pad">
+          <div className="card card-pad bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/20">
             <div className="comm-tabs">
               <div
                 className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
@@ -596,16 +596,25 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   100,
               );
 
+              const hoverGlowClass =
+                id === "problema"
+                  ? "hover:shadow-glow-amber hover:ring-1 hover:ring-neon-amber/40"
+                  : id === "solucao"
+                    ? "hover:shadow-glow-lime hover:ring-1 hover:ring-neon-lime/40"
+                    : id === "parcerias"
+                      ? "hover:shadow-glow-purple hover:ring-1 hover:ring-neon-purple/40"
+                      : "hover:shadow-glow-cyan hover:ring-1 hover:ring-neon-cyan/40";
+
               return (
                 <div
                   key={id}
-                  className="chave-card"
+                  className={`chave-card bg-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
                   style={{
                     background: concluida
                       ? `var(${KEY_COLOR_VAR[id]}-bg)`
                       : ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                        : "rgba(255,255,255,.02)",
+                        : "rgba(255,255,255,.04)",
                     borderColor:
                       concluida || ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bd)`
@@ -666,7 +675,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }

@@ -13,12 +13,15 @@ export function Modal({
 }) {
   return (
     <div
-      className="modal-overlay"
+      className="modal-overlay backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal" style={{ maxWidth }}>
+      <div
+        className="modal bg-neon-bg/90 backdrop-blur-xl border border-white/15 shadow-glow-purple"
+        style={{ maxWidth }}
+      >
         {children}
       </div>
     </div>

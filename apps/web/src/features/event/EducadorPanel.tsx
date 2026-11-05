@@ -140,9 +140,9 @@ export function EducadorPanel() {
 
   return (
     <div id="tela-educador">
-      <div className="topbar">
+      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
         <div className="tb-logo">
-          <div className="tb-gem">
+          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>TdoE</span>
@@ -205,7 +205,7 @@ export function EducadorPanel() {
       </div>
 
       <div className="edu-layout">
-        <div className="sidebar">
+        <div className="sidebar bg-white/[0.03] backdrop-blur-xl border-r border-white/10">
           <div className="sidebar-sec">{t("sidebar.sessoes")}</div>
           <div>
             {sessions.length === 0 && (
@@ -222,7 +222,7 @@ export function EducadorPanel() {
             {sessions.map((s, i) => (
               <div
                 key={s.id}
-                className={`eq-item ${s.id === selectedId ? "on" : ""}`}
+                className={`eq-item transition-all duration-200 hover:bg-white/5 hover:translate-x-0.5 ${s.id === selectedId ? "on" : ""}`}
                 onClick={() => selectSession(s.id)}
               >
                 <div
@@ -244,37 +244,49 @@ export function EducadorPanel() {
           </div>
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.acoes")}</div>
-          <div className="sidebar-action" onClick={() => setShowCreate(true)}>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={() => setShowCreate(true)}
+          >
             ＋ {t("sidebar.novaSessao")}
           </div>
-          <div className="sidebar-action" onClick={handleVerificarAlertas}>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={handleVerificarAlertas}
+          >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
-          <div className="sidebar-action" onClick={handleSocializar}>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={handleSocializar}
+          >
             ↗ {t("socializar")}
           </div>
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
           <div
-            className="sidebar-action"
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
             onClick={() => handlePending(t("sidebar.relatorio"))}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className="sidebar-action"
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
             onClick={() => handlePending(t("sidebar.exportarPropostas"))}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
-          <div className="sidebar-action" onClick={() => router.push("/")}>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={() => router.push("/")}
+          >
             ← {t("sair")}
           </div>
         </div>
 
         <div className="edu-main">
           <div className="metrics">
-            <div className="metric-card">
+            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime">
               <div
                 style={{
                   position: "absolute",
@@ -290,7 +302,7 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.equipesAtivas")}</div>
             </div>
-            <div className="metric-card">
+            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
               <div
                 style={{
                   position: "absolute",
@@ -304,7 +316,7 @@ export function EducadorPanel() {
               <div className="m-val">0</div>
               <div className="m-lbl">{t("metrics.participantes")}</div>
             </div>
-            <div className="metric-card">
+            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-purple/40 hover:shadow-glow-purple">
               <div
                 style={{
                   position: "absolute",
@@ -320,7 +332,7 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.chavesConcluidas")}</div>
             </div>
-            <div className="metric-card">
+            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-amber/40 hover:shadow-glow-amber">
               <div
                 style={{
                   position: "absolute",
@@ -345,7 +357,10 @@ export function EducadorPanel() {
             {KEY_IDS.map((id) => {
               const key = tKeys.raw(id) as KeyTranslation;
               return (
-                <div className="prog-card" key={id}>
+                <div
+                  className="prog-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/35 hover:shadow-glow-lime"
+                  key={id}
+                >
                   <div className="pc-head">
                     <div
                       className="pc-icon"
@@ -384,7 +399,7 @@ export function EducadorPanel() {
           </div>
         </div>
 
-        <div className="edu-right">
+        <div className="edu-right bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
           <div className="panel-title">{t("right.alertasMediacao")}</div>
           <div style={{ fontSize: 11, color: "var(--t3)" }}>
             {t("right.nenhumAlerta")}
@@ -392,16 +407,28 @@ export function EducadorPanel() {
           <div className="sidebar-divider" />
           <div className="panel-title">{t("right.controlesSessao")}</div>
           <div className="ctrl-grid">
-            <div className="ctrl-btn" onClick={handleSessionAction}>
+            <div
+              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-lime/40 hover:text-white hover:shadow-glow-lime"
+              onClick={handleSessionAction}
+            >
               ▶ {t("right.iniciar")}
             </div>
-            <div className="ctrl-btn" onClick={handleSessionAction}>
+            <div
+              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-amber/40 hover:text-white hover:shadow-glow-amber"
+              onClick={handleSessionAction}
+            >
               ⏸ {t("right.pausar")}
             </div>
-            <div className="ctrl-btn" onClick={handleSessionAction}>
+            <div
+              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-cyan/40 hover:text-white hover:shadow-glow-cyan"
+              onClick={handleSessionAction}
+            >
               ↺ {t("right.retomar")}
             </div>
-            <div className="ctrl-btn" onClick={handleVerificarAlertas}>
+            <div
+              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-purple/40 hover:text-white hover:shadow-glow-purple"
+              onClick={handleVerificarAlertas}
+            >
               🔔 {t("right.alertas")}
             </div>
           </div>
@@ -457,7 +484,7 @@ export function EducadorPanel() {
                 ⏹ {t("timer.parar")}
               </button>
             </div>
-            <div className="timer-toggle-row">
+            <div className="timer-toggle-row bg-white/5 backdrop-blur-md border-white/10">
               <span className="timer-toggle-lbl">
                 {t("timer.mostrarEstudantes")}
               </span>
@@ -480,7 +507,7 @@ export function EducadorPanel() {
               return (
                 <button
                   key={id}
-                  className="carta-launcher-btn"
+                  className="carta-launcher-btn backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-purple"
                   style={{
                     borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
                     background: `var(${KEY_COLOR_VAR[id]}-bg)`,
