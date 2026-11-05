@@ -75,8 +75,11 @@ Registro de educador (pestaña de registro del login).
 { "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
 ```
 
-- Errores: `VALIDATION_ERROR`, `EMAIL_TAKEN`.
-- `senha`: mínimo 8 caracteres ❓ (hoy el frontend solo valida que coincida con la confirmación).
+- **Implementado.** Errores: `VALIDATION_ERROR`, `EMAIL_TAKEN`, `RATE_LIMITED` (5 registros por
+  IP cada 15 min).
+- `fields` de `VALIDATION_ERROR`: `nome` / `sobrenome` → `REQUIRED` | `TOO_LONG` (máx. 60);
+  `email` → `REQUIRED` | `INVALID`; `senha` → `REQUIRED` | `TOO_SHORT` (mín. 8) | `TOO_LONG`
+  (máx. 128). El correo se guarda en minúsculas.
 - ❓ **Decisión 6.2.1 del contexto:** el PM quiere que el líder del equipo se registre. Si el
   líder tiene cuenta con correo y contraseña, este endpoint cambia o aparece uno nuevo. Mientras
   no se decida, esto es solo para staff.
@@ -90,8 +93,10 @@ Registro de educador (pestaña de registro del login).
 { "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
 ```
 
-- Errores: `INVALID_CREDENTIALS` (el mismo si el correo no existe o la contraseña está mal),
-  `RATE_LIMITED`.
+- **Implementado.** Errores: `INVALID_CREDENTIALS` (el mismo si el correo no existe o la
+  contraseña está mal), `RATE_LIMITED` (10 intentos por IP cada 15 min), `VALIDATION_ERROR`
+  (`email` o `senha` vacíos).
+- Sin sesión de staff, cualquier página de `/[locale]/mestre/*` redirige al login (`/[locale]`).
 
 ### `POST /api/events` — Staff
 
@@ -361,7 +366,8 @@ Después de subir con `PUT uploadUrl`, el frontend manda `fileUrl` en `PUT /api/
 
 ### `POST /api/auth/logout` — Staff o Jugador
 
-Borra la cookie. `204`.
+Borra la cookie. `204`. **Implementado para staff**; la cookie del jugador se agrega cuando exista
+su sesión.
 
 ---
 
