@@ -1,6 +1,7 @@
+import type { NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
-import { verifyStaffSession } from "@/lib/auth/session";
+import { STAFF_SESSION_COOKIE, verifyStaffSession } from "@/lib/auth/session";
 
 export type StaffUser = { id: string; name: string; email: string };
 
@@ -16,4 +17,11 @@ export async function getStaffFromToken(
     where: { id: session.staffId },
     select: { id: true, name: true, email: true },
   });
+}
+
+// For route handlers: the staff behind the request's session cookie, or null.
+export function getStaffFromRequest(
+  request: NextRequest,
+): Promise<StaffUser | null> {
+  return getStaffFromToken(request.cookies.get(STAFF_SESSION_COOKIE)?.value);
 }
