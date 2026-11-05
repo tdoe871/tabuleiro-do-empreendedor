@@ -3859,4 +3859,120 @@
       gap: 12px;
     }
   }
+
+  /* ═══════════════════════════════════════
+     BUTTON POLISH (2026-11-05) — micro-interações sobre o port
+     verbatim; não alteramos as regras originais de .btn*, só
+     adicionamos estado de hover/active/focus e brilho por variante.
+     Continuação da direção "neon glass" que JP começou no Modal.
+  ═══════════════════════════════════════ */
+  .btn {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      filter 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--parc);
+    outline-offset: 2px;
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 8px 32px rgba(46, 128, 240, 0.5);
+    filter: brightness(1.05);
+  }
+  .btn-ghost {
+    backdrop-filter: blur(6px);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--border2);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.06);
+  }
+  .btn-gold:hover:not(:disabled) {
+    box-shadow: 0 8px 28px rgba(240, 188, 64, 0.45);
+  }
+  .btn-danger:hover:not(:disabled) {
+    box-shadow: 0 8px 28px rgba(255, 80, 80, 0.4);
+  }
+
+  /* Cartões seletores (ex. tipo de entrega) — mesma família visual dos .btn */
+  .option-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border2);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    text-align: left;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .option-card:hover {
+    border-color: var(--border2);
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-1px);
+  }
+  .option-card:focus-visible {
+    outline: 2px solid var(--parc);
+    outline-offset: 2px;
+  }
+  .option-card[aria-pressed="true"] {
+    border-color: var(--parc-bd);
+    background: var(--parc-bg);
+    box-shadow: 0 6px 24px rgba(46, 128, 240, 0.25);
+  }
+  .option-card-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--t2);
+  }
+  .option-card[aria-pressed="true"] .option-card-icon {
+    background: var(--parc-bg);
+    color: var(--parc);
+  }
+  .option-card-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--t1);
+    line-height: 1.3;
+  }
+  .option-card-sub {
+    font-size: 10.5px;
+    color: var(--t3);
+    margin-top: 2px;
+  }
+
+  .field-hint {
+    font-size: 10.5px;
+    color: var(--t3);
+    margin-top: 4px;
+  }
+  .field-error {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ff6b6b;
+    margin-top: 5px;
+  }
+  .field-count {
+    font-size: 10px;
+    color: var(--t3);
+    text-align: right;
+    margin-top: 3px;
+  }
 }

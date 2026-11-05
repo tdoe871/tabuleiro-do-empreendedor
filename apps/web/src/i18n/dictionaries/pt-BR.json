@@ -34,7 +34,13 @@
     "saved": "Entrega salva localmente — falta conectar ao backend.",
     "editar": "✏️ Editar entrega",
     "abrir": "📦 Entregar projeto",
-    "status": "Entrega registrada"
+    "status": "Entrega registrada",
+    "invalidUrl": "O link precisa começar com http:// ou https://",
+    "fileHint": "Máx. 10MB · PDF, PNG, JPG ou WEBP",
+    "fileTooLarge": "O arquivo passa do limite de 10MB.",
+    "fileInvalidType": "Formato não permitido. Use PDF, PNG, JPG ou WEBP.",
+    "fileRequired": "Selecione um arquivo antes de salvar.",
+    "saving": "Salvando…"
   },
   "keys": {
     "problema": {

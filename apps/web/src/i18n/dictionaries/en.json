@@ -34,7 +34,13 @@
     "saved": "Submission saved locally — still needs to connect to the backend.",
     "editar": "✏️ Edit submission",
     "abrir": "📦 Submit project",
-    "status": "Submission recorded"
+    "status": "Submission recorded",
+    "invalidUrl": "The link must start with http:// or https://",
+    "fileHint": "Max 10MB · PDF, PNG, JPG or WEBP",
+    "fileTooLarge": "The file is over the 10MB limit.",
+    "fileInvalidType": "Format not allowed. Use PDF, PNG, JPG or WEBP.",
+    "fileRequired": "Select a file before saving.",
+    "saving": "Saving…"
   },
   "keys": {
     "problema": {

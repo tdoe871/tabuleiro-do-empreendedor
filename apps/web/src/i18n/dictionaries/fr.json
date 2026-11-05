@@ -34,7 +34,13 @@
     "saved": "Soumission enregistrée localement — il faut encore la connecter au backend.",
     "editar": "✏️ Modifier la soumission",
     "abrir": "📦 Soumettre le projet",
-    "status": "Soumission enregistrée"
+    "status": "Soumission enregistrée",
+    "invalidUrl": "Le lien doit commencer par http:// ou https://",
+    "fileHint": "Max 10 Mo · PDF, PNG, JPG ou WEBP",
+    "fileTooLarge": "Le fichier dépasse la limite de 10 Mo.",
+    "fileInvalidType": "Format non autorisé. Utilisez PDF, PNG, JPG ou WEBP.",
+    "fileRequired": "Sélectionnez un fichier avant d'enregistrer.",
+    "saving": "Enregistrement…"
   },
   "keys": {
     "problema": {
