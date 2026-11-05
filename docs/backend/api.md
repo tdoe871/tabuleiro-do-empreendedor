@@ -1,0 +1,491 @@
+# Contrato de la API — Tabuleiro do Empreendedor
+
+> **Estado: BORRADOR para revisar con JP (frontend).** Nada de esto está implementado todavía,
+> salvo `GET /api/health`. Lo marcado con ❓ es una decisión abierta; lo marcado con 🆕 es un
+> endpoint que el frontend todavía no llama. Si algo no te cuadra, coméntalo en el PR.
+>
+> Responsable: Eddy (backend). Base: rama `dev` + PR #2 (esquema con 4 chaves × 3 fases).
+
+---
+
+## 1. Convenciones
+
+- **Mismo origen.** Todo vive en `apps/web/src/app/api/*` (route handlers de Next.js). JSON en
+  request y response.
+- **Sesiones con cookie `httpOnly`** firmadas con `jose` (HS256, `AUTH_SECRET`). El frontend no
+  las lee ni las manda a mano: `fetch` al mismo origen las incluye solo.
+  - `tdoe_staff`: educador/staff. Dura 12 h.
+  - `tdoe_player`: jugador. Lleva `participantId`, `teamId` y `eventId`. Dura 36 h (cubre el
+    evento de 24 h).
+- **La identidad sale siempre de la sesión, nunca del body.** El frontend no manda `teamId`,
+  `participantId` ni `eventId` del jugador; el backend los toma de la cookie.
+- **Errores como códigos** (la app tiene 4 idiomas, el frontend traduce):
+
+  ```json
+  { "error": "TEAM_FULL" }
+  { "error": "VALIDATION_ERROR", "fields": { "nickname": "TOO_LONG" } }
+  ```
+
+  La lista completa está en la [sección 5](#5-códigos-de-error).
+
+- **Fechas** en ISO 8601 UTC. Las respuestas que tienen timer incluyen `serverNow` para que el
+  cliente calcule el tiempo restante sin depender del reloj del dispositivo.
+- **Chaves en minúsculas** en la API (`problema`, `solucao`, `parcerias`, `oportunidades`), igual
+  que `KEY_IDS` en `features/event/keys.ts`. En la base son el enum `BoardKey` en mayúsculas; la
+  conversión la hace el backend.
+- **Fases**: `order` 1-3 dentro de cada chave, igual que `numero` en `PlayerBoard`. El nombre y la
+  pregunta salen de i18n (`jogador.fases.<chave>[order-1]`); la API no manda textos.
+
+### Quién puede llamar cada endpoint
+
+| Marca   | Significa                                                        |
+| ------- | ---------------------------------------------------------------- |
+| Público | Sin sesión                                                       |
+| Staff   | Cookie `tdoe_staff` válida; además, el evento tiene que ser suyo |
+| Jugador | Cookie `tdoe_player` válida                                      |
+| Líder   | Jugador con `role = LEADER` en su equipo                         |
+
+---
+
+## 2. Endpoints que el frontend ya llama
+
+### `POST /api/auth/register` — Público
+
+Registro de educador (pestaña "cadastro" del login).
+
+```json
+// request
+{ "nome": "Ana", "sobrenome": "Souza", "email": "ana@ejemplo.com", "senha": "********" }
+// 201 + cookie tdoe_staff
+{ "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
+```
+
+- Errores: `VALIDATION_ERROR`, `EMAIL_TAKEN`.
+- `senha`: mínimo 8 caracteres ❓ (hoy el frontend solo valida que coincida con la confirmación).
+- ❓ **Decisión 6.2.1 del contexto:** el PM quiere que el líder del equipo se registre. Si el
+  líder tiene cuenta con correo y contraseña, este endpoint cambia o aparece uno nuevo. Mientras
+  no se decida, esto es solo para staff.
+
+### `POST /api/auth/login` — Público
+
+```json
+// request
+{ "email": "ana@ejemplo.com", "senha": "********" }
+// 200 + cookie tdoe_staff
+{ "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
+```
+
+- Errores: `INVALID_CREDENTIALS` (el mismo si el correo no existe o la contraseña está mal),
+  `RATE_LIMITED`.
+
+### `POST /api/events` — Staff
+
+El educador crea una sesión (`CreateSessionModal`).
+
+```json
+// request (lo que ya manda el frontend)
+{ "titulo": "Hackathon MTY", "modo": "escolar", "cenario": null, "numEquipes": 60, "integrantes": 5 }
+// 201
+{ "event": EventDTO }
+```
+
+```ts
+type EventDTO = {
+  id: string;
+  code: string; // 6 caracteres, sin I/O/0/1. Lo genera el BACKEND.
+  name: string;
+  mode: "escolar" | "personalizado";
+  scenario: string | null;
+  status: "DRAFT" | "ACTIVE" | "PAUSED" | "FINISHED";
+  timerMode: "GLOBAL" | "PER_PHASE";
+  durationMinutes: number | null;
+  maxTeams: number; // = numEquipes
+  maxTeamSize: number; // = integrantes, de 2 a 5
+  startedAt: string | null;
+  endsAt: string | null;
+};
+```
+
+- Errores: `VALIDATION_ERROR` (título vacío, `cenario` vacío en modo personalizado, `integrantes`
+  fuera de 2-5), `UNAUTHORIZED`.
+- **Cambio en el frontend:** hoy `CreateSessionModal` inventa el código con `randomCode()`. Tiene
+  que usar `event.code` de la respuesta, porque es el que existe en la base.
+- Mapeo de estados con `EduSession.status`: `aguardando` = `DRAFT`, `ativa` = `ACTIVE`,
+  `pausada` = `PAUSED`. Falta `FINISHED` (el botón "encerrar sessão" del mural).
+- ❓ `modo` y `cenario` no existen en el esquema. Propuesta: agregar `Event.mode` y
+  `Event.scenario`. ¿Qué cambia en el juego con modo "personalizado" además de guardar el texto?
+
+### `POST /api/teams` — Público (crea la sesión del jugador)
+
+Crear equipo; quien lo crea queda como `LEADER`.
+
+```json
+// request (lo que ya manda el frontend)
+{ "eventCode": "QATEST", "name": "Los Innovadores", "nickname": "Eddy" }
+// 201 + cookie tdoe_player
+{
+  "team": { "id": "uuid", "name": "Los Innovadores", "joinCode": "K7XM2Q" },
+  "participant": { "id": "uuid", "nickname": "Eddy", "role": "LEADER" }
+}
+```
+
+- Errores: `EVENT_NOT_FOUND`, `EVENT_FINISHED`, `EVENT_FULL` (ya hay `maxTeams` equipos),
+  `TEAM_NAME_TAKEN`, `VALIDATION_ERROR`.
+- `joinCode`: 6 caracteres, mismo alfabeto que el código del evento. El link de invitación sigue
+  siendo `/team/join?code=<joinCode>`.
+- **Cambio en el frontend:** hoy `team/create` solo muestra el código y el link en el caso 501.
+  Con `201` tiene que usar `team.joinCode` de la respuesta para la misma pantalla.
+
+### `GET /api/teams?eventCode=QATEST` — Público
+
+Lista de equipos para que quien se une elija por nombre real.
+
+```json
+// 200
+{ "teams": [{ "name": "Los Innovadores", "memberCount": 3, "maxTeamSize": 5 }] }
+```
+
+- **Nunca devuelve `joinCode`** (cualquiera con el código del evento podría entrar a cualquier
+  equipo). Para unirse hace falta el código que comparte el líder.
+- Errores: `EVENT_NOT_FOUND`.
+
+### `POST /api/participants` — Público (crea la sesión del jugador)
+
+Unirse a un equipo.
+
+```json
+// request (lo que ya manda el frontend)
+{ "teamJoinCode": "K7XM2Q", "nickname": "Ana" }
+// 201 + cookie tdoe_player
+{
+  "team": { "id": "uuid", "name": "Los Innovadores" },
+  "participant": { "id": "uuid", "nickname": "Ana", "role": "MEMBER" }
+}
+```
+
+- Errores: `TEAM_NOT_FOUND` (código inválido o regenerado), `TEAM_FULL`, `NICKNAME_TAKEN`,
+  `EVENT_FINISHED`, `VALIDATION_ERROR`.
+- El límite de integrantes se valida dentro de una transacción con el equipo bloqueado, así que dos
+  personas entrando al mismo tiempo no pueden pasarse de `maxTeamSize`.
+- **Cambio en el frontend:** quien abre el link de invitación (`/team/join?code=...`) llega sin
+  `nickname`, y hoy la página no tiene dónde escribirlo. Hace falta un campo de nickname en
+  `team/join` cuando no viene en la URL.
+
+### `PUT /api/submissions` — Jugador
+
+Entrega del proyecto del equipo (`SubmissionModal`). Una entrega por equipo; cada `PUT` la
+reemplaza.
+
+```json
+// request
+{ "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app", "description": "..." }
+// 200
+{ "submission": { "type": "DEPLOY_LINK", "url": "https://...", "fileUrl": null, "description": "...", "submittedAt": "2026-11-13T10:00:00Z" } }
+```
+
+- `type`: `DEPLOY_LINK` | `REPO_LINK` | `FILE_OR_IMAGE` | `NONE`.
+- `url` obligatorio con `DEPLOY_LINK` y `REPO_LINK` (solo `https://`). `fileUrl` obligatorio con
+  `FILE_OR_IMAGE` y tiene que venir de `POST /api/submissions/upload-url`.
+- Errores: `VALIDATION_ERROR`, `INVALID_URL`, `DEADLINE_PASSED`, `EVENT_NOT_ACTIVE`.
+- ❓ ¿Puede entregar cualquier miembro o solo el líder?
+- ❓ El PM pidió **PDF y Word más un apartado de links**. Hoy es un solo `url` + un solo `fileUrl`.
+  ¿Varios archivos? ¿Varios links? Si sí, el body cambia a listas.
+
+### `GET /api/phases?eventId=` → reemplazado por `GET /api/board`
+
+El frontend todavía no lo llama. Propongo **no implementarlo** y usar `GET /api/board` (abajo),
+porque el jugador no debería mandar `eventId` (sale de su sesión) y el tablero necesita más que
+las fases.
+
+### `GET /api/health` — Público
+
+Ya implementado. Sin datos sensibles.
+
+---
+
+## 3. Endpoints nuevos para el jugador 🆕
+
+### `GET /api/board` — Jugador
+
+Todo lo que necesita `PlayerBoard` en una sola llamada, ya con la forma de su estado local para
+que no haya que convertir nada.
+
+```json
+{
+  "serverNow": "2026-11-12T15:00:00Z",
+  "event": {
+    "code": "QATEST",
+    "name": "...",
+    "status": "ACTIVE",
+    "timerMode": "GLOBAL",
+    "startedAt": "...",
+    "endsAt": "..."
+  },
+  "team": {
+    "id": "uuid",
+    "name": "Los Innovadores",
+    "joinCode": "K7XM2Q",
+    "score": 0
+  },
+  "me": {
+    "id": "uuid",
+    "nickname": "Eddy",
+    "role": "LEADER",
+    "rpgRole": "pesquisador"
+  },
+  "members": [
+    { "id": "uuid", "nickname": "Ana", "role": "MEMBER", "rpgRole": null }
+  ],
+  "keys": {
+    "problema": {
+      "status": "ativa",
+      "phases": {
+        "1": { "status": "concluida", "conteudo": "...", "completedAt": "..." },
+        "2": { "status": "disponivel" },
+        "3": { "status": "bloqueada" }
+      }
+    },
+    "solucao": {
+      "status": "disponivel",
+      "phases": {
+        "1": { "status": "disponivel" },
+        "2": { "status": "bloqueada" },
+        "3": { "status": "bloqueada" }
+      }
+    }
+  },
+  "cartaAtiva": { "key": "problema", "text": "..." },
+  "submission": null
+}
+```
+
+- `keys.*.status`: `disponivel` | `ativa` | `concluida` (igual que `KeyStatus`).
+- `phases.*.status`: `bloqueada` | `disponivel` | `concluida` (igual que `PhaseStatus`).
+- Sustituye los miembros de prueba (`["Ana", "Bruno", "Carla"]`) y el `nickname` que hoy llega por
+  la URL: el dashboard ya no necesita `?nickname=`.
+- Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar a `/team`).
+
+### `POST /api/board/keys/:key/activate` — Jugador
+
+Activar una chave (`ativarChave`). Responde el tablero completo (`200`, mismo cuerpo que
+`GET /api/board`).
+
+- Reglas (las del prototipo): al inicio solo `problema` está disponible; `solucao`, `parcerias` y
+  `oportunidades` se liberan al concluir `problema`. Solo una chave `ativa` por equipo: activar
+  otra deja la anterior en `disponivel`.
+- Errores: `KEY_LOCKED` (falta concluir `problema`), `EVENT_NOT_ACTIVE`, `VALIDATION_ERROR`
+  (chave que no existe).
+- ❓ En el prototipo, reactivar una chave reinicia sus fases (1 disponible, 2 y 3 bloqueadas) aunque
+  ya tuviera fases concluidas. **Propuesta:** el backend no borra lo ya concluido.
+- Nota de esquema: hoy `TeamPhase.keyActivated` está por fase. Propongo cambiarlo por
+  `Team.activeKey` (una chave activa por equipo) y calcular `concluida` cuando las 3 fases lo
+  están.
+
+### `PUT /api/board/keys/:key/phases/:order` — Jugador
+
+Guardar la respuesta de una fase y concluirla (`concluirFase`). Libera la siguiente fase de esa
+chave. Responde el tablero completo.
+
+```json
+// request
+{ "conteudo": "El problema ocurre en..." }
+```
+
+- Errores: `KEY_NOT_ACTIVE`, `PHASE_LOCKED`, `EVENT_NOT_ACTIVE`, `VALIDATION_ERROR` (vacío o más
+  de 5000 caracteres).
+- ❓ ¿Se puede editar una fase ya concluida? ¿Cualquier miembro puede concluir, o solo el líder?
+- ❓ Puntos (`TeamPhase.pointsAwarded`, `Team.score`): ¿cuántos por fase? ¿Hay leaderboard visible?
+
+### `PUT /api/participants/me/rpg-role` — Jugador
+
+Elegir o cambiar papel RPG (`RolePickerModal`).
+
+```json
+// request
+{ "rpgRole": "pesquisador" }   // agente_saude | lider_comunitario | jovem_empreendedor | pesquisador
+// 200
+{ "rpgRole": "pesquisador" }
+```
+
+- Errores: `VALIDATION_ERROR`.
+- ❓ ¿Dos miembros del mismo equipo pueden tener el mismo papel?
+
+### `POST /api/teams/me/join-code` — Líder
+
+Regenera el código de invitación; el anterior deja de servir.
+
+```json
+// 200
+{ "joinCode": "P4WN8D" }
+```
+
+- Errores: `FORBIDDEN` (no es líder).
+
+### `POST /api/submissions/upload-url` — Jugador
+
+Pide una URL firmada para subir un archivo directo a Supabase Storage (bucket privado).
+
+```json
+// request
+{ "fileName": "pitch.pdf", "contentType": "application/pdf", "size": 2400000 }
+// 200
+{ "uploadUrl": "https://...", "fileUrl": "submissions/<teamId>/<uuid>.pdf" }
+```
+
+Después de subir con `PUT uploadUrl`, el frontend manda `fileUrl` en `PUT /api/submissions`.
+
+- Errores: `FILE_TYPE_NOT_ALLOWED`, `FILE_TOO_LARGE`.
+- ❓ Tipos permitidos: PDF y `.docx`. ¿También `.doc` viejo e imágenes? ¿Tamaño máximo?
+
+### `POST /api/auth/logout` — Staff o Jugador
+
+Borra la cookie. `204`.
+
+---
+
+## 4. Endpoints nuevos para el educador 🆕
+
+### `GET /api/events` — Staff
+
+Las sesiones del educador para la barra lateral de `EducadorPanel`.
+
+```json
+{ "events": [ EventDTO ] }
+```
+
+### `PATCH /api/events/:id/status` — Staff
+
+Botón iniciar / pausar / retomar, y "encerrar sessão".
+
+```json
+// request
+{ "status": "ACTIVE" }   // ACTIVE | PAUSED | FINISHED
+// 200
+{ "event": EventDTO }
+```
+
+- La primera vez que pasa a `ACTIVE` se fija `startedAt`; con timer `GLOBAL`,
+  `endsAt = startedAt + durationMinutes`.
+- Errores: `INVALID_STATUS_TRANSITION`, `FORBIDDEN`.
+- ❓ ¿Pausar detiene el timer global (y se recorre `endsAt` al retomar) o el reloj sigue?
+
+### `GET /api/events/:id/overview` — Staff
+
+Métricas, equipos y alertas para `EducadorPanel` y `SocializacaoPanel`, en una sola consulta
+agregada (sin N+1).
+
+```json
+{
+  "serverNow": "...",
+  "event": EventDTO,
+  "metrics": { "activeTeams": 58, "participants": 271, "keysCompleted": 103 },
+  "teams": [
+    {
+      "id": "uuid",
+      "name": "Los Innovadores",
+      "memberCount": 4,
+      "score": 0,
+      "keys": { "problema": "concluida", "solucao": "ativa", "parcerias": "disponivel", "oportunidades": "disponivel" },
+      "submission": { "type": "DEPLOY_LINK", "url": "https://..." }
+    }
+  ],
+  "alerts": [ { "id": "uuid", "severity": "WARNING", "code": "TEAM_INACTIVE", "teamId": "uuid", "createdAt": "..." } ]
+}
+```
+
+- El mural (`SocializacaoPanel`) usa `"pendente"` para las chaves bloqueadas. Propongo que la API
+  use los mismos estados que el tablero (`disponivel` / `ativa` / `concluida`, más `bloqueada`) y
+  que el mural los pinte como quiera.
+- ❓ `proposta` en el mural: ¿es la descripción de la entrega o algo aparte?
+
+### Timer del educador ❓
+
+`EducadorPanel` tiene un timer con presets, iniciar/parar y "mostrar a los estudiantes", aparte del
+timer global del evento (24 h). Antes de definir el endpoint hay que aclarar qué es:
+
+- **Opción A:** cuenta regresiva corta para una actividad (por ejemplo, 15 min de pitch). Se guarda
+  en el evento (`activityEndsAt`, `activityVisible`) y los jugadores la ven en `GET /api/board`.
+- **Opción B:** es el mismo timer global y los presets solo eligen la duración del evento.
+
+### Carta-desafío ❓
+
+El educador lanza una carta por chave y la quita.
+
+```json
+// PUT /api/events/:id/challenge-card
+{ "key": "problema", "text": "..." }
+// DELETE /api/events/:id/challenge-card → 204
+```
+
+Los jugadores la reciben en `GET /api/board` como `cartaAtiva`. ❓ ¿Una sola carta activa por
+evento, o una por chave? ¿Se manda a todos los equipos o a uno en particular?
+
+### Alertas ❓
+
+`GET /api/events/:id/alerts` y `PATCH /api/alerts/:id/resolve`. ❓ ¿Qué genera una alerta en el
+prototipo ("alertas de mediação")? ¿Equipo sin avanzar X minutos, equipo sin miembros, otra cosa?
+
+### Exportar ❓
+
+"Relatório" y "exportar propostas": `GET /api/events/:id/export?type=report|proposals` → CSV.
+Se define cuando el resto esté funcionando.
+
+---
+
+## 5. Códigos de error
+
+| Código                      | HTTP | Cuándo                                                           |
+| --------------------------- | ---- | ---------------------------------------------------------------- |
+| `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo            |
+| `INVALID_URL`               | 400  | Link de entrega no es `https://` válido                          |
+| `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                     |
+| `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                 |
+| `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
+| `INVALID_CREDENTIALS`       | 401  | Login fallido                                                    |
+| `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
+| `EVENT_NOT_FOUND`           | 404  | Código de evento inexistente                                     |
+| `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
+| `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
+| `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
+| `NICKNAME_TAKEN`            | 409  | Ya hay alguien con ese nickname en el equipo                     |
+| `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
+| `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                     |
+| `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
+| `EVENT_FINISHED`            | 409  | El evento terminó                                                |
+| `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
+| `KEY_LOCKED`                | 409  | Chave bloqueada (falta concluir `problema`)                      |
+| `KEY_NOT_ACTIVE`            | 409  | Se intenta concluir una fase de una chave que no está activa     |
+| `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
+| `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
+| `RATE_LIMITED`              | 429  | Demasiados intentos                                              |
+| `INTERNAL_ERROR`            | 500  | Error del servidor (el detalle solo va a los logs)               |
+
+`501 not_implemented` desaparece endpoint por endpoint a medida que se implementan.
+
+---
+
+## 6. Pendiente de decidir con el equipo (no está en este contrato)
+
+- **Comunicación (balão, sussurro, cutucar).** Hoy solo existe en el estado local de
+  `PlayerBoard`. Si entra (decisión 6.2.2 del contexto), propuesta:
+  `GET /api/messages?after=<id>` y
+  `POST /api/messages { type: "BALAO" | "SUSSURRO" | "CUTUCAR", text?, toParticipantId?, clientId }`.
+  `clientId` evita duplicados al reintentar.
+- **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
+  tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
+- **Mentores y calificación** (decisión 6.2.3): no hay rol ni modelo todavía.
+- **Registro del líder** (decisión 6.2.1).
+
+---
+
+## 7. Resumen de cambios para el frontend
+
+1. `CreateSessionModal`: usar `event.code` de la respuesta en vez de `randomCode()`.
+2. `team/create`: con `201`, mostrar el código y el link usando `team.joinCode` de la respuesta.
+3. `team/join`: agregar campo de nickname cuando no viene en la URL (link de invitación).
+4. `PlayerBoard`: cargar todo de `GET /api/board` (sin `?nickname=` en la URL y sin miembros de
+   prueba) y mandar las acciones a los endpoints de la sección 3.
+5. `EducadorPanel` / `SocializacaoPanel`: cargar de `GET /api/events` y
+   `GET /api/events/:id/overview`.
+6. Traducir los códigos de error de la sección 5 en los 4 diccionarios.
+7. Si una llamada responde `401`, mandar al jugador a `/team` y al educador al login.
