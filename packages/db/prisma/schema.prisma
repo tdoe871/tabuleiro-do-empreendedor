@@ -55,13 +55,14 @@ model Event {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  @@index([code])
+  // `code` is already indexed by @unique; hostId backs the FK to Staff.
+  @@index([hostId])
 }
 
 model Phase {
-  id              String          @id @default(uuid())
+  id              String      @id @default(uuid())
   eventId         String
-  event           Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event           Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   order           Int
   name            String
   prompt          String? // "carta-desafio" — the challenge question/card
@@ -76,19 +77,18 @@ model Phase {
 // team instead of guessing a raw number. The first participant to create a
 // team becomes its leader automatically.
 model Team {
-  id             String       @id @default(uuid())
-  eventId        String
-  event          Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name           String
-  joinCode       String       @unique
-  score          Int          @default(0)
-  participants   Participant[]
-  phaseProgress  TeamPhase[]
-  submission     Submission?
-  createdAt      DateTime     @default(now())
+  id            String        @id @default(uuid())
+  eventId       String
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name          String
+  joinCode      String        @unique
+  score         Int           @default(0)
+  participants  Participant[]
+  phaseProgress TeamPhase[]
+  submission    Submission?
+  createdAt     DateTime      @default(now())
 
   @@unique([eventId, name])
-  @@index([joinCode])
 }
 
 enum ParticipantRole {
@@ -97,13 +97,13 @@ enum ParticipantRole {
 }
 
 model Participant {
-  id        String          @id @default(uuid())
-  teamId    String
-  team      Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  nickname  String
-  role      ParticipantRole @default(MEMBER)
-  rpgRole   String? // optional gamification role, kept from the original prototype
-  joinedAt  DateTime        @default(now())
+  id       String          @id @default(uuid())
+  teamId   String
+  team     Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  nickname String
+  role     ParticipantRole @default(MEMBER)
+  rpgRole  String? // optional gamification role, kept from the original prototype
+  joinedAt DateTime        @default(now())
 
   @@unique([teamId, nickname])
 }
@@ -119,6 +119,7 @@ model TeamPhase {
   pointsAwarded Int       @default(0)
 
   @@unique([teamId, phaseId])
+  @@index([phaseId])
 }
 
 // Per UX fix #1: teams need a place to deliver their project. Most hackathon
@@ -133,15 +134,15 @@ enum SubmissionType {
 }
 
 model Submission {
-  id            String         @id @default(uuid())
-  teamId        String         @unique
-  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  type          SubmissionType @default(NONE)
-  url           String? // deploy link or repo link
-  fileUrl       String? // Supabase Storage URL for a presentation/image
-  description   String?
-  submittedAt   DateTime?
-  updatedAt     DateTime       @updatedAt
+  id          String         @id @default(uuid())
+  teamId      String         @unique
+  team        Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  type        SubmissionType @default(NONE)
+  url         String? // deploy link or repo link
+  fileUrl     String? // Supabase Storage URL for a presentation/image
+  description String?
+  submittedAt DateTime?
+  updatedAt   DateTime       @updatedAt
 }
 
 enum AlertSeverity {
@@ -158,4 +159,6 @@ model Alert {
   message    String
   resolvedAt DateTime?
   createdAt  DateTime      @default(now())
+
+  @@index([eventId])
 }
