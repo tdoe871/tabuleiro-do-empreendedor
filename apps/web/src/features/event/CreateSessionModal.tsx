@@ -123,7 +123,8 @@ export function CreateSessionModal({
               min={1}
               max={80}
               value={numEquipes}
-              onChange={(e) =>
+              onChange={(e) => setNumEquipes(Number(e.target.value))}
+              onBlur={(e) =>
                 setNumEquipes(
                   Math.min(80, Math.max(1, Number(e.target.value) || 1)),
                 )
