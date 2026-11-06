@@ -1,5 +1,6 @@
 // The 4 "chaves" (keys) of the board — Problema / Solução / Parcerias /
-// Oportunidades — map 1:1 to Phase.order 0-3 in packages/db/prisma/schema.prisma.
+// Oportunidades — map to the BoardKey enum (uppercased) in
+// packages/db/prisma/schema.prisma; each one has 3 phases (Phase.order 1-3).
 export const KEY_IDS = [
   "problema",
   "solucao",

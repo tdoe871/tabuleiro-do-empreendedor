@@ -55,20 +55,35 @@ model Event {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  @@index([code])
+  // `code` is already indexed by @unique; hostId backs the FK to Staff.
+  @@index([hostId])
 }
 
+// The 4 "chaves" of the board. Lowercased, they match KEY_IDS in
+// apps/web/src/features/event/keys.ts.
+enum BoardKey {
+  PROBLEMA
+  SOLUCAO
+  PARCERIAS
+  OPORTUNIDADES
+}
+
+// Each chave has 3 phases (order 1-3), so an event has 12 phases. The phase
+// name and question live in the i18n dictionaries (jogador.fases.<key>[order-1])
+// because the app ships in 4 languages; name/prompt here are optional
+// overrides. The standard set is BOARD_PHASES in src/board.ts.
 model Phase {
-  id              String          @id @default(uuid())
+  id              String      @id @default(uuid())
   eventId         String
-  event           Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  order           Int
-  name            String
+  event           Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  key             BoardKey
+  order           Int // 1-3 within the chave
+  name            String?
   prompt          String? // "carta-desafio" — the challenge question/card
   durationMinutes Int? // only relevant when Event.timerMode = PER_PHASE
   teamProgress    TeamPhase[]
 
-  @@unique([eventId, order])
+  @@unique([eventId, key, order])
 }
 
 // Per UX fix #2: a team has a real name chosen at creation, plus its own
@@ -76,19 +91,18 @@ model Phase {
 // team instead of guessing a raw number. The first participant to create a
 // team becomes its leader automatically.
 model Team {
-  id             String       @id @default(uuid())
-  eventId        String
-  event          Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name           String
-  joinCode       String       @unique
-  score          Int          @default(0)
-  participants   Participant[]
-  phaseProgress  TeamPhase[]
-  submission     Submission?
-  createdAt      DateTime     @default(now())
+  id            String        @id @default(uuid())
+  eventId       String
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name          String
+  joinCode      String        @unique
+  score         Int           @default(0)
+  participants  Participant[]
+  phaseProgress TeamPhase[]
+  submission    Submission?
+  createdAt     DateTime      @default(now())
 
   @@unique([eventId, name])
-  @@index([joinCode])
 }
 
 enum ParticipantRole {
@@ -97,13 +111,13 @@ enum ParticipantRole {
 }
 
 model Participant {
-  id        String          @id @default(uuid())
-  teamId    String
-  team      Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  nickname  String
-  role      ParticipantRole @default(MEMBER)
-  rpgRole   String? // optional gamification role, kept from the original prototype
-  joinedAt  DateTime        @default(now())
+  id       String          @id @default(uuid())
+  teamId   String
+  team     Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  nickname String
+  role     ParticipantRole @default(MEMBER)
+  rpgRole  String? // optional gamification role, kept from the original prototype
+  joinedAt DateTime        @default(now())
 
   @@unique([teamId, nickname])
 }
@@ -115,10 +129,12 @@ model TeamPhase {
   phaseId       String
   phase         Phase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   keyActivated  Boolean   @default(false)
+  content       String? // the team's answer to the phase question
   completedAt   DateTime?
   pointsAwarded Int       @default(0)
 
   @@unique([teamId, phaseId])
+  @@index([phaseId])
 }
 
 // Per UX fix #1: teams need a place to deliver their project. Most hackathon
@@ -133,15 +149,15 @@ enum SubmissionType {
 }
 
 model Submission {
-  id            String         @id @default(uuid())
-  teamId        String         @unique
-  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  type          SubmissionType @default(NONE)
-  url           String? // deploy link or repo link
-  fileUrl       String? // Supabase Storage URL for a presentation/image
-  description   String?
-  submittedAt   DateTime?
-  updatedAt     DateTime       @updatedAt
+  id          String         @id @default(uuid())
+  teamId      String         @unique
+  team        Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  type        SubmissionType @default(NONE)
+  url         String? // deploy link or repo link
+  fileUrl     String? // Supabase Storage URL for a presentation/image
+  description String?
+  submittedAt DateTime?
+  updatedAt   DateTime       @updatedAt
 }
 
 enum AlertSeverity {
@@ -158,4 +174,6 @@ model Alert {
   message    String
   resolvedAt DateTime?
   createdAt  DateTime      @default(now())
+
+  @@index([eventId])
 }
