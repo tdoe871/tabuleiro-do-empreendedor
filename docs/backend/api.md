@@ -153,8 +153,13 @@ Crear equipo; quien lo crea queda como `LEADER`.
 }
 ```
 
+- **Implementado.** Se puede crear equipo antes de que el educador inicie la sesión, mientras corre
+  y en pausa; no cuando ya terminó.
 - Errores: `EVENT_NOT_FOUND`, `EVENT_FINISHED`, `EVENT_FULL` (ya hay `maxTeams` equipos),
-  `TEAM_NAME_TAKEN`, `VALIDATION_ERROR`.
+  `TEAM_NAME_TAKEN` (sin distinguir mayúsculas: "Los Innovadores" = "los innovadores"),
+  `RATE_LIMITED`, `VALIDATION_ERROR` con `fields`: `eventCode` → `REQUIRED`; `name` →
+  `REQUIRED` | `TOO_LONG` (máx. 40); `nickname` → `REQUIRED` | `TOO_LONG` (máx. 30).
+- El código del evento se acepta en minúsculas o con espacios; el backend lo normaliza.
 - `joinCode`: 6 caracteres, mismo alfabeto que el código del evento. El link de invitación sigue
   siendo `/team/join?code=<joinCode>`.
 - **Cambio en el frontend:** hoy `team/create` solo muestra el código y el link en el caso 501.
@@ -169,9 +174,9 @@ Lista de equipos para que quien se une elija por nombre real.
 { "teams": [{ "name": "Los Innovadores", "memberCount": 3, "maxTeamSize": 5 }] }
 ```
 
-- **Nunca devuelve `joinCode`** (cualquiera con el código del evento podría entrar a cualquier
-  equipo). Para unirse hace falta el código que comparte el líder.
-- Errores: `EVENT_NOT_FOUND`.
+- **Implementado.** **Nunca devuelve `joinCode`** (cualquiera con el código del evento podría entrar
+  a cualquier equipo). Para unirse hace falta el código que comparte el líder.
+- Errores: `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`eventCode` vacío).
 
 ### `POST /api/participants` — Público (crea la sesión del jugador)
 
@@ -185,10 +190,18 @@ Unirse a un equipo.
   "team": { "id": "uuid", "name": "Los Innovadores" },
   "participant": { "id": "uuid", "nickname": "Ana", "role": "MEMBER" }
 }
+// 200 + cookie tdoe_player (ese nickname ya estaba en el equipo: recupera su lugar)
+{ "team": { ... }, "participant": { ... }, "recovered": true }
 ```
 
-- Errores: `TEAM_NOT_FOUND` (código inválido o regenerado), `TEAM_FULL`, `NICKNAME_TAKEN`,
-  `EVENT_FINISHED`, `VALIDATION_ERROR`.
+- **Implementado.**
+- **Volver a entrar:** si alguien pierde su sesión (otro celular, borró el navegador), entra otra vez
+  con el código del equipo y **el mismo nickname** (sin importar mayúsculas) y recupera su lugar
+  (`200` con `recovered: true`). Por eso no existe `NICKNAME_TAKEN`. Solo puede hacerlo quien tenga
+  el código del equipo.
+- Errores: `TEAM_NOT_FOUND` (código inválido o regenerado), `TEAM_FULL`, `EVENT_FINISHED`,
+  `RATE_LIMITED`, `VALIDATION_ERROR` con `fields`: `teamJoinCode` → `REQUIRED`; `nickname` →
+  `REQUIRED` | `TOO_LONG`.
 - El límite de integrantes se valida dentro de una transacción con el equipo bloqueado, así que dos
   personas entrando al mismo tiempo no pueden pasarse de `maxTeamSize`.
 - **Cambio en el frontend:** quien abre el link de invitación (`/team/join?code=...`) llega sin
@@ -198,22 +211,43 @@ Unirse a un equipo.
 ### `PUT /api/submissions` — Jugador
 
 Entrega del proyecto del equipo (`SubmissionModal`). Una entrega por equipo; cada `PUT` la
-reemplaza.
+reemplaza. **Implementado.**
 
 ```json
-// request
-{ "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app", "description": "..." }
-// 200
-{ "submission": { "type": "DEPLOY_LINK", "url": "https://...", "fileUrl": null, "description": "...", "submittedAt": "2026-11-13T10:00:00Z" } }
+// request (lo que ya manda el frontend, más `links` opcional)
+{ "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app", "links": ["https://github.com/equipo/app"], "description": "..." }
+// 200 (mismo cuerpo que GET /api/submissions)
+{
+  "submission": { "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app/", "links": ["https://github.com/equipo/app"], "description": "...", "submittedAt": "2026-11-13T10:00:00Z" },
+  "files": [ SubmissionFileDTO ]
+}
+```
+
+```ts
+type SubmissionFileDTO = {
+  id: string;
+  fileName: string; // nombre original
+  contentType: string;
+  size: number; // bytes
+  downloadUrl: string; // "/api/submissions/files/<id>" (redirige a una URL firmada de 60 s)
+};
 ```
 
 - `type`: `DEPLOY_LINK` | `REPO_LINK` | `FILE_OR_IMAGE` | `NONE`.
-- `url` obligatorio con `DEPLOY_LINK` y `REPO_LINK` (solo `https://`). `fileUrl` obligatorio con
-  `FILE_OR_IMAGE` y tiene que venir de `POST /api/submissions/upload-url`.
-- Errores: `VALIDATION_ERROR`, `INVALID_URL`, `DEADLINE_PASSED`, `EVENT_NOT_ACTIVE`.
-- ❓ ¿Puede entregar cualquier miembro o solo el líder?
-- ❓ El PM pidió **PDF y Word más un apartado de links**. Hoy es un solo `url` + un solo `fileUrl`.
-  ¿Varios archivos? ¿Varios links? Si sí, el body cambia a listas.
+- `url` (link principal) obligatorio con `DEPLOY_LINK` y `REPO_LINK`. `links`: hasta 5 links extra
+  (otras páginas, presentación, video). Todos tienen que ser `https://`.
+- `FILE_OR_IMAGE` necesita al menos un archivo ya subido (ver "Archivos de la entrega" abajo). Los
+  archivos pertenecen al equipo, no a un `type`: un equipo puede entregar un link **y** archivos.
+- Cualquier miembro puede entregar, mientras la sesión está `ACTIVE` y con tiempo.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_ACTIVE` (sin iniciar o en pausa), `DEADLINE_PASSED` (se acabó
+  el tiempo o el evento terminó), `VALIDATION_ERROR` con `fields`: `type` → `INVALID`; `url` →
+  `REQUIRED` | `INVALID_URL`; `links` → `INVALID` (no es lista o son más de 5) | `INVALID_URL`;
+  `description` → `TOO_LONG` (máx. 2000); `files` → `REQUIRED` (`FILE_OR_IMAGE` sin archivos).
+
+### `GET /api/submissions` — Jugador
+
+La entrega del equipo y sus archivos: `{ "submission": ... | null, "files": [SubmissionFileDTO] }`.
+**Implementado.** `GET /api/board` también trae `submission` y `files`.
 
 ### `GET /api/phases?eventId=` → reemplazado por `GET /api/board`
 
@@ -228,6 +262,18 @@ Ya implementado. Sin datos sensibles.
 ---
 
 ## 3. Endpoints nuevos para el jugador 🆕
+
+**Implementados** (salvo los de entregas). Defaults que se tomaron mientras no haya otra decisión;
+cualquiera se puede cambiar después sin rehacer nada:
+
+- Cualquier miembro del equipo puede contestar fases; una fase concluida ya no se edita.
+- Puntos por fase: **0** por ahora (`POINTS_PER_PHASE` en `features/event/server/board.ts`;
+  cambiar ese número basta para empezar a dar puntos).
+- Dos miembros pueden tener el mismo rol del juego de rol.
+- El tablero solo avanza con la sesión `ACTIVE` y tiempo restante (en pausa o con el tiempo
+  agotado responde `EVENT_NOT_ACTIVE` / `EVENT_FINISHED`).
+- Se guarda quién contestó cada fase (`TeamPhase.completedById`), para el registro de actividad.
+- Sin sesión de jugador, cualquier página de `/[locale]/jogador/*` redirige al login (`/[locale]`).
 
 ### `GET /api/board` — Jugador
 
@@ -279,7 +325,8 @@ que no haya que convertir nada.
     }
   },
   "cartaAtiva": { "key": "problema", "text": "..." },
-  "submission": null
+  "submission": null,
+  "files": []
 }
 ```
 
@@ -289,8 +336,11 @@ que no haya que convertir nada.
 - `phases.*.status`: `bloqueada` | `disponivel` | `concluida` (igual que `PhaseStatus`).
 - Las 4 llaves siempre vienen en el objeto, cada una con sus 3 fases.
 - Sustituye los miembros de prueba (`["Ana", "Bruno", "Carla"]`) y el `nickname` que hoy llega por
-  la URL: el dashboard ya no necesita `?nickname=`.
-- Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar a `/team`).
+  la URL: el dashboard ya no necesita `?nickname=`. `me` es el jugador; `members` son los demás.
+- `event.playable`: `true` si ahora mismo se puede contestar (sesión activa y con tiempo). Sirve para
+  deshabilitar los botones en pausa.
+- `cartaAtiva` llega siempre `null` hasta que se defina la carta de reto.
+- Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar al login).
 
 ### Cómo avanza el tablero (lo calcula el backend)
 
@@ -305,8 +355,7 @@ No hay endpoint para activar una llave: el estado se calcula a partir de las fas
 - Cuando las 4 están `concluida`, el tablero está completo (el frontend ya muestra la entrega).
 - Esto reemplaza `ativarChave` del prototipo y su botón. En el prototipo, después de Problema el
   equipo elegía el orden de las otras 3; con el avance automático el orden es fijo.
-- Nota de esquema: `TeamPhase.keyActivated` ya no hace falta (la llave activa es la primera no
-  concluida). Se quita en una migración cuando se implemente.
+- `TeamPhase.keyActivated` se quitó del esquema: la llave activa es la primera no concluida.
 
 ### `PUT /api/board/keys/:key/phases/:order` — Jugador
 
@@ -319,12 +368,11 @@ siguiente llave si era la fase 3. Responde el tablero completo (`200`, mismo cue
 { "conteudo": "El problema ocurre en..." }
 ```
 
-- Errores: `KEY_LOCKED` (llave todavía bloqueada), `PHASE_LOCKED`, `EVENT_NOT_ACTIVE`,
-  `VALIDATION_ERROR` (vacío, más de 5000 caracteres, o llave/fase que no existe).
-- Si dos miembros concluyen la misma fase al mismo tiempo, gana el primero y el segundo recibe el
-  tablero ya actualizado (no es error).
-- ❓ ¿Se puede editar una fase ya concluida? ¿Cualquier miembro puede concluir, o solo el líder?
-- ❓ Puntos (`TeamPhase.pointsAwarded`, `Team.score`): ¿cuántos por fase? ¿Hay leaderboard visible?
+- Errores: `UNAUTHORIZED`, `KEY_LOCKED` (llave todavía bloqueada), `PHASE_LOCKED`,
+  `EVENT_NOT_ACTIVE`, `EVENT_FINISHED`, `VALIDATION_ERROR` con `fields`: `key` / `order` →
+  `INVALID`; `conteudo` → `REQUIRED` | `TOO_LONG` (máx. 5000).
+- Si la fase ya estaba concluida (por ejemplo, dos miembros al mismo tiempo), responde `200` con el
+  tablero actual; no es error ni sobrescribe la respuesta.
 
 ### `PUT /api/participants/me/rpg-role` — Jugador
 
@@ -338,8 +386,8 @@ de `rpgRoles.ts`.
 { "rpgRole": "pesquisador" }
 ```
 
-- Errores: `VALIDATION_ERROR`.
-- ❓ ¿Dos miembros del mismo equipo pueden tener el mismo rol?
+- `"rpgRole": null` quita el rol. Dos miembros pueden tener el mismo.
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`rpgRole` → `INVALID`).
 
 ### `POST /api/teams/me/join-code` — Líder
 
@@ -350,28 +398,50 @@ Regenera el código de invitación; el anterior deja de servir.
 { "joinCode": "P4WN8D" }
 ```
 
-- Errores: `FORBIDDEN` (no es líder).
+- Los miembros que ya entraron conservan su sesión.
+- Errores: `UNAUTHORIZED`, `FORBIDDEN` (no es líder).
 
-### `POST /api/submissions/upload-url` — Jugador
+### Archivos de la entrega — Jugador
 
-Pide una URL firmada para subir un archivo directo a Supabase Storage (bucket privado).
+**Implementado.** Los archivos se suben **directo del navegador a Supabase Storage** (bucket privado
+`submissions`) con una URL de un solo uso; nuestro servidor no recibe el archivo. Son 3 pasos:
 
 ```json
-// request
-{ "fileName": "pitch.pdf", "contentType": "application/pdf", "size": 2400000 }
+// 1. POST /api/submissions/files
+{ "fileName": "Propuesta Final.pdf", "contentType": "application/pdf", "size": 2400000 }
+// 201
+{ "file": { ...SubmissionFileDTO, "status": "PENDING" }, "uploadUrl": "https://<proyecto>.supabase.co/storage/v1/object/upload/sign/..." }
+
+// 2. PUT <uploadUrl>  — body: el archivo; header Content-Type: el mismo contentType del paso 1
+
+// 3. POST /api/submissions/files/:id/confirm
 // 200
-{ "uploadUrl": "https://...", "fileUrl": "submissions/<teamId>/<uuid>.pdf" }
+{ "file": { ...SubmissionFileDTO, "status": "READY" } }
 ```
 
-Después de subir con `PUT uploadUrl`, el frontend manda `fileUrl` en `PUT /api/submissions`.
+- En el paso 3 el backend revisa **el contenido real** del archivo (sus primeros bytes), no solo el
+  nombre: un HTML renombrado a `.pdf` se rechaza y se borra. Confirmar dos veces no es error.
+- Permitidos (por defecto, se cambian en `features/submission/server/rules.ts`): PDF, Word (`.doc`,
+  `.docx`), PowerPoint (`.ppt`, `.pptx`) e imágenes (`.png`, `.jpg`, `.webp`). Máximo **20 MB** por
+  archivo y **5 archivos** por equipo. Storage también rechaza otros tipos y tamaños por su cuenta.
+- Una subida que no se confirma en 1 hora se descarta sola.
+- Errores del paso 1: `FILE_TYPE_NOT_ALLOWED` (extensión no permitida o que no coincide con
+  `contentType`), `FILE_TOO_LARGE`, `TOO_MANY_FILES`, `EVENT_NOT_ACTIVE`, `DEADLINE_PASSED`,
+  `VALIDATION_ERROR` (`fileName` / `contentType` → `REQUIRED`, `size` → `INVALID`).
+- Errores del paso 3: `FILE_NOT_FOUND`, `FILE_NOT_UPLOADED` (todavía no se subió nada),
+  `FILE_TYPE_NOT_ALLOWED` (el contenido no corresponde), `FILE_TOO_LARGE`, `EVENT_NOT_ACTIVE`,
+  `DEADLINE_PASSED`.
 
-- Errores: `FILE_TYPE_NOT_ALLOWED`, `FILE_TOO_LARGE`.
-- ❓ Tipos permitidos: PDF y `.docx`. ¿También `.doc` viejo e imágenes? ¿Tamaño máximo?
+`DELETE /api/submissions/files/:id` — un miembro del equipo borra un archivo (`204`), mientras la
+entrega esté abierta. Errores: `FILE_NOT_FOUND`, `EVENT_NOT_ACTIVE`, `DEADLINE_PASSED`.
+
+`GET /api/submissions/files/:id` — descarga. Redirige (`307`) a una URL firmada que vence en 60 s y
+baja el archivo con su nombre original. Pueden descargar los miembros del equipo y el educador
+dueño del evento (también después de que termina). Errores: `UNAUTHORIZED`, `FILE_NOT_FOUND`.
 
 ### `POST /api/auth/logout` — Staff o Jugador
 
-Borra la cookie. `204`. **Implementado para staff**; la cookie del jugador se agrega cuando exista
-su sesión.
+Borra las cookies de educador y de jugador. `204`. **Implementado.**
 
 ---
 
@@ -483,7 +553,6 @@ Se define cuando el resto esté funcionando.
 | Código                      | HTTP | Cuándo                                                           |
 | --------------------------- | ---- | ---------------------------------------------------------------- |
 | `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo            |
-| `INVALID_URL`               | 400  | Link de entrega no es `https://` válido                          |
 | `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                     |
 | `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                 |
 | `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
@@ -491,14 +560,16 @@ Se define cuando el resto esté funcionando.
 | `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
 | `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
 | `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
+| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                             |
 | `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
 | `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
-| `NICKNAME_TAKEN`            | 409  | Ya hay alguien con ese nickname en el equipo                     |
 | `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
 | `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                     |
 | `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
 | `EVENT_FINISHED`            | 409  | El evento terminó                                                |
 | `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
+| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
+| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
 | `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                  |
 | `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
 | `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
@@ -536,4 +607,7 @@ Se define cuando el resto esté funcionando.
 6. `EducadorPanel` / `SocializacaoPanel`: cargar de `GET /api/events` y
    `GET /api/events/:id/overview`.
 7. Traducir los códigos de error de la sección 5 en los 4 diccionarios.
-8. Si una llamada responde `401`, mandar al jugador a `/team` y al educador al login.
+8. Si una llamada responde `401`, mandar al login (`/[locale]`) tanto al jugador como al educador.
+9. `SubmissionModal`: para archivos, seguir los 3 pasos de "Archivos de la entrega" (pedir URL,
+   subir directo a Storage, confirmar). Mostrar la lista de `files` con su `downloadUrl` y un botón
+   para borrar. Opcional: un campo para los links extra (`links`).

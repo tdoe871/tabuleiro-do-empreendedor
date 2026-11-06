@@ -3,6 +3,7 @@ import { prisma } from "@tdoe/db";
 
 import { toEventDTO } from "@/features/event/server/event";
 import { computeKeyStatuses } from "@/features/event/server/progress";
+import { toFileDTO, toSubmissionDTO } from "@/features/submission/server/dto";
 import { apiError } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
 
@@ -37,8 +38,19 @@ export async function GET(
               select: {
                 type: true,
                 url: true,
+                links: true,
                 description: true,
                 submittedAt: true,
+              },
+            },
+            files: {
+              where: { status: "READY" },
+              orderBy: { createdAt: "asc" },
+              select: {
+                id: true,
+                fileName: true,
+                contentType: true,
+                size: true,
               },
             },
           },
@@ -63,13 +75,9 @@ export async function GET(
         score: team.score,
         keys,
         submission: team.submission?.submittedAt
-          ? {
-              type: team.submission.type,
-              url: team.submission.url,
-              description: team.submission.description,
-              submittedAt: team.submission.submittedAt.toISOString(),
-            }
+          ? toSubmissionDTO(team.submission)
           : null,
+        files: team.files.map(toFileDTO),
       };
     });
 

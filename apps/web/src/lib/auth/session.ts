@@ -58,6 +58,70 @@ export async function verifyStaffSession(
   }
 }
 
+// Player session: identifies the participant and pins their team and event,
+// so every player endpoint takes identity from here and never from the body.
+// Long enough to cover the 24 h event plus margin.
+export const PLAYER_SESSION_COOKIE = "tdoe_player";
+export const PLAYER_SESSION_DURATION_SECONDS = 60 * 60 * 36;
+
+export type PlayerSession = {
+  participantId: string;
+  teamId: string;
+  eventId: string;
+};
+
+export async function createPlayerSession(
+  session: PlayerSession,
+): Promise<string> {
+  const key = getSecretKey();
+  if (!key) {
+    throw new Error(
+      `AUTH_SECRET is not set or is shorter than ${MIN_SECRET_LENGTH} characters`,
+    );
+  }
+
+  return new SignJWT({
+    kind: "player",
+    teamId: session.teamId,
+    eventId: session.eventId,
+  })
+    .setProtectedHeader({ alg: ALGORITHM })
+    .setSubject(session.participantId)
+    .setIssuedAt()
+    .setExpirationTime(`${PLAYER_SESSION_DURATION_SECONDS}s`)
+    .sign(key);
+}
+
+export async function verifyPlayerSession(
+  token: string | undefined,
+): Promise<PlayerSession | null> {
+  if (!token) return null;
+
+  const key = getSecretKey();
+  if (!key) return null;
+
+  try {
+    const { payload } = await jwtVerify(token, key, {
+      algorithms: [ALGORITHM],
+    });
+    if (
+      payload.kind !== "player" ||
+      typeof payload.sub !== "string" ||
+      typeof payload.teamId !== "string" ||
+      typeof payload.eventId !== "string"
+    ) {
+      return null;
+    }
+    return {
+      participantId: payload.sub,
+      teamId: payload.teamId,
+      eventId: payload.eventId,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function sessionCookieOptions(maxAge: number) {
   return {
     httpOnly: true,

@@ -102,16 +102,17 @@ model Phase {
 // team instead of guessing a raw number. The first participant to create a
 // team becomes its leader automatically.
 model Team {
-  id            String        @id @default(uuid())
+  id            String           @id @default(uuid())
   eventId       String
-  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event         Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
   name          String
-  joinCode      String        @unique
-  score         Int           @default(0)
+  joinCode      String           @unique
+  score         Int              @default(0)
   participants  Participant[]
   phaseProgress TeamPhase[]
   submission    Submission?
-  createdAt     DateTime      @default(now())
+  files         SubmissionFile[]
+  createdAt     DateTime         @default(now())
 
   @@unique([eventId, name])
 }
@@ -122,30 +123,35 @@ enum ParticipantRole {
 }
 
 model Participant {
-  id       String          @id @default(uuid())
-  teamId   String
-  team     Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  nickname String
-  role     ParticipantRole @default(MEMBER)
-  rpgRole  String? // optional gamification role, kept from the original prototype
-  joinedAt DateTime        @default(now())
+  id              String           @id @default(uuid())
+  teamId          String
+  team            Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  nickname        String
+  role            ParticipantRole  @default(MEMBER)
+  rpgRole         String? // optional gamification role, kept from the original prototype
+  joinedAt        DateTime         @default(now())
+  completedPhases TeamPhase[]
+  uploadedFiles   SubmissionFile[]
 
   @@unique([teamId, nickname])
 }
 
 model TeamPhase {
-  id            String    @id @default(uuid())
+  id            String       @id @default(uuid())
   teamId        String
-  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team          Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
   phaseId       String
-  phase         Phase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  keyActivated  Boolean   @default(false)
+  phase         Phase        @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   content       String? // the team's answer to the phase question
   completedAt   DateTime?
-  pointsAwarded Int       @default(0)
+  // Who answered it (any team member can). Kept for the activity record.
+  completedById String?
+  completedBy   Participant? @relation(fields: [completedById], references: [id], onDelete: SetNull)
+  pointsAwarded Int          @default(0)
 
   @@unique([teamId, phaseId])
   @@index([phaseId])
+  @@index([completedById])
 }
 
 // Per UX fix #1: teams need a place to deliver their project. Most hackathon
@@ -164,11 +170,37 @@ model Submission {
   teamId      String         @unique
   team        Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
   type        SubmissionType @default(NONE)
-  url         String? // deploy link or repo link
-  fileUrl     String? // Supabase Storage URL for a presentation/image
+  url         String? // main link: deploy link or repo link
+  links       String[]       @default([]) // extra links (other pages, slides, video)
+  fileUrl     String? // unused: files live in SubmissionFile
   description String?
   submittedAt DateTime?
   updatedAt   DateTime       @updatedAt
+}
+
+enum SubmissionFileStatus {
+  PENDING // upload URL issued, not confirmed yet
+  READY // uploaded and its content checked
+}
+
+// Files a team uploads for its delivery (PDF, Word, slides, images). They
+// live in the private "submissions" Storage bucket at `path`; downloads go
+// through short-lived signed URLs.
+model SubmissionFile {
+  id           String               @id @default(uuid())
+  teamId       String
+  team         Team                 @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  path         String               @unique // object path inside the bucket
+  fileName     String // original name, for display and download
+  contentType  String
+  size         Int
+  status       SubmissionFileStatus @default(PENDING)
+  uploadedById String?
+  uploadedBy   Participant?         @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime             @default(now())
+
+  @@index([teamId])
+  @@index([uploadedById])
 }
 
 enum AlertSeverity {
