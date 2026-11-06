@@ -24,6 +24,331 @@
     "deployLink": "Link del deployment (Vercel, Netlify, etc.)",
     "repoLink": "Link del repositorio",
     "fileOrImage": "Presentación o imagen",
-    "none": "Sin entrega de código"
+    "none": "Sin entrega de código",
+    "chooseType": "Tipo de entrega",
+    "urlLabel": "Link",
+    "urlPlaceholder": "https://tu-proyecto.vercel.app",
+    "descriptionLabel": "Descripción (opcional)",
+    "descriptionPlaceholder": "Cuenta brevemente sobre el proyecto…",
+    "submit": "Guardar entrega →",
+    "saved": "Entrega guardada localmente — falta conectar con el backend.",
+    "editar": "✏️ Editar entrega",
+    "abrir": "📦 Entregar proyecto",
+    "status": "Entrega registrada"
+  },
+  "keys": {
+    "problema": {
+      "name": "Problema",
+      "icon": "🔍",
+      "desc": "La clave Problema representa el inicio de la dinámica, ya que su identificación es resultado de la interacción de los jugadores que, al compartir sus experiencias, reflexionan sobre el contexto investigado (Landry, 1995; Bianchi; Verganti, 2021), delimitándolo y caracterizándolo a partir de vivencias establecidas con el entorno. En este proceso, la motivación para resolver el problema se vuelve un aspecto compartido por el equipo (Hevner et al., 2004; Bianchi; Verganti, 2021).\n\nEl problema puede comprenderse a partir de su identificación en el contexto, siendo: ocurrencia negativa, evaluación de una intervención, uso de recursos sin planificación y situaciones de incertidumbre (Landry, 1995). Bianchi y Verganti (2021) destacan que la identificación de problemas involucra componentes que no se limitan a procesos analíticos, sino a la construcción interpretativa de los participantes, derivada de transformaciones sociales, culturales y tecnológicas."
+    },
+    "solucao": {
+      "name": "Solución",
+      "icon": "✓",
+      "desc": "La clave Solución corresponde al camino de investigación en el que los participantes construyen una solución aplicable al contexto, estableciendo respuestas o alternativas para el problema identificado. En esta etapa, los participantes ejercitan la creatividad y la toma de decisiones frente a propuestas viables y generadoras de valor (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).\n\nAnte esto, el comportamiento de los jugadores influye en las posibilidades de creación de nuevos negocios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020)."
+    },
+    "parcerias": {
+      "name": "Alianzas",
+      "icon": "🤝",
+      "desc": "Estimula a los participantes a analizar el contexto y definir alianzas estratégicas para la implementación de la propuesta emprendedora. Para esto, la combinación de los conocimientos de diferentes actores, que se organizan alrededor de un objetivo común (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contribuye al desarrollo de proyectos, con definición de plazos, responsabilidades (Reed; Reed, 2009), recursos y condiciones de actuación (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021)."
+    },
+    "oportunidades": {
+      "name": "Oportunidades",
+      "icon": "💡",
+      "desc": "La clave Oportunidades representa una posibilidad identificada por los participantes a través de la contextualización del problema y de las soluciones construidas durante la investigación. De esta forma, la oportunidad se vuelve un proceso de creación de valor (George et al., 2016), tanto por el comportamiento del emprendedor, que utiliza competencias emprendedoras, como por las posibles transformaciones en el contexto investigado (Wood y Mickinley, 2020).\n\nEn este sentido, los autores presentan la oportunidad como un paraguas que permite comprender procesos de creación de nuevos negocios (Wood; Mickinley, 2020) y el desarrollo de ideas (Matzembacher et al., 2019), a partir del descubrimiento, evaluación y explotación (Shane; Venkataraman, 2000; Wood; Mickinley, 2020)."
+    }
+  },
+  "login": {
+    "heroHl": "Tu idea",
+    "heroJogo": "en JUEGO",
+    "heroTag": "Una metodología activa que transforma problemas reales en propuestas de impacto — investigando, construyendo soluciones, formando alianzas y revelando oportunidades.",
+    "conceitosTitle": "Conoce las claves",
+    "footer": "Plataforma desarrollada como parte de una investigación de doctorado en Administración\nde la Universidad Federal de Lavras (UFLA)",
+    "tabs": {
+      "login": "Entrar",
+      "cadastro": "Crear cuenta",
+      "codigo": "Código"
+    },
+    "form": {
+      "titleEdu": "Bienvenido de nuevo",
+      "subEdu": "Accede a tu cuenta de educador",
+      "email": "Correo",
+      "senha": "Contraseña",
+      "enter": "Entrar →",
+      "titleCad": "Crear cuenta",
+      "subCad": "Completa para empezar",
+      "nome": "Nombre",
+      "sobrenome": "Apellido",
+      "confirmar": "Confirmar",
+      "criarConta": "Crear cuenta →",
+      "titleCod": "Entrar con código",
+      "subCod": "Para jugadores — sin registro",
+      "seuNome": "Tu nombre",
+      "comoChamado": "Cómo quieres que te llamen",
+      "codigoSessao": "Código de la sesión",
+      "codigoPlaceholder": "Ej: A7X3K2",
+      "entrarJogo": "Entrar al juego →",
+      "codeHint1": "Código proporcionado por el educador",
+      "codeHint2": "Pide el código de 6 letras para empezar"
+    }
+  },
+  "educador": {
+    "painelTitulo": "Panel del educador",
+    "status": {
+      "aguardando": "En espera",
+      "ativa": "Activa",
+      "pausada": "Pausada",
+      "finalizada": "Finalizada"
+    },
+    "extensoes": "Extensiones",
+    "acao": {
+      "iniciar": "Iniciar partida",
+      "pausar": "Pausar partida",
+      "retomar": "Reanudar partida"
+    },
+    "socializar": "Socializar",
+    "sair": "Salir",
+    "nenhumaSessao": "Todavía no hay sesiones",
+    "sidebar": {
+      "sessoes": "Sesiones",
+      "acoes": "Acciones",
+      "novaSessao": "Nueva sesión",
+      "verificarAlertas": "Verificar alertas",
+      "exportar": "Exportar",
+      "relatorio": "Reporte de interacción",
+      "exportarPropostas": "Exportar propuestas"
+    },
+    "metrics": {
+      "equipesAtivas": "Equipos activos",
+      "participantes": "Participantes",
+      "chavesConcluidas": "Claves completadas",
+      "codigoAcesso": "Código de acceso"
+    },
+    "right": {
+      "alertasMediacao": "Alertas de mediación",
+      "nenhumAlerta": "Sin alertas activas",
+      "controlesSessao": "Controles de la sesión",
+      "iniciar": "Iniciar",
+      "pausar": "Pausar",
+      "retomar": "Reanudar",
+      "alertas": "Alertas"
+    },
+    "timer": {
+      "titulo": "Reloj de la fase",
+      "duracao": "Duración",
+      "definir": "Definir",
+      "iniciar": "Iniciar",
+      "parar": "Detener",
+      "mostrarEstudantes": "Mostrar timer a los estudiantes"
+    },
+    "carta": {
+      "titulo": "Carta-desafío",
+      "ativa": "Carta activa",
+      "remover": "Quitar carta",
+      "enviar": "Enviar carta",
+      "launcherSub": {
+        "problema": "Profundizar investigación",
+        "solucao": "Revisar propuesta",
+        "parcerias": "Ampliar alianzas",
+        "oportunidades": "Descubrir nuevo camino"
+      },
+      "prompts": {
+        "problema": "Identifiquen un problema aún más específico en el contexto investigado y propongan una nueva perspectiva.",
+        "solucao": "Revisen la solución propuesta considerando nuevos criterios de viabilidad e impacto.",
+        "parcerias": "Mapeen al menos tres nuevos socios estratégicos y justifiquen el papel de cada uno.",
+        "oportunidades": "Identifiquen una oportunidad de mercado no explorada y describan cómo aprovecharla."
+      }
+    },
+    "modalSessao": {
+      "titulo": "Nueva sesión",
+      "sub": "Configura la sesión de investigación emprendedora",
+      "tituloLabel": "Título de la sesión",
+      "tituloPlaceholder": "Ej: Barrio Nuevo Horizonte — EJA",
+      "modoLabel": "Modo de investigación",
+      "modoEscolar": "🌱 Escolar — los equipos definen el problema",
+      "modoPersonalizado": "✏️ Personalizado — el educador define el contexto",
+      "contextoLabel": "Contexto de investigación",
+      "contextoPlaceholder": "Ej: Son agentes de transformación del barrio Nuevo Horizonte…",
+      "contextoAjuda": "Este texto se mostrará a los equipos al iniciar la sesión.",
+      "numEquipesLabel": "Número de equipos (hasta 80 — sin límite de 10)",
+      "integrantesLabel": "Integrantes por equipo",
+      "cancelar": "Cancelar",
+      "criar": "Crear sesión →"
+    },
+    "toasts": {
+      "selecioneSessao": "Selecciona una sesión",
+      "nenhumAlertaNovo": "Sin alertas nuevas",
+      "tituloObrigatorio": "Escribe un título para la sesión",
+      "contextoObrigatorio": "Describe el contexto de investigación",
+      "sessaoCriada": "¡Sesión creada! Código: {code}",
+      "backendPendente": "Backend en construcción — sesión mostrada localmente."
+    }
+  },
+  "jogador": {
+    "topbarTitulo": "Tablero",
+    "semChaveAtiva": "— sin clave activa —",
+    "sair": "Salir",
+    "score": {
+      "label": "Puntos de investigación",
+      "unidade": "pts",
+      "verResumo": "Ver resumen"
+    },
+    "timer": { "label": "Tiempo de la fase" },
+    "cenario": {
+      "titulo": "Sesión de investigación",
+      "sub": "Eres un agente de transformación."
+    },
+    "membros": {
+      "titulo": "Miembros del equipo",
+      "voce": "tú",
+      "ativo": "activo"
+    },
+    "comm": {
+      "equipe": "Equipo",
+      "individual": "Individual",
+      "registro": "Registro",
+      "placeholderEquipe": "Habla con todo el equipo…",
+      "placeholderIndividual": "Mensaje privado…",
+      "soDestinatario": "🔒 Solo el destinatario lo lee",
+      "enviar": "Enviar →",
+      "paraQuem": "¿Para quién?",
+      "semMensagens": "Todavía no hay mensajes",
+      "historico": "Historial de la sesión · visible para el educador"
+    },
+    "chave": {
+      "concluida": "✓ Hecha",
+      "ativa": "⏱ Activa",
+      "disponivel": "▶ Disponible",
+      "padrao": "○ Disponible",
+      "iniciar": "Iniciar {nome}",
+      "bloqueadaPorProblema": "🔒 Completa Problema primero",
+      "clique": "toca",
+      "bloqueada": "🔒"
+    },
+    "fase": {
+      "tituloModal": "Fase {numero} — {nome}",
+      "label": "Contenido investigado por el equipo",
+      "placeholder": "Describe lo que descubrió el equipo…",
+      "vazio": "Describe lo que descubrió el equipo",
+      "cancelar": "Cancelar",
+      "concluir": "✓ Completar fase",
+      "salvar": "✓ Guardar edición"
+    },
+    "congrats": {
+      "chaveConcluida": "¡Clave completada! 🎉",
+      "faseConcluidaTpl": "¡Fase {numero} completada!",
+      "todasFasesCompletas": "todas las fases completas",
+      "continuar": "Seguir investigando →",
+      "pontos": "puntos de investigación"
+    },
+    "fases": {
+      "problema": [
+        { "nome": "Contexto", "pergunta": "¿Dónde ocurre el problema?" },
+        {
+          "nome": "Características",
+          "pergunta": "¿Cómo afecta el problema al contexto?"
+        },
+        {
+          "nome": "Motivación",
+          "pergunta": "¿Por qué vale la pena investigar este problema?"
+        }
+      ],
+      "solucao": [
+        { "nome": "Características", "pergunta": "¿Cómo será la solución?" },
+        {
+          "nome": "Costos",
+          "pergunta": "¿Cuáles son los gastos para implementar la solución?"
+        },
+        {
+          "nome": "Riesgos",
+          "pergunta": "¿Qué barreras pueden dificultar o inviabilizar la implementación de la solución?"
+        }
+      ],
+      "parcerias": [
+        {
+          "nome": "Recursos",
+          "pergunta": "¿Quién puede ofrecer los servicios o productos en la localidad?"
+        },
+        {
+          "nome": "Características",
+          "pergunta": "¿Cuál será la responsabilidad de cada socio?"
+        },
+        {
+          "nome": "Tiempo",
+          "pergunta": "¿Cuánto tiempo pasa entre la formalización y la ejecución?"
+        }
+      ],
+      "oportunidades": [
+        {
+          "nome": "Características",
+          "pergunta": "¿Qué es y cómo se identificó la oportunidad?"
+        },
+        {
+          "nome": "Diferenciación",
+          "pergunta": "¿Cómo es innovadora la idea respecto a las actividades existentes?"
+        },
+        {
+          "nome": "Aplicabilidad",
+          "pergunta": "¿Cómo se puede desarrollar esta oportunidad en el contexto investigado?"
+        }
+      ]
+    },
+    "comm2": {
+      "cutucou": "Le diste un toque a {nome}",
+      "paraDestino": "Tú → {nome}",
+      "faseConcluidaLog": "✓ Fase {nome} de {chave} completada"
+    },
+    "rpg": {
+      "escolherTitulo": "Elige tu rol",
+      "escolherSub": "Cada rol ve el problema de una forma distinta",
+      "perspectiva": "Perspectiva",
+      "confirmar": "Asumir este rol",
+      "trocarPapel": "Cambiar rol"
+    }
+  },
+  "socializacao": {
+    "titulo": "Pitch de los equipos",
+    "aoVivo": "En vivo",
+    "voltar": "← Volver",
+    "voltarPainel": "← Volver al panel",
+    "encerrarSessao": "✓ Terminar sesión →",
+    "maisAvancada": "★ más avanzado",
+    "emInvestigacao": "En investigación...",
+    "investigada": "Investigada",
+    "proposta": "💡 Propuesta",
+    "emConstrucao": "En construcción...",
+    "resumo": {
+      "equipes": "Equipos",
+      "chavesConcluidas": "Claves completadas",
+      "contexto": "Contexto",
+      "maisAvancadaLbl": "Más avanzado"
+    },
+    "avisoDemo": "Vista previa — datos de ejemplo, falta conectar con el backend real."
+  },
+  "rpgPapeis": {
+    "agente_saude": {
+      "nome": "Agente de Salud",
+      "titulo": "Investigador del bienestar",
+      "descricao": "Observa los impactos del problema en la salud y la calidad de vida.",
+      "perspectiva": "¿Quién está sufriendo? ¿Cómo afecta esto al cuerpo y a la rutina?"
+    },
+    "lider_comunitario": {
+      "nome": "Líder Comunitario",
+      "titulo": "Voz del territorio",
+      "descricao": "Representa a las personas del barrio y conoce las dinámicas locales.",
+      "perspectiva": "¿Qué ha intentado ya la comunidad? ¿Quién tiene poder aquí?"
+    },
+    "jovem_empreendedor": {
+      "nome": "Joven Emprendedor",
+      "titulo": "Creador de soluciones",
+      "descricao": "Piensa en cómo transformar el problema en una oportunidad sostenible.",
+      "perspectiva": "¿Qué no existe todavía aquí? ¿Qué solución podría replicarse?"
+    },
+    "pesquisador": {
+      "nome": "Investigador",
+      "titulo": "Investigador de datos",
+      "descricao": "Busca evidencias y contextos que expliquen por qué existe el problema.",
+      "perspectiva": "¿Cuáles son los datos? ¿Qué se ha estudiado ya? ¿Cuál es la raíz?"
+    }
   }
 }

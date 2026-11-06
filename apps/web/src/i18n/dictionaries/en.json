@@ -24,6 +24,330 @@
     "deployLink": "Deployment link (Vercel, Netlify, etc.)",
     "repoLink": "Repository link",
     "fileOrImage": "Presentation or image",
-    "none": "No code submission"
+    "none": "No code submission",
+    "chooseType": "Submission type",
+    "urlLabel": "Link",
+    "urlPlaceholder": "https://your-project.vercel.app",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Briefly describe the project…",
+    "submit": "Save submission →",
+    "saved": "Submission saved locally — still needs to connect to the backend.",
+    "editar": "✏️ Edit submission",
+    "abrir": "📦 Submit project",
+    "status": "Submission recorded"
+  },
+  "keys": {
+    "problema": {
+      "name": "Problem",
+      "icon": "🔍",
+      "desc": "The Problem key represents the start of the dynamic, since its identification results from the interaction of players who, by sharing their experiences, reflect on the investigated context (Landry, 1995; Bianchi; Verganti, 2021), defining and characterizing it based on experiences established with the environment. In this process, the motivation to solve the problem becomes an aspect shared by the team (Hevner et al., 2004; Bianchi; Verganti, 2021).\n\nThe problem can be understood from its identification in the context, being: a negative occurrence, the evaluation of an intervention, unplanned use of resources, and situations of uncertainty (Landry, 1995). Bianchi and Verganti (2021) point out that identifying problems involves components that are not limited to analytical processes, but to the interpretive construction of participants, arising from social, cultural, and technological transformations."
+    },
+    "solucao": {
+      "name": "Solution",
+      "icon": "✓",
+      "desc": "The Solution key corresponds to the investigation path in which participants build a solution applicable to the context, establishing responses or alternatives to the identified problem. At this stage, participants exercise creativity and decision-making when facing viable, value-generating proposals (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).\n\nGiven this, players' behavior influences the possibilities for creating new businesses (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020)."
+    },
+    "parcerias": {
+      "name": "Partnerships",
+      "icon": "🤝",
+      "desc": "Encourages participants to analyze the context and define strategic alliances to implement the entrepreneurial proposal. To do this, combining the knowledge of different actors, who organize around a common goal (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contributes to project development, with defined timelines, responsibilities (Reed; Reed, 2009), resources, and conditions for action (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021)."
+    },
+    "oportunidades": {
+      "name": "Opportunities",
+      "icon": "💡",
+      "desc": "The Opportunities key represents a possibility identified by participants through contextualizing the problem and the solutions built during the investigation. In this way, the opportunity becomes a value-creation process (George et al., 2016), both through the entrepreneur's behavior — using entrepreneurial competencies — and through possible transformations in the investigated context (Wood and Mickinley, 2020).\n\nIn this sense, the authors present opportunity as an umbrella concept for understanding the processes of new business creation (Wood; Mickinley, 2020) and idea development (Matzembacher et al., 2019), through discovery, evaluation, and exploitation (Shane; Venkataraman, 2000; Wood; Mickinley, 2020)."
+    }
+  },
+  "login": {
+    "heroHl": "Your idea",
+    "heroJogo": "in PLAY",
+    "heroTag": "An active methodology that turns real problems into proposals with impact — investigating, building solutions, forming partnerships, and revealing opportunities.",
+    "conceitosTitle": "Learn about the keys",
+    "footer": "Platform developed as part of a doctoral research project in Business Administration\nat the Federal University of Lavras (UFLA)",
+    "tabs": {
+      "login": "Sign in",
+      "cadastro": "Create account",
+      "codigo": "Code"
+    },
+    "form": {
+      "titleEdu": "Welcome back",
+      "subEdu": "Sign in to your educator account",
+      "email": "Email",
+      "senha": "Password",
+      "enter": "Sign in →",
+      "titleCad": "Create account",
+      "subCad": "Fill in to get started",
+      "nome": "First name",
+      "sobrenome": "Last name",
+      "confirmar": "Confirm",
+      "criarConta": "Create account →",
+      "titleCod": "Join with a code",
+      "subCod": "For players — no sign-up needed",
+      "seuNome": "Your name",
+      "comoChamado": "What should we call you",
+      "codigoSessao": "Session code",
+      "codigoPlaceholder": "e.g. A7X3K2",
+      "entrarJogo": "Join the game →",
+      "codeHint1": "Code provided by your educator",
+      "codeHint2": "Ask for the 6-letter code to get started"
+    }
+  },
+  "educador": {
+    "painelTitulo": "Educator panel",
+    "status": {
+      "aguardando": "Waiting",
+      "ativa": "Active",
+      "pausada": "Paused",
+      "finalizada": "Finished"
+    },
+    "extensoes": "Extensions",
+    "acao": {
+      "iniciar": "Start session",
+      "pausar": "Pause session",
+      "retomar": "Resume session"
+    },
+    "socializar": "Socialize",
+    "sair": "Sign out",
+    "nenhumaSessao": "No sessions yet",
+    "sidebar": {
+      "sessoes": "Sessions",
+      "acoes": "Actions",
+      "novaSessao": "New session",
+      "verificarAlertas": "Check alerts",
+      "exportar": "Export",
+      "relatorio": "Interaction report",
+      "exportarPropostas": "Export proposals"
+    },
+    "metrics": {
+      "equipesAtivas": "Active teams",
+      "participantes": "Participants",
+      "chavesConcluidas": "Keys completed",
+      "codigoAcesso": "Access code"
+    },
+    "right": {
+      "alertasMediacao": "Mediation alerts",
+      "nenhumAlerta": "No active alerts",
+      "controlesSessao": "Session controls",
+      "iniciar": "Start",
+      "pausar": "Pause",
+      "retomar": "Resume",
+      "alertas": "Alerts"
+    },
+    "timer": {
+      "titulo": "Phase clock",
+      "duracao": "Duration",
+      "definir": "Set",
+      "iniciar": "Start",
+      "parar": "Stop",
+      "mostrarEstudantes": "Show timer to students"
+    },
+    "carta": {
+      "titulo": "Challenge card",
+      "ativa": "Active card",
+      "remover": "Remove card",
+      "enviar": "Send card",
+      "launcherSub": {
+        "problema": "Deepen the investigation",
+        "solucao": "Review the proposal",
+        "parcerias": "Expand alliances",
+        "oportunidades": "Discover a new path"
+      },
+      "prompts": {
+        "problema": "Identify an even more specific problem within the investigated context and propose a new perspective.",
+        "solucao": "Review the proposed solution considering new feasibility and impact criteria.",
+        "parcerias": "Map out at least three new strategic partners and justify each one's role.",
+        "oportunidades": "Identify an unexplored market opportunity and describe how to seize it."
+      }
+    },
+    "modalSessao": {
+      "titulo": "New session",
+      "sub": "Configure the entrepreneurial investigation session",
+      "tituloLabel": "Session title",
+      "tituloPlaceholder": "e.g. Novo Horizonte Neighborhood — adult ed.",
+      "modoLabel": "Investigation mode",
+      "modoEscolar": "🌱 School-based — teams define the problem",
+      "modoPersonalizado": "✏️ Custom — educator defines the context",
+      "contextoLabel": "Investigation context",
+      "contextoPlaceholder": "e.g. You are change agents for the Novo Horizonte neighborhood…",
+      "contextoAjuda": "This text will be shown to teams when the session starts.",
+      "numEquipesLabel": "Number of teams (up to 80 — no 10-team cap)",
+      "integrantesLabel": "Members per team",
+      "cancelar": "Cancel",
+      "criar": "Create session →"
+    },
+    "toasts": {
+      "selecioneSessao": "Select a session",
+      "nenhumAlertaNovo": "No new alerts",
+      "tituloObrigatorio": "Enter a title for the session",
+      "contextoObrigatorio": "Describe the investigation context",
+      "sessaoCriada": "Session created! Code: {code}",
+      "backendPendente": "Backend still in progress — session shown locally."
+    }
+  },
+  "jogador": {
+    "topbarTitulo": "Board",
+    "semChaveAtiva": "— no active key —",
+    "sair": "Sign out",
+    "score": {
+      "label": "Investigation points",
+      "unidade": "pts",
+      "verResumo": "View summary"
+    },
+    "timer": { "label": "Phase time" },
+    "cenario": {
+      "titulo": "Investigation session",
+      "sub": "You are a change agent."
+    },
+    "membros": { "titulo": "Team members", "voce": "you", "ativo": "active" },
+    "comm": {
+      "equipe": "Team",
+      "individual": "Individual",
+      "registro": "Log",
+      "placeholderEquipe": "Talk to the whole team…",
+      "placeholderIndividual": "Private message…",
+      "soDestinatario": "🔒 Only the recipient reads it",
+      "enviar": "Send →",
+      "paraQuem": "To whom?",
+      "semMensagens": "No messages yet",
+      "historico": "Session history · visible to the educator"
+    },
+    "chave": {
+      "concluida": "✓ Done",
+      "ativa": "⏱ Active",
+      "disponivel": "▶ Available",
+      "padrao": "○ Available",
+      "iniciar": "Start {nome}",
+      "bloqueadaPorProblema": "🔒 Complete Problem first",
+      "clique": "tap",
+      "bloqueada": "🔒"
+    },
+    "fase": {
+      "tituloModal": "Phase {numero} — {nome}",
+      "label": "Content investigated by the team",
+      "placeholder": "Describe what the team discovered…",
+      "vazio": "Describe what the team discovered",
+      "cancelar": "Cancel",
+      "concluir": "✓ Complete phase",
+      "salvar": "✓ Save edit"
+    },
+    "congrats": {
+      "chaveConcluida": "Key completed! 🎉",
+      "faseConcluidaTpl": "Phase {numero} completed!",
+      "todasFasesCompletas": "all phases complete",
+      "continuar": "Keep investigating →",
+      "pontos": "investigation points"
+    },
+    "fases": {
+      "problema": [
+        { "nome": "Context", "pergunta": "Where does the problem happen?" },
+        {
+          "nome": "Characteristics",
+          "pergunta": "How does the problem affect the context?"
+        },
+        {
+          "nome": "Motivation",
+          "pergunta": "Why is it worth investigating this problem?"
+        }
+      ],
+      "solucao": [
+        {
+          "nome": "Characteristics",
+          "pergunta": "What will the solution look like?"
+        },
+        {
+          "nome": "Costs",
+          "pergunta": "What expenses are involved in implementing the solution?"
+        },
+        {
+          "nome": "Risks",
+          "pergunta": "What barriers could hinder or prevent implementing the solution?"
+        }
+      ],
+      "parcerias": [
+        {
+          "nome": "Resources",
+          "pergunta": "Who can provide the services or products locally?"
+        },
+        {
+          "nome": "Characteristics",
+          "pergunta": "What will each partner's responsibility be?"
+        },
+        {
+          "nome": "Timeline",
+          "pergunta": "How long between formalizing and executing?"
+        }
+      ],
+      "oportunidades": [
+        {
+          "nome": "Characteristics",
+          "pergunta": "What is the opportunity and how was it identified?"
+        },
+        {
+          "nome": "Differentiation",
+          "pergunta": "How is the idea innovative compared to existing activities?"
+        },
+        {
+          "nome": "Applicability",
+          "pergunta": "How can this opportunity be developed in the investigated context?"
+        }
+      ]
+    },
+    "comm2": {
+      "cutucou": "You poked {nome}",
+      "paraDestino": "You → {nome}",
+      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed"
+    },
+    "rpg": {
+      "escolherTitulo": "Choose your role",
+      "escolherSub": "Each role sees the problem differently",
+      "perspectiva": "Perspective",
+      "confirmar": "Take on this role",
+      "trocarPapel": "Change role"
+    }
+  },
+  "socializacao": {
+    "titulo": "Team pitches",
+    "aoVivo": "Live",
+    "voltar": "← Back",
+    "voltarPainel": "← Back to panel",
+    "encerrarSessao": "✓ End session →",
+    "maisAvancada": "★ most advanced",
+    "emInvestigacao": "Investigating...",
+    "investigada": "Investigated",
+    "proposta": "💡 Proposal",
+    "emConstrucao": "In progress...",
+    "resumo": {
+      "equipes": "Teams",
+      "chavesConcluidas": "Keys completed",
+      "contexto": "Context",
+      "maisAvancadaLbl": "Most advanced"
+    },
+    "avisoDemo": "Preview — sample data, still needs to connect to the real backend."
+  },
+  "rpgPapeis": {
+    "agente_saude": {
+      "nome": "Health Agent",
+      "titulo": "Wellbeing investigator",
+      "descricao": "Observes the problem's impact on health and quality of life.",
+      "perspectiva": "Who is suffering? How does this affect the body and daily routine?"
+    },
+    "lider_comunitario": {
+      "nome": "Community Leader",
+      "titulo": "Voice of the territory",
+      "descricao": "Represents the neighborhood's people and knows the local dynamics.",
+      "perspectiva": "What has the community already tried? Who holds power here?"
+    },
+    "jovem_empreendedor": {
+      "nome": "Young Entrepreneur",
+      "titulo": "Solution creator",
+      "descricao": "Thinks about how to turn the problem into a sustainable opportunity.",
+      "perspectiva": "What doesn't exist here yet? What solution could be replicated?"
+    },
+    "pesquisador": {
+      "nome": "Researcher",
+      "titulo": "Data investigator",
+      "descricao": "Looks for evidence and context explaining why the problem exists.",
+      "perspectiva": "What does the data say? What has already been studied? What's the root cause?"
+    }
   }
 }

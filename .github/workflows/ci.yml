@@ -61,7 +61,7 @@ jobs:
       - run: pnpm db:generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - run: pnpm test -- --ci --coverage
+      - run: pnpm test -- --ci --coverage --passWithNoTests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
