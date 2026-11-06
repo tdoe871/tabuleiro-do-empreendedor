@@ -6,8 +6,17 @@ export type ApiErrorCode =
   | "VALIDATION_ERROR"
   | "UNAUTHORIZED"
   | "INVALID_CREDENTIALS"
-  | "EMAIL_TAKEN"
+  | "FORBIDDEN"
   | "EVENT_NOT_FOUND"
+  | "TEAM_NOT_FOUND"
+  | "EMAIL_TAKEN"
+  | "TEAM_NAME_TAKEN"
+  | "TEAM_FULL"
+  | "EVENT_FULL"
+  | "EVENT_NOT_ACTIVE"
+  | "EVENT_FINISHED"
+  | "KEY_LOCKED"
+  | "PHASE_LOCKED"
   | "INVALID_STATUS_TRANSITION"
   | "RATE_LIMITED"
   | "INTERNAL_ERROR";
@@ -16,8 +25,17 @@ const STATUS: Record<ApiErrorCode, number> = {
   VALIDATION_ERROR: 400,
   UNAUTHORIZED: 401,
   INVALID_CREDENTIALS: 401,
+  FORBIDDEN: 403,
   EVENT_NOT_FOUND: 404,
+  TEAM_NOT_FOUND: 404,
   EMAIL_TAKEN: 409,
+  TEAM_NAME_TAKEN: 409,
+  TEAM_FULL: 409,
+  EVENT_FULL: 409,
+  EVENT_NOT_ACTIVE: 409,
+  EVENT_FINISHED: 409,
+  KEY_LOCKED: 409,
+  PHASE_LOCKED: 409,
   INVALID_STATUS_TRANSITION: 409,
   RATE_LIMITED: 429,
   INTERNAL_ERROR: 500,
@@ -30,6 +48,14 @@ export function apiError(
   return NextResponse.json(fields ? { error, fields } : { error }, {
     status: STATUS[error],
   });
+}
+
+// Thrown inside a transaction to abort it with an API error code; the route
+// catches it and answers with apiError(code).
+export class ApiFailure extends Error {
+  constructor(readonly code: ApiErrorCode) {
+    super(code);
+  }
 }
 
 // Parses a JSON object body; null when the body is missing or not an object.

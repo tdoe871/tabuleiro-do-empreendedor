@@ -122,30 +122,34 @@ enum ParticipantRole {
 }
 
 model Participant {
-  id       String          @id @default(uuid())
-  teamId   String
-  team     Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  nickname String
-  role     ParticipantRole @default(MEMBER)
-  rpgRole  String? // optional gamification role, kept from the original prototype
-  joinedAt DateTime        @default(now())
+  id              String          @id @default(uuid())
+  teamId          String
+  team            Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  nickname        String
+  role            ParticipantRole @default(MEMBER)
+  rpgRole         String? // optional gamification role, kept from the original prototype
+  joinedAt        DateTime        @default(now())
+  completedPhases TeamPhase[]
 
   @@unique([teamId, nickname])
 }
 
 model TeamPhase {
-  id            String    @id @default(uuid())
+  id            String       @id @default(uuid())
   teamId        String
-  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team          Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
   phaseId       String
-  phase         Phase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  keyActivated  Boolean   @default(false)
+  phase         Phase        @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   content       String? // the team's answer to the phase question
   completedAt   DateTime?
-  pointsAwarded Int       @default(0)
+  // Who answered it (any team member can). Kept for the activity record.
+  completedById String?
+  completedBy   Participant? @relation(fields: [completedById], references: [id], onDelete: SetNull)
+  pointsAwarded Int          @default(0)
 
   @@unique([teamId, phaseId])
   @@index([phaseId])
+  @@index([completedById])
 }
 
 // Per UX fix #1: teams need a place to deliver their project. Most hackathon
