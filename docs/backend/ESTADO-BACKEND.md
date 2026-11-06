@@ -1,0 +1,311 @@
+# Estado del backend — Tabuleiro do Empreendedor
+
+> Bitácora del backend y la base de datos (responsable: Eddy). Dice **qué está hecho, dónde está,
+> cómo se trabaja y qué sigue**, para que cualquiera (o Claude en una sesión nueva) retome sin
+> perder el hilo. Última actualización: **6 nov 2026**.
+>
+> Documentos relacionados:
+>
+> - `docs/backend/api.md` — **contrato de la API** (qué recibe y devuelve cada endpoint). Es la
+>   referencia para el frontend.
+> - `docs/architecture/README.md` y `docs/architecture/DECISIONS-UX.md` — decisiones de arquitectura
+>   del equipo.
+> - `docs/architecture/backend/CONTEXTO-BACKEND.md` — contexto inicial del backend. **Ojo: hoy solo
+>   existe en la máquina de Eddy (no está en git).**
+
+---
+
+## 1. Resumen en 30 segundos
+
+- Plataforma del LATAM Social Business Hackathon (Monterrey, **12-13 nov 2026**, 24 h, ~300
+  participantes, ~60 equipos de 2 a 5). **Lunes 9: todo terminado.** Martes 10 y miércoles 11: QA.
+- Un solo deploy de Next.js 16 (API en route handlers) + Prisma 7 sobre Postgres de Supabase.
+- **Hechos y probados contra Supabase real:** base de datos, login del educador, sesiones del
+  educador (crear / listar / iniciar / pausar / terminar / resumen), equipos y jugadores, tablero con
+  avance automático entre llaves, entregas con links y archivos.
+- **Falta:** chat del equipo, tiempo real, mentores y calificación, y las partes del panel del
+  educador que no se han definido (timer con presets, carta de reto, alertas, exportar).
+
+---
+
+## 2. Dónde estamos ahora (git y PRs)
+
+| PR  | Rama                    | Base              | Estado       | Contenido                                                                                         |
+| --- | ----------------------- | ----------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| #2  | `feature/backend-base`  | `dev`             | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
+| #3  | `feature/staff-auth`    | `dev`             | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
+| #7  | `feature/players`       | `dev`             | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
+| #8  | `feature/submissions`   | `feature/players` | **Abierto**  | Bloque de entregas (montado sobre #7; al hacer merge del #7, GitHub lo pasa a `dev`)              |
+| #6  | `ui/theme-sandbox-test` | `dev`             | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #5  | `test/initial-tests`    | `qa`              | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
+
+- **Rama local actual de Eddy:** `feature/submissions` (incluye todo lo de #7).
+- Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
+  `docs/architecture/backend/` (contexto inicial).
+- **Orden de merge:** primero #7, luego #8.
+- **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
+  no uno por cada tarea chica.
+
+---
+
+## 3. Entorno local
+
+### Requisitos
+
+- **Node 22** con nvm (`.nvmrc` dice 22). Eddy tiene Node 25 por defecto; Node 25 **no trae
+  corepack**, así que `pnpm` y el hook de husky fallan con `pnpm: command not found`. Solución:
+  `nvm use` en cada terminal, o `nvm alias default 22` una vez.
+- **pnpm 12.16.1** con corepack (`corepack enable`; lo fija `packageManager` en `package.json`).
+
+### Variables de entorno
+
+Un solo archivo: **`apps/web/.env`** (ignorado por git; la plantilla es `apps/web/.env.example`).
+`packages/db/prisma.config.ts` lo carga solo cuando existe.
+
+| Variable                               | Para qué                                 | Notas                                                                                      |
+| -------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`                         | La app (Prisma con `@prisma/adapter-pg`) | Pooler de transacción, puerto **6543**                                                     |
+| `DIRECT_URL`                           | Solo migraciones (CLI de Prisma)         | Pooler de sesión, puerto **5432** (las migraciones necesitan locks que el 6543 no soporta) |
+| `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                       |
+| `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local                                                           |
+| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                            |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre     |
+| `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                   |
+| `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal)                       |
+
+- Eddy ya pasó su `.env` al equipo.
+- **Brandon:** en GitHub (secrets del CI) y en Vercel, los nombres tienen que ser **exactamente** los
+  de `.env.example`. Hoy GitHub solo tiene `AUTH_SECRET`; Vercel necesita al menos `DATABASE_URL`,
+  `AUTH_SECRET`, `NEXT_PUBLIC_SUPABASE_URL` y `SUPABASE_SECRET_KEY`.
+
+### Comandos
+
+```bash
+nvm use                                   # Node 22
+pnpm install
+pnpm db:generate                          # genera el cliente de Prisma (no toca la base)
+pnpm --filter @tdoe/db exec prisma migrate status   # qué migraciones faltan (solo lectura)
+pnpm --filter @tdoe/db exec prisma migrate deploy   # aplica migraciones pendientes
+pnpm db:seed                              # evento de prueba QATEST (se puede correr varias veces)
+pnpm dev                                  # app en localhost:3000
+pnpm typecheck && pnpm lint && pnpm test && pnpm build
+```
+
+### Problemas conocidos
+
+- **En la red de la escuela no hay conexión a la base**: abre los puertos 5432/6543 pero corta el
+  cifrado (TLS). Las migraciones y las pruebas en vivo se hacen desde casa. Se puede escribir código
+  sin base.
+- `next dev`/`next build` reescriben `apps/web/next-env.d.ts`; no se sube ese cambio
+  (`git checkout -- apps/web/next-env.d.ts`).
+- pnpm muestra "Agent skills awaiting approval: dotenv": no se aprobó y no hace falta.
+
+---
+
+## 4. Base de datos (Supabase)
+
+- Proyecto: ref **`tlxvxcukcxklecyljysk`** (`https://tlxvxcukcxklecyljysk.supabase.co`), región
+  us-east-1. Hay **un solo proyecto**: es también la base del evento.
+- Esquema: `packages/db/prisma/schema.prisma`. Cliente compartido: `@tdoe/db`
+  (`packages/db/src/index.ts`, más `BOARD_KEYS`, `BOARD_PHASES`, `PHASES_PER_KEY` en
+  `packages/db/src/board.ts`).
+
+### Migraciones (todas aplicadas)
+
+| Migración                                     | Qué hace                                                                                                                                           |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261105145444_init`                         | Tablas Staff, Event, Phase, Team, Participant, TeamPhase, Submission, Alert. **RLS activo sin políticas en todas** (incluida `_prisma_migrations`) |
+| `20261105145757_fk_indexes`                   | Índices en llaves foráneas; quita índices que repetían un `@unique`                                                                                |
+| `20261105150323_board_keys_and_phase_content` | `Phase.key` (enum `BoardKey`) + `order` 1-3; `TeamPhase.content`                                                                                   |
+| `20261105231454_event_mode_and_scenario`      | `Event.mode` (`SCHOOL`/`CUSTOM`) y `Event.scenario`                                                                                                |
+| `20261106011207_team_phase_completed_by`      | Quita `TeamPhase.keyActivated`; agrega `completedById` (quién contestó)                                                                            |
+| `20261106161554_submission_files_and_links`   | `Submission.links` y tabla `SubmissionFile` (con RLS)                                                                                              |
+
+### Reglas de la base
+
+- **Las tablas solo cambian con migraciones de Prisma.** Nunca con SQL directo (ni dashboard ni
+  MCP). Por el MCP de Supabase solo se hacen **consultas de lectura** para verificar.
+- **RLS en todas las tablas, sin políticas:** la llave pública no puede leer ni escribir nada. Prisma
+  entra como dueño de las tablas y no le afecta. Supabase además tiene un trigger (`ensure_rls`, con
+  la función `public.rls_auto_enable()`) que activa RLS en cada tabla nueva de `public`.
+- **Cómo se crea una migración** (desde aquí no se puede usar `migrate dev` porque pide confirmar en
+  modo interactivo):
+  1. Editar `schema.prisma` y correr `prisma format`.
+  2. Generar el SQL comparando contra el esquema anterior, sin conectarse:
+     `prisma migrate diff --from-schema <esquema_anterior> --to-schema prisma/schema.prisma --script -o prisma/migrations/<fecha>_<nombre>/migration.sql`
+     (el anterior se saca con `git show HEAD:packages/db/prisma/schema.prisma`).
+  3. Si crea una tabla, agregar al final `ALTER TABLE "<Tabla>" ENABLE ROW LEVEL SECURITY;`.
+  4. Revisar el SQL y aplicar con `prisma migrate deploy`.
+  5. **Si la migración borra algo** (columnas, tablas), Claude no puede aplicarla: la corre Eddy con
+     `! source ~/.nvm/nvm.sh && nvm use 22 && pnpm --filter @tdoe/db exec prisma migrate deploy`.
+
+### Datos actuales
+
+- Solo el seed: Staff `seed@tabuleiro.local` (**no puede iniciar sesión**: su hash es `"!"`) y el
+  evento **`QATEST`** con sus 12 fases. **Hay que quitarlos antes del 12 de noviembre.**
+- Todas las pruebas en vivo crean sus propios datos y los borran al terminar.
+
+### Storage
+
+- Bucket **`submissions`**: privado, límite de 20 MB y solo tipos permitidos (PDF, Word, PowerPoint,
+  imágenes). Lo crea el código la primera vez que se usa (`ensureBucket` en
+  `apps/web/src/lib/storage/submissions.ts`). Hoy está vacío.
+
+---
+
+## 5. Arquitectura del backend (dónde está cada cosa)
+
+```
+apps/web/src/
+  app/api/...                   route handlers (uno por endpoint, ver sección 6)
+  proxy.ts                      protege /[locale]/mestre/* (educador) y /[locale]/jogador/* (jugador)
+  lib/api/errors.ts             apiError(code), ApiFailure (para abortar transacciones), readJsonObject
+  lib/auth/session.ts           JWT con jose: sesión de educador (tdoe_staff, 12 h) y de jugador (tdoe_player, 36 h)
+  lib/auth/staff.ts             getStaffFromRequest / getStaffFromToken (revisa que la cuenta exista)
+  lib/auth/player.ts            getPlayerFromRequest (participante + equipo + evento), setPlayerSessionCookie
+  lib/auth/password.ts          hash de contraseñas con scrypt de Node (igual que Maestro-virtual)
+  lib/auth/account.ts           reglas de correo, nombre y contraseña
+  lib/auth/rate-limit.ts        límite de intentos por IP (en memoria)
+  lib/codes.ts                  códigos de 6 caracteres sin I/O/0/1 (eventos y equipos)
+  lib/email/send.ts             sendEmail() con Resend (todavía ningún flujo lo usa)
+  lib/storage/submissions.ts    Storage por REST: bucket, URL de subida, lectura de bytes, URL de descarga, borrar
+  features/event/server/
+    event.ts                    validación de crear evento, transiciones de estado, EventDTO
+    progress.ts                 estado de cada llave a partir de las fases concluidas
+    board.ts                    arma GET /api/board, orden de fases, POINTS_PER_PHASE
+    load-board.ts               consultas para el tablero
+  features/team/server/team.ts  nombres, nicknames, códigos, cuándo se puede unir y jugar
+  features/submission/server/
+    rules.ts                    tipos de archivo, firmas (primeros bytes), tamaños, links https, validación
+    dto.ts                      formatos de respuesta de entregas y archivos
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, features/event-server, players, submissions
+packages/db/                    esquema, migraciones, seed, prisma.config.ts
+```
+
+### Patrones que se repiten
+
+- **Reglas puras + route handler delgado:** la lógica (validar, decidir) vive en funciones sin base
+  de datos dentro de `features/*/server/*.ts`, con pruebas unitarias. El route handler solo lee la
+  sesión, consulta la base y responde.
+- **Identidad siempre de la sesión**, nunca del body.
+- **Errores como códigos** (`{ "error": "TEAM_FULL" }` y `fields` por campo); el frontend traduce.
+  La lista está en `lib/api/errors.ts` y en la sección 5 de `api.md`.
+- **Concurrencia:** cuando un límite importa (equipos por evento, integrantes por equipo, archivos por
+  equipo), la transacción bloquea la fila con `SELECT ... FOR UPDATE`. Concluir una fase y confirmar
+  un archivo son idempotentes: repetir no es error.
+- **Lo ajeno responde "no existe"** (`EVENT_NOT_FOUND`, `FILE_NOT_FOUND`), para no revelar ids.
+
+---
+
+## 6. Qué está implementado
+
+Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
+
+| Bloque    | Endpoint                                                                            | Quién                |
+| --------- | ----------------------------------------------------------------------------------- | -------------------- |
+| Educador  | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`          | Público              |
+| Educador  | `POST /api/events`, `GET /api/events`                                               | Educador             |
+| Educador  | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                 | Educador             |
+| Educador  | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)       | Educador             |
+| Jugadores | `POST /api/teams`, `GET /api/teams?eventCode=`                                      | Público              |
+| Jugadores | `POST /api/participants` (unirse o recuperar sesión)                                | Público              |
+| Jugadores | `POST /api/teams/me/join-code` (nuevo código)                                       | Líder                |
+| Jugadores | `GET /api/board`, `PUT /api/board/keys/:key/phases/:order`                          | Jugador              |
+| Jugadores | `PUT /api/participants/me/rpg-role`                                                 | Jugador              |
+| Entregas  | `GET /api/submissions`, `PUT /api/submissions`                                      | Jugador              |
+| Entregas  | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id` | Jugador              |
+| Entregas  | `GET /api/submissions/files/:id` (descarga)                                         | Equipo o su educador |
+| —         | `GET /api/health`                                                                   | Público              |
+
+- `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
+- Pruebas: **51 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+  la descripción de cada PR).
+
+---
+
+## 7. Decisiones tomadas
+
+### Confirmadas por el equipo
+
+- **JP (5 nov):** el tablero llega ya armado con la forma del estado de `PlayerBoard`; el avance
+  entre llaves es **automático** (al concluir la 3.ª fase se activa la siguiente, en orden fijo
+  Problema → Solución → Alianzas → Oportunidades); errores como código puro; sesión del jugador por
+  cookie.
+- **PM (5 nov):** **pausar no detiene el reloj**; solo bloquea a los participantes.
+- Nombre único de la llave pública: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+
+### Defaults tomados (se cambian sin rehacer nada)
+
+| Tema                           | Default                                                             | Dónde se cambia                                |
+| ------------------------------ | ------------------------------------------------------------------- | ---------------------------------------------- |
+| Entrar al equipo               | Código del equipo + nickname, sin contraseña                        | —                                              |
+| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                     | `app/api/participants/route.ts`                |
+| Quién contesta fases y entrega | Cualquier miembro                                                   | —                                              |
+| Editar una fase concluida      | No se puede                                                         | `features/event/server/board.ts`               |
+| Puntos por fase                | 0                                                                   | `POINTS_PER_PHASE` en `board.ts`               |
+| Rol del juego de rol           | Se puede repetir en el equipo                                       | `app/api/participants/me/rpg-role/route.ts`    |
+| Carta de reto                  | `cartaAtiva` siempre `null`                                         | `board.ts`                                     |
+| Duración del evento            | 24 h, timer global                                                  | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
+| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra | `features/submission/server/rules.ts`          |
+| Registro de educadores         | Abierto a cualquiera                                                | `app/api/auth/register/route.ts`               |
+
+---
+
+## 8. Qué sigue
+
+### Siguientes bloques (avanzar con defaults, sin bloquearse)
+
+1. **Chat del equipo:** mensajes al equipo, mensajes privados y "toque" para llamar la atención. Hoy
+   solo existe en el estado local de `PlayerBoard`. Propuesta en `api.md` sección 6
+   (`GET/POST /api/messages`, con `clientId` para no duplicar).
+2. **Tiempo real:** que el timer, el tablero y el panel se actualicen solos. Propuesta: Supabase
+   Broadcast enviado desde el servidor; mientras tanto, el frontend refresca `GET /api/board` cada
+   10-15 s. Ojo con el límite de conexiones de Supabase gratis (200) contra ~300 personas.
+3. **Mentores y calificación:** no existe rol ni modelo todavía.
+4. **Panel del educador pendiente:** timer con presets, carta de reto, alertas y exportar.
+5. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
+   registro de actividad para la investigación, avisos generales, recuperar contraseña por correo,
+   script de 60 equipos / 300 participantes para pruebas de carga.
+
+### Decisiones abiertas (ver ❓ en `api.md`)
+
+- ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
+- ¿Entra el chat? ¿Cómo califican los mentores (criterios, escala, a qué equipos)?
+- ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
+- Presupuesto de hosting (Supabase/Vercel Pro antes del evento).
+- Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera).
+
+### Para el resto del equipo
+
+- **JP:** conectar pantallas según la sección 7 de `api.md` (crear evento con el código del backend,
+  crear/unirse a equipo, campo de nickname en el link de invitación, tablero desde `GET /api/board`,
+  estado `bloqueada` y quitar el botón de activar llave, modal de entrega en 3 pasos, traducir
+  códigos de error, mandar al login con `401`). Para ver los paneles en local hay que registrarse
+  como educador y crear o unirse a un equipo (por ejemplo en `QATEST`).
+- **Brandon:** variables en GitHub y Vercel con los nombres de `.env.example`
+  (`SUPABASE_SECRET_KEY` es indispensable para archivos).
+- **Leo:** `apps/web/jest.config.mjs` transforma `jose` (paquete solo ESM); sin eso, cualquier
+  prueba que importe la sesión falla.
+
+### Antes del evento
+
+- Auditoría completa de seguridad (pedida por Eddy para el final). La lista de pendientes la lleva
+  Claude en su memoria; incluye: cambiar la contraseña de la base, `.env` compartido completo,
+  registro abierto de educadores, aviso del advisor sobre `rls_auto_enable()`, límite de intentos
+  en memoria, archivos validados solo por sus primeros bytes, recuperar sesión con el código del
+  equipo.
+- Quitar el seed (`QATEST` y `seed@tabuleiro.local`).
+- Pruebas de carga.
+
+---
+
+## 9. Cómo retomar (checklist)
+
+1. `nvm use` y `git status`: ¿en qué rama estás? ¿Ya se hizo merge de #7 y #8?
+   (`gh pr list --state all`).
+2. Si ya se hizo merge: `git switch dev && git pull`, y crear la rama del siguiente bloque.
+3. `pnpm install && pnpm db:generate`.
+4. `pnpm --filter @tdoe/db exec prisma migrate status`: debe decir "Database schema is up to date".
+5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento.
+6. Antes de cada PR: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, prueba en vivo contra
+   Supabase (y borrar los datos de prueba) y actualizar `api.md` y este documento.
