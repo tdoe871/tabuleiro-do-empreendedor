@@ -75,8 +75,11 @@ Registro de educador (pestaña de registro del login).
 { "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
 ```
 
-- Errores: `VALIDATION_ERROR`, `EMAIL_TAKEN`.
-- `senha`: mínimo 8 caracteres ❓ (hoy el frontend solo valida que coincida con la confirmación).
+- **Implementado.** Errores: `VALIDATION_ERROR`, `EMAIL_TAKEN`, `RATE_LIMITED` (5 registros por
+  IP cada 15 min).
+- `fields` de `VALIDATION_ERROR`: `nome` / `sobrenome` → `REQUIRED` | `TOO_LONG` (máx. 60);
+  `email` → `REQUIRED` | `INVALID`; `senha` → `REQUIRED` | `TOO_SHORT` (mín. 8) | `TOO_LONG`
+  (máx. 128). El correo se guarda en minúsculas.
 - ❓ **Decisión 6.2.1 del contexto:** el PM quiere que el líder del equipo se registre. Si el
   líder tiene cuenta con correo y contraseña, este endpoint cambia o aparece uno nuevo. Mientras
   no se decida, esto es solo para staff.
@@ -90,8 +93,10 @@ Registro de educador (pestaña de registro del login).
 { "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
 ```
 
-- Errores: `INVALID_CREDENTIALS` (el mismo si el correo no existe o la contraseña está mal),
-  `RATE_LIMITED`.
+- **Implementado.** Errores: `INVALID_CREDENTIALS` (el mismo si el correo no existe o la
+  contraseña está mal), `RATE_LIMITED` (10 intentos por IP cada 15 min), `VALIDATION_ERROR`
+  (`email` o `senha` vacíos).
+- Sin sesión de staff, cualquier página de `/[locale]/mestre/*` redirige al login (`/[locale]`).
 
 ### `POST /api/events` — Staff
 
@@ -121,14 +126,18 @@ type EventDTO = {
 };
 ```
 
-- Errores: `VALIDATION_ERROR` (título vacío, `cenario` vacío en modo personalizado, `integrantes`
-  fuera de 2-5), `UNAUTHORIZED`.
+- **Implementado.** Crea también las 12 fases estándar del tablero. Duración por defecto: 24 h
+  (`durationMinutes: 1440`, timer `GLOBAL`).
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` con `fields`: `titulo` → `REQUIRED` | `TOO_LONG`
+  (máx. 120); `modo` → `INVALID`; `cenario` → `REQUIRED` | `TOO_LONG` (máx. 2000, solo en modo
+  personalizado; en modo escolar se ignora); `numEquipes` → `REQUIRED` | `INVALID` (entero 1-200);
+  `integrantes` → `REQUIRED` | `INVALID` (entero 2-5).
 - **Cambio en el frontend:** hoy `CreateSessionModal` inventa el código con `randomCode()`. Tiene
   que usar `event.code` de la respuesta, porque es el que existe en la base.
 - Mapeo de estados con `EduSession.status`: `aguardando` = `DRAFT`, `ativa` = `ACTIVE`,
   `pausada` = `PAUSED`. Falta `FINISHED` (el botón "terminar sesión" del mural).
-- ❓ `modo` y `cenario` no existen en el esquema. Propuesta: agregar `Event.mode` y
-  `Event.scenario`. ¿Qué cambia en el juego con modo "personalizado" además de guardar el texto?
+- `modo` y `cenario` se guardan en `Event.mode` / `Event.scenario`. ❓ ¿Qué cambia en el juego con
+  modo "personalizado" además de guardar el texto?
 
 ### `POST /api/teams` — Público (crea la sesión del jugador)
 
@@ -361,7 +370,8 @@ Después de subir con `PUT uploadUrl`, el frontend manda `fileUrl` en `PUT /api/
 
 ### `POST /api/auth/logout` — Staff o Jugador
 
-Borra la cookie. `204`.
+Borra la cookie. `204`. **Implementado para staff**; la cookie del jugador se agrega cuando exista
+su sesión.
 
 ---
 
@@ -369,7 +379,8 @@ Borra la cookie. `204`.
 
 ### `GET /api/events` — Staff
 
-Las sesiones del educador para la barra lateral de `EducadorPanel`.
+Las sesiones del educador para la barra lateral de `EducadorPanel`, de la más nueva a la más
+vieja. **Implementado.** Cada educador solo ve las suyas.
 
 ```json
 { "events": [ EventDTO ] }
@@ -386,15 +397,21 @@ Botón iniciar / pausar / retomar, y "terminar sesión".
 { "event": EventDTO }
 ```
 
-- La primera vez que pasa a `ACTIVE` se fija `startedAt`; con timer `GLOBAL`,
-  `endsAt = startedAt + durationMinutes`.
-- Errores: `INVALID_STATUS_TRANSITION`, `FORBIDDEN`.
-- ❓ ¿Pausar detiene el timer global (y se recorre `endsAt` al retomar) o el reloj sigue?
+- **Implementado.** Transiciones:
+  - `DRAFT` → `ACTIVE`: se fija `startedAt`; con timer `GLOBAL`, `endsAt = startedAt + durationMinutes`.
+  - `ACTIVE` → `PAUSED` → `ACTIVE`: **el reloj no se detiene** (`endsAt` no cambia). Mientras está en
+    pausa, los participantes no pueden avanzar en el tablero ni entregar (`EVENT_NOT_ACTIVE`).
+    Confirmado con el PM (5 nov).
+  - Cualquiera → `FINISHED`: termina el evento; `endsAt` pasa a ser ahora (si era más tarde).
+  - Pedir el estado que ya tiene responde `200` sin cambiar nada (doble clic seguro).
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`status` inválido), `EVENT_NOT_FOUND` (no existe o
+  es de otro educador), `INVALID_STATUS_TRANSITION` (por ejemplo, `DRAFT` → `PAUSED` o salir de
+  `FINISHED`).
 
 ### `GET /api/events/:id/overview` — Staff
 
 Métricas, equipos y alertas para `EducadorPanel` y `SocializacaoPanel`, en una sola consulta
-agregada (sin N+1).
+agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `teams` llega vacío.
 
 ```json
 {
@@ -408,12 +425,19 @@ agregada (sin N+1).
       "memberCount": 4,
       "score": 0,
       "keys": { "problema": "concluida", "solucao": "ativa", "parcerias": "bloqueada", "oportunidades": "bloqueada" },
-      "submission": { "type": "DEPLOY_LINK", "url": "https://..." }
+      "submission": { "type": "DEPLOY_LINK", "url": "https://...", "description": "...", "submittedAt": "..." }
     }
   ],
-  "alerts": [ { "id": "uuid", "severity": "WARNING", "code": "TEAM_INACTIVE", "teamId": "uuid", "createdAt": "..." } ]
+  "alerts": [ { "id": "uuid", "severity": "WARNING", "message": "...", "createdAt": "..." } ]
 }
 ```
+
+- `metrics.activeTeams`: equipos con al menos un integrante. `keysCompleted`: total de llaves
+  concluidas sumando todos los equipos.
+- `submission` es `null` hasta que el equipo entrega. El archivo subido no viene aquí; su descarga
+  con URL firmada llega con el bloque de entregas.
+- `alerts`: solo las no resueltas. Qué las genera sigue pendiente (ver Alertas ❓).
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador).
 
 - El mural (`SocializacaoPanel`) usa `"pendente"` para las llaves bloqueadas. Propongo que la API
   use los mismos estados que el tablero (`ativa` / `concluida` / `bloqueada`) y
@@ -465,7 +489,7 @@ Se define cuando el resto esté funcionando.
 | `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
 | `INVALID_CREDENTIALS`       | 401  | Login fallido                                                    |
 | `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
-| `EVENT_NOT_FOUND`           | 404  | Código de evento inexistente                                     |
+| `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
 | `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
 | `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
 | `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |

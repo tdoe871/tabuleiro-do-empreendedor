@@ -21,11 +21,20 @@ model Staff {
   updatedAt      DateTime @updatedAt
 }
 
+// PAUSED does not stop the clock: endsAt stays the same and participants just
+// cannot act until the event is ACTIVE again.
 enum EventStatus {
   DRAFT
   ACTIVE
   PAUSED
   FINISHED
+}
+
+// Picked when the educator creates the session. SCHOOL uses the standard
+// scenario; CUSTOM comes with the educator's own scenario text.
+enum EventMode {
+  SCHOOL
+  CUSTOM
 }
 
 // Per UX fix #3: a hackathon needs ONE countdown for the whole event, not a
@@ -40,6 +49,8 @@ model Event {
   id              String      @id @default(uuid())
   code            String      @unique // short code to join as a participant
   name            String
+  mode            EventMode   @default(SCHOOL)
+  scenario        String? // required when mode = CUSTOM
   status          EventStatus @default(DRAFT)
   timerMode       TimerMode   @default(GLOBAL)
   durationMinutes Int? // used when timerMode = GLOBAL

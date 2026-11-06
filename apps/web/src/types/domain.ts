@@ -5,6 +5,8 @@
  */
 
 export type EventStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "FINISHED";
+// API values for Event.mode (the database stores SCHOOL / CUSTOM).
+export type EventMode = "escolar" | "personalizado";
 export type TimerMode = "GLOBAL" | "PER_PHASE";
 export type ParticipantRole = "LEADER" | "MEMBER";
 export type BoardKey = "PROBLEMA" | "SOLUCAO" | "PARCERIAS" | "OPORTUNIDADES";
@@ -15,6 +17,8 @@ export interface EventSummary {
   id: string;
   code: string;
   name: string;
+  mode: EventMode;
+  scenario: string | null;
   status: EventStatus;
   timerMode: TimerMode;
   durationMinutes: number | null;
