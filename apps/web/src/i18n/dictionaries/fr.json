@@ -195,10 +195,11 @@
       "contextoLabel": "Contexte d'investigation",
       "contextoPlaceholder": "Ex : Vous êtes des agents de transformation du quartier Novo Horizonte…",
       "contextoAjuda": "Ce texte sera affiché aux équipes au démarrage de la session.",
-      "numEquipesLabel": "Nombre d'équipes (jusqu'à 80 — sans limite de 10)",
+      "numEquipesLabel": "Nombre d'équipes",
       "integrantesLabel": "Membres par équipe",
       "cancelar": "Annuler",
-      "criar": "Créer la session →"
+      "criar": "Créer la session →",
+      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10)."
     },
     "toasts": {
       "selecioneSessao": "Sélectionnez une session",
@@ -209,7 +210,26 @@
       "backendPendente": "Backend encore en construction — session affichée localement.",
       "erroCriar": "Impossible de créer la session"
     },
-    "equipesVazio": "Aucune équipe dans cette session pour l'instant. Partagez le code {codigo} avec les participants pour qu'ils rejoignent."
+    "equipesVazio": "Aucune équipe dans cette session pour l'instant. Partagez le code {codigo} avec les participants pour qu'ils rejoignent.",
+    "extensoesModal": {
+      "subtitulo": "Fonctionnalités prévues pour les prochaines versions de TdoE",
+      "emBreve": "Bientôt disponible",
+      "fechar": "Fermer",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Défis supplémentaires",
+          "descricao": "Jeu de cartes additionnel que le formateur peut lancer manuellement."
+        },
+        "coringas": {
+          "nome": "Jokers",
+          "descricao": "Cartes spéciales utilisables une fois par session par l'équipe."
+        },
+        "cartasPedagogicas": {
+          "nome": "Cartes pédagogiques",
+          "descricao": "Cartes avec des concepts et des questions pour accompagner l'équipe."
+        }
+      }
+    }
   },
   "jogador": {
     "topbarTitulo": "Plateau",

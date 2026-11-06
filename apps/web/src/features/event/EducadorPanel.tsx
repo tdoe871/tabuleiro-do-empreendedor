@@ -38,6 +38,20 @@ const NEXT_STATUS: Record<
 
 const AVATAR_COLORS = ["#2E80F0", "#22C97A", "#A040E0", "#0FD4B0", "#F0BC40"];
 
+// Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
+// roadmap list, not a backend-driven feature. Kept hardcoded like the icons
+// in keys.ts/rpgRoles.ts.
+const EXTENSOES_IDS = [
+  "desafiosExtras",
+  "coringas",
+  "cartasPedagogicas",
+] as const;
+const EXTENSOES_ICON: Record<(typeof EXTENSOES_IDS)[number], string> = {
+  desafiosExtras: "⚡",
+  coringas: "🃏",
+  cartasPedagogicas: "📚",
+};
+
 export function EducadorPanel() {
   const t = useTranslations("educador");
   const tKeys = useTranslations("keys");
@@ -48,6 +62,7 @@ export function EducadorPanel() {
   const [sessions, setSessions] = useState<EduSession[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showExtensoes, setShowExtensoes] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
   const [cartaAtiva, setCartaAtiva] = useState<{
@@ -168,7 +183,7 @@ export function EducadorPanel() {
           <LangSwitcher />
           <button
             className="btn btn-gold btn-sm"
-            onClick={() => handlePending(t("extensoes"))}
+            onClick={() => setShowExtensoes(true)}
           >
             ☕ {t("extensoes")}
           </button>
@@ -666,6 +681,57 @@ export function EducadorPanel() {
               🃏 {t("carta.enviar")}
             </button>
           </div>
+        </Modal>
+      )}
+
+      {showExtensoes && (
+        <Modal onClose={() => setShowExtensoes(false)} maxWidth={440}>
+          <h3>☕ {t("extensoes")}</h3>
+          <p>{t("extensoesModal.subtitulo")}</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {EXTENSOES_IDS.map((id) => (
+              <div
+                key={id}
+                style={{
+                  background: "var(--gold-bg)",
+                  border: "1px solid var(--gold-bd)",
+                  borderRadius: 9,
+                  padding: "9px 11px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "var(--gold)",
+                  }}
+                >
+                  {EXTENSOES_ICON[id]} {t(`extensoesModal.items.${id}.nome`)}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 3 }}>
+                  {t(`extensoesModal.items.${id}.descricao`)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 8,
+                    color: "rgba(240,188,64,.5)",
+                    marginTop: 4,
+                    textTransform: "uppercase",
+                    letterSpacing: ".06em",
+                  }}
+                >
+                  {t("extensoesModal.emBreve")}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            className="btn btn-ghost w100"
+            style={{ marginTop: 20 }}
+            onClick={() => setShowExtensoes(false)}
+          >
+            {t("extensoesModal.fechar")}
+          </button>
         </Modal>
       )}
     </div>

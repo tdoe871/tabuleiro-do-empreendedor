@@ -195,10 +195,11 @@
       "contextoLabel": "Investigation context",
       "contextoPlaceholder": "e.g. You are change agents for the Novo Horizonte neighborhood…",
       "contextoAjuda": "This text will be shown to teams when the session starts.",
-      "numEquipesLabel": "Number of teams (up to 80 — no 10-team cap)",
+      "numEquipesLabel": "Number of teams",
       "integrantesLabel": "Members per team",
       "cancelar": "Cancel",
-      "criar": "Create session →"
+      "criar": "Create session →",
+      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap)."
     },
     "toasts": {
       "selecioneSessao": "Select a session",
@@ -209,7 +210,26 @@
       "backendPendente": "Backend still in progress — session shown locally.",
       "erroCriar": "Couldn't create the session"
     },
-    "equipesVazio": "No teams in this session yet. Share the code {codigo} with participants so they can join."
+    "equipesVazio": "No teams in this session yet. Share the code {codigo} with participants so they can join.",
+    "extensoesModal": {
+      "subtitulo": "Features planned for upcoming versions of TdoE",
+      "emBreve": "Coming soon",
+      "fechar": "Close",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Extra challenges",
+          "descricao": "Additional deck the educator can release manually."
+        },
+        "coringas": {
+          "nome": "Wildcards",
+          "descricao": "Special cards the team can use once per session."
+        },
+        "cartasPedagogicas": {
+          "nome": "Teaching cards",
+          "descricao": "Cards with concepts and prompting questions for support."
+        }
+      }
+    }
   },
   "jogador": {
     "topbarTitulo": "Board",

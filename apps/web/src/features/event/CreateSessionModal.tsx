@@ -123,8 +123,13 @@ export function CreateSessionModal({
               min={1}
               max={80}
               value={numEquipes}
-              onChange={(e) => setNumEquipes(Number(e.target.value))}
+              onChange={(e) =>
+                setNumEquipes(
+                  Math.min(80, Math.max(1, Number(e.target.value) || 1)),
+                )
+              }
             />
+            <div className="field-hint">{t("numEquipesHint")}</div>
           </div>
           <div className="field">
             <label>{t("integrantesLabel")}</label>

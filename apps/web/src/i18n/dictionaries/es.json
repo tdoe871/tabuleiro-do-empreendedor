@@ -195,10 +195,11 @@
       "contextoLabel": "Contexto de investigación",
       "contextoPlaceholder": "Ej: Son agentes de transformación del barrio Nuevo Horizonte…",
       "contextoAjuda": "Este texto se mostrará a los equipos al iniciar la sesión.",
-      "numEquipesLabel": "Número de equipos (hasta 80 — sin límite de 10)",
+      "numEquipesLabel": "Número de equipos",
       "integrantesLabel": "Integrantes por equipo",
       "cancelar": "Cancelar",
-      "criar": "Crear sesión →"
+      "criar": "Crear sesión →",
+      "numEquipesHint": "Hasta 80 equipos por sesión (sin límite de 10)."
     },
     "toasts": {
       "selecioneSessao": "Selecciona una sesión",
@@ -209,7 +210,26 @@
       "backendPendente": "Backend en construcción — sesión mostrada localmente.",
       "erroCriar": "No se pudo crear la sesión"
     },
-    "equipesVazio": "Todavía no hay equipos en esta sesión. Comparte el código {codigo} con los participantes para que se unan."
+    "equipesVazio": "Todavía no hay equipos en esta sesión. Comparte el código {codigo} con los participantes para que se unan.",
+    "extensoesModal": {
+      "subtitulo": "Funcionalidades planeadas para las próximas versiones de TdoE",
+      "emBreve": "Próximamente",
+      "fechar": "Cerrar",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Desafíos extra",
+          "descricao": "Mazo adicional que el educador puede lanzar manualmente."
+        },
+        "coringas": {
+          "nome": "Comodines",
+          "descricao": "Cartas especiales que el equipo usa una vez por sesión."
+        },
+        "cartasPedagogicas": {
+          "nome": "Cartas pedagógicas",
+          "descricao": "Tarjetas con conceptos y preguntas generadoras de apoyo."
+        }
+      }
+    }
   },
   "jogador": {
     "topbarTitulo": "Tablero",
