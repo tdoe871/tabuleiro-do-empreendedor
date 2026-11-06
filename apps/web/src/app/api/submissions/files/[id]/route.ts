@@ -1,0 +1,70 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { prisma } from "@tdoe/db";
+
+import { canSubmit } from "@/features/submission/server/rules";
+import { canPlay } from "@/features/team/server/team";
+import { apiError } from "@/lib/api/errors";
+import { getPlayerFromRequest } from "@/lib/auth/player";
+import { getStaffFromRequest } from "@/lib/auth/staff";
+import {
+  createSignedDownloadUrl,
+  removeObjects,
+} from "@/lib/storage/submissions";
+
+type Context = { params: Promise<{ id: string }> };
+
+// GET /api/submissions/files/:id — download. Redirects to a signed URL that
+// expires in 60 s. Allowed for members of the team that uploaded it and for
+// the educator who owns the event; anyone else gets FILE_NOT_FOUND.
+export async function GET(request: NextRequest, { params }: Context) {
+  const { id } = await params;
+  try {
+    const file = await prisma.submissionFile.findFirst({
+      where: { id, status: "READY" },
+      include: { team: { select: { event: { select: { hostId: true } } } } },
+    });
+    if (!file) return apiError("FILE_NOT_FOUND");
+
+    const player = await getPlayerFromRequest(request);
+    let allowed = player?.team.id === file.teamId;
+    if (!allowed) {
+      const staff = await getStaffFromRequest(request);
+      allowed = staff?.id === file.team.event.hostId;
+    }
+    if (!allowed) {
+      return player ? apiError("FILE_NOT_FOUND") : apiError("UNAUTHORIZED");
+    }
+
+    return NextResponse.redirect(
+      await createSignedDownloadUrl(file.path, file.fileName),
+    );
+  } catch (error) {
+    console.error("Download file failed:", error);
+    return apiError("INTERNAL_ERROR");
+  }
+}
+
+// DELETE /api/submissions/files/:id — a team member removes one of the
+// team's files (only while deliveries are open).
+export async function DELETE(request: NextRequest, { params }: Context) {
+  const player = await getPlayerFromRequest(request);
+  if (!player) return apiError("UNAUTHORIZED");
+
+  const gate = canSubmit(canPlay(player.event, new Date()));
+  if (gate !== "ok") return apiError(gate);
+
+  const { id } = await params;
+  try {
+    const file = await prisma.submissionFile.findFirst({
+      where: { id, teamId: player.team.id },
+    });
+    if (!file) return apiError("FILE_NOT_FOUND");
+
+    await removeObjects([file.path]);
+    await prisma.submissionFile.delete({ where: { id: file.id } });
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error("Delete file failed:", error);
+    return apiError("INTERNAL_ERROR");
+  }
+}

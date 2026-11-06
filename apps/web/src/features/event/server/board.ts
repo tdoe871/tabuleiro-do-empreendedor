@@ -5,9 +5,16 @@ import {
   type Event,
   type Participant,
   type Submission,
+  type SubmissionFile,
   type Team,
 } from "@tdoe/db";
 
+import {
+  toFileDTO,
+  toSubmissionDTO,
+  type SubmissionDTO,
+  type SubmissionFileDTO,
+} from "@/features/submission/server/dto";
 import { canPlay } from "@/features/team/server/team";
 import {
   computeKeyStatuses,
@@ -53,12 +60,9 @@ export type BoardDTO = {
   // The educator's challenge card. Not modeled yet (open decision), so
   // always null for now; the field is here so the frontend can wire it.
   cartaAtiva: { key: KeyId; text: string } | null;
-  submission: {
-    type: Submission["type"];
-    url: string | null;
-    description: string | null;
-    submittedAt: string | null;
-  } | null;
+  submission: SubmissionDTO | null;
+  // The team's uploaded files (ready ones only).
+  files: SubmissionFileDTO[];
 };
 
 type MemberDTO = {
@@ -93,9 +97,10 @@ export function buildBoard(input: {
   members: Participant[];
   completed: CompletedPhase[];
   submission: Submission | null;
+  files: SubmissionFile[];
   now: Date;
 }): BoardDTO {
-  const { event, team, me, members, completed, submission, now } = input;
+  const { event, team, me, members, completed, submission, files, now } = input;
   const keyStatuses = computeKeyStatuses(completed);
 
   const keys = {} as BoardDTO["keys"];
@@ -147,14 +152,8 @@ export function buildBoard(input: {
     members: members.filter((member) => member.id !== me.id).map(toMember),
     keys,
     cartaAtiva: null,
-    submission: submission
-      ? {
-          type: submission.type,
-          url: submission.url,
-          description: submission.description,
-          submittedAt: submission.submittedAt?.toISOString() ?? null,
-        }
-      : null,
+    submission: submission ? toSubmissionDTO(submission) : null,
+    files: files.map(toFileDTO),
   };
 }
 

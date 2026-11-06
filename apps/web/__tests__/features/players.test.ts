@@ -150,6 +150,7 @@ describe("buildBoard", () => {
       members: [me, ana],
       completed: [],
       submission: null,
+      files: [],
       now,
     });
     expect(board.keys.problema).toEqual({
@@ -165,6 +166,7 @@ describe("buildBoard", () => {
     expect(board.members.map((m) => m.nickname)).toEqual(["Ana"]);
     expect(board.event.playable).toBe(true);
     expect(board.cartaAtiva).toBeNull();
+    expect(board.files).toEqual([]);
   });
 
   it("carries answers and moves to the next key", () => {
@@ -180,6 +182,7 @@ describe("buildBoard", () => {
         phase("SOLUCAO", 1),
       ],
       submission: null,
+      files: [],
       now,
     });
     expect(board.keys.problema.status).toBe("concluida");

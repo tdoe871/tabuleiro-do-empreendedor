@@ -211,22 +211,43 @@ Unirse a un equipo.
 ### `PUT /api/submissions` — Jugador
 
 Entrega del proyecto del equipo (`SubmissionModal`). Una entrega por equipo; cada `PUT` la
-reemplaza.
+reemplaza. **Implementado.**
 
 ```json
-// request
-{ "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app", "description": "..." }
-// 200
-{ "submission": { "type": "DEPLOY_LINK", "url": "https://...", "fileUrl": null, "description": "...", "submittedAt": "2026-11-13T10:00:00Z" } }
+// request (lo que ya manda el frontend, más `links` opcional)
+{ "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app", "links": ["https://github.com/equipo/app"], "description": "..." }
+// 200 (mismo cuerpo que GET /api/submissions)
+{
+  "submission": { "type": "DEPLOY_LINK", "url": "https://mi-app.vercel.app/", "links": ["https://github.com/equipo/app"], "description": "...", "submittedAt": "2026-11-13T10:00:00Z" },
+  "files": [ SubmissionFileDTO ]
+}
+```
+
+```ts
+type SubmissionFileDTO = {
+  id: string;
+  fileName: string; // nombre original
+  contentType: string;
+  size: number; // bytes
+  downloadUrl: string; // "/api/submissions/files/<id>" (redirige a una URL firmada de 60 s)
+};
 ```
 
 - `type`: `DEPLOY_LINK` | `REPO_LINK` | `FILE_OR_IMAGE` | `NONE`.
-- `url` obligatorio con `DEPLOY_LINK` y `REPO_LINK` (solo `https://`). `fileUrl` obligatorio con
-  `FILE_OR_IMAGE` y tiene que venir de `POST /api/submissions/upload-url`.
-- Errores: `VALIDATION_ERROR`, `INVALID_URL`, `DEADLINE_PASSED`, `EVENT_NOT_ACTIVE`.
-- ❓ ¿Puede entregar cualquier miembro o solo el líder?
-- ❓ El PM pidió **PDF y Word más un apartado de links**. Hoy es un solo `url` + un solo `fileUrl`.
-  ¿Varios archivos? ¿Varios links? Si sí, el body cambia a listas.
+- `url` (link principal) obligatorio con `DEPLOY_LINK` y `REPO_LINK`. `links`: hasta 5 links extra
+  (otras páginas, presentación, video). Todos tienen que ser `https://`.
+- `FILE_OR_IMAGE` necesita al menos un archivo ya subido (ver "Archivos de la entrega" abajo). Los
+  archivos pertenecen al equipo, no a un `type`: un equipo puede entregar un link **y** archivos.
+- Cualquier miembro puede entregar, mientras la sesión está `ACTIVE` y con tiempo.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_ACTIVE` (sin iniciar o en pausa), `DEADLINE_PASSED` (se acabó
+  el tiempo o el evento terminó), `VALIDATION_ERROR` con `fields`: `type` → `INVALID`; `url` →
+  `REQUIRED` | `INVALID_URL`; `links` → `INVALID` (no es lista o son más de 5) | `INVALID_URL`;
+  `description` → `TOO_LONG` (máx. 2000); `files` → `REQUIRED` (`FILE_OR_IMAGE` sin archivos).
+
+### `GET /api/submissions` — Jugador
+
+La entrega del equipo y sus archivos: `{ "submission": ... | null, "files": [SubmissionFileDTO] }`.
+**Implementado.** `GET /api/board` también trae `submission` y `files`.
 
 ### `GET /api/phases?eventId=` → reemplazado por `GET /api/board`
 
@@ -304,7 +325,8 @@ que no haya que convertir nada.
     }
   },
   "cartaAtiva": { "key": "problema", "text": "..." },
-  "submission": null
+  "submission": null,
+  "files": []
 }
 ```
 
@@ -379,21 +401,43 @@ Regenera el código de invitación; el anterior deja de servir.
 - Los miembros que ya entraron conservan su sesión.
 - Errores: `UNAUTHORIZED`, `FORBIDDEN` (no es líder).
 
-### `POST /api/submissions/upload-url` — Jugador
+### Archivos de la entrega — Jugador
 
-Pide una URL firmada para subir un archivo directo a Supabase Storage (bucket privado).
+**Implementado.** Los archivos se suben **directo del navegador a Supabase Storage** (bucket privado
+`submissions`) con una URL de un solo uso; nuestro servidor no recibe el archivo. Son 3 pasos:
 
 ```json
-// request
-{ "fileName": "pitch.pdf", "contentType": "application/pdf", "size": 2400000 }
+// 1. POST /api/submissions/files
+{ "fileName": "Propuesta Final.pdf", "contentType": "application/pdf", "size": 2400000 }
+// 201
+{ "file": { ...SubmissionFileDTO, "status": "PENDING" }, "uploadUrl": "https://<proyecto>.supabase.co/storage/v1/object/upload/sign/..." }
+
+// 2. PUT <uploadUrl>  — body: el archivo; header Content-Type: el mismo contentType del paso 1
+
+// 3. POST /api/submissions/files/:id/confirm
 // 200
-{ "uploadUrl": "https://...", "fileUrl": "submissions/<teamId>/<uuid>.pdf" }
+{ "file": { ...SubmissionFileDTO, "status": "READY" } }
 ```
 
-Después de subir con `PUT uploadUrl`, el frontend manda `fileUrl` en `PUT /api/submissions`.
+- En el paso 3 el backend revisa **el contenido real** del archivo (sus primeros bytes), no solo el
+  nombre: un HTML renombrado a `.pdf` se rechaza y se borra. Confirmar dos veces no es error.
+- Permitidos (por defecto, se cambian en `features/submission/server/rules.ts`): PDF, Word (`.doc`,
+  `.docx`), PowerPoint (`.ppt`, `.pptx`) e imágenes (`.png`, `.jpg`, `.webp`). Máximo **20 MB** por
+  archivo y **5 archivos** por equipo. Storage también rechaza otros tipos y tamaños por su cuenta.
+- Una subida que no se confirma en 1 hora se descarta sola.
+- Errores del paso 1: `FILE_TYPE_NOT_ALLOWED` (extensión no permitida o que no coincide con
+  `contentType`), `FILE_TOO_LARGE`, `TOO_MANY_FILES`, `EVENT_NOT_ACTIVE`, `DEADLINE_PASSED`,
+  `VALIDATION_ERROR` (`fileName` / `contentType` → `REQUIRED`, `size` → `INVALID`).
+- Errores del paso 3: `FILE_NOT_FOUND`, `FILE_NOT_UPLOADED` (todavía no se subió nada),
+  `FILE_TYPE_NOT_ALLOWED` (el contenido no corresponde), `FILE_TOO_LARGE`, `EVENT_NOT_ACTIVE`,
+  `DEADLINE_PASSED`.
 
-- Errores: `FILE_TYPE_NOT_ALLOWED`, `FILE_TOO_LARGE`.
-- ❓ Tipos permitidos: PDF y `.docx`. ¿También `.doc` viejo e imágenes? ¿Tamaño máximo?
+`DELETE /api/submissions/files/:id` — un miembro del equipo borra un archivo (`204`), mientras la
+entrega esté abierta. Errores: `FILE_NOT_FOUND`, `EVENT_NOT_ACTIVE`, `DEADLINE_PASSED`.
+
+`GET /api/submissions/files/:id` — descarga. Redirige (`307`) a una URL firmada que vence en 60 s y
+baja el archivo con su nombre original. Pueden descargar los miembros del equipo y el educador
+dueño del evento (también después de que termina). Errores: `UNAUTHORIZED`, `FILE_NOT_FOUND`.
 
 ### `POST /api/auth/logout` — Staff o Jugador
 
@@ -509,7 +553,6 @@ Se define cuando el resto esté funcionando.
 | Código                      | HTTP | Cuándo                                                           |
 | --------------------------- | ---- | ---------------------------------------------------------------- |
 | `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo            |
-| `INVALID_URL`               | 400  | Link de entrega no es `https://` válido                          |
 | `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                     |
 | `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                 |
 | `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
@@ -517,6 +560,7 @@ Se define cuando el resto esté funcionando.
 | `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
 | `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
 | `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
+| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                             |
 | `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
 | `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
 | `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
@@ -524,6 +568,8 @@ Se define cuando el resto esté funcionando.
 | `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
 | `EVENT_FINISHED`            | 409  | El evento terminó                                                |
 | `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
+| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
+| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
 | `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                  |
 | `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
 | `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
@@ -562,3 +608,6 @@ Se define cuando el resto esté funcionando.
    `GET /api/events/:id/overview`.
 7. Traducir los códigos de error de la sección 5 en los 4 diccionarios.
 8. Si una llamada responde `401`, mandar al login (`/[locale]`) tanto al jugador como al educador.
+9. `SubmissionModal`: para archivos, seguir los 3 pasos de "Archivos de la entrega" (pedir URL,
+   subir directo a Storage, confirmar). Mostrar la lista de `files` con su `downloadUrl` y un botón
+   para borrar. Opcional: un campo para los links extra (`links`).

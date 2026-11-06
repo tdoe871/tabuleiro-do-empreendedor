@@ -32,12 +32,13 @@ export async function loadBoard(player: Player): Promise<BoardDTO> {
       include: {
         participants: { orderBy: { joinedAt: "asc" } },
         submission: true,
+        files: { where: { status: "READY" }, orderBy: { createdAt: "asc" } },
       },
     }),
     loadCompletedPhases(player.team.id),
   ]);
 
-  const { participants, submission, ...teamRow } = team;
+  const { participants, submission, files, ...teamRow } = team;
   return buildBoard({
     event: player.event,
     team: teamRow,
@@ -45,6 +46,7 @@ export async function loadBoard(player: Player): Promise<BoardDTO> {
     members: participants,
     completed,
     submission,
+    files,
     now: new Date(),
   });
 }
