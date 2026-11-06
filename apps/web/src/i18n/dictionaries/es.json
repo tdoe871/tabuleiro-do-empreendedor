@@ -5,6 +5,30 @@
     "back": "Atrás",
     "toasts": {
       "featurePendente": "{feature}: todavía en construcción"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Revisa los datos enviados.",
+      "INVALID_URL": "El link debe empezar con https://",
+      "FILE_TYPE_NOT_ALLOWED": "Formato de archivo no permitido.",
+      "FILE_TOO_LARGE": "El archivo supera el límite permitido.",
+      "UNAUTHORIZED": "Tu sesión expiró. Entra de nuevo.",
+      "INVALID_CREDENTIALS": "Correo o contraseña incorrectos.",
+      "FORBIDDEN": "No tienes permiso para esto.",
+      "EVENT_NOT_FOUND": "Sesión no encontrada.",
+      "TEAM_NOT_FOUND": "Código de equipo inválido.",
+      "EMAIL_TAKEN": "Ese correo ya está registrado.",
+      "TEAM_NAME_TAKEN": "Ya existe un equipo con ese nombre en este evento.",
+      "NICKNAME_TAKEN": "Ya existe alguien con ese apodo en el equipo.",
+      "TEAM_FULL": "Ese equipo ya está completo.",
+      "EVENT_FULL": "Ese evento ya llegó al límite de equipos.",
+      "EVENT_NOT_ACTIVE": "La sesión está pausada o todavía no empieza.",
+      "EVENT_FINISHED": "Esa sesión ya terminó.",
+      "DEADLINE_PASSED": "El plazo de entrega ya pasó.",
+      "KEY_LOCKED": "Esa clave todavía está bloqueada.",
+      "PHASE_LOCKED": "Esa fase todavía está bloqueada.",
+      "INVALID_STATUS_TRANSITION": "Esa acción no se puede hacer en el estado actual de la sesión.",
+      "RATE_LIMITED": "Demasiados intentos. Espera un poco e intenta de nuevo.",
+      "INTERNAL_ERROR": "Algo salió mal de nuestro lado. Intenta de nuevo."
     }
   },
   "join": {
@@ -208,7 +232,8 @@
       "contextoObrigatorio": "Describe el contexto de investigación",
       "sessaoCriada": "¡Sesión creada! Código: {code}",
       "backendPendente": "Backend en construcción — sesión mostrada localmente.",
-      "erroCriar": "No se pudo crear la sesión"
+      "erroCriar": "No se pudo crear la sesión",
+      "alertasEncontrados": "{count} alerta(s) activa(s)"
     },
     "equipesVazio": "Todavía no hay equipos en esta sesión. Comparte el código {codigo} con los participantes para que se unan.",
     "extensoesModal": {
@@ -229,6 +254,11 @@
           "descricao": "Tarjetas con conceptos y preguntas generadoras de apoyo."
         }
       }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "Sin clave activa",
+      "chaves": "claves",
+      "entregou": "Entregó"
     }
   },
   "jogador": {

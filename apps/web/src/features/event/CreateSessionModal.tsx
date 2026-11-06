@@ -4,25 +4,23 @@ import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/providers/ToastProvider";
-import type { EduSession } from "./EducadorPanel";
+import type { EventDTO } from "./EducadorPanel";
 
-function randomCode(len = 6) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from(
-    { length: len },
-    () => chars[Math.floor(Math.random() * chars.length)],
-  ).join("");
-}
+// Mirrors MIN_TEAM_SIZE/MAX_TEAM_SIZE in
+// apps/web/src/features/event/server/event.ts — the backend rejects
+// anything outside this range, so the picker must not offer it.
+const TEAM_SIZE_OPTIONS = [2, 3, 4, 5];
 
 export function CreateSessionModal({
   onClose,
   onCreated,
 }: {
   onClose: () => void;
-  onCreated: (session: EduSession) => void;
+  onCreated: (event: EventDTO) => void;
 }) {
   const t = useTranslations("educador.modalSessao");
   const tToast = useTranslations("educador.toasts");
+  const tCommon = useTranslations("common");
   const toast = useToast();
 
   const [titulo, setTitulo] = useState("");
@@ -43,35 +41,38 @@ export function CreateSessionModal({
       return;
     }
     setSubmitting(true);
-    const res = await fetch("/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        titulo,
-        modo,
-        cenario: cenario || null,
-        numEquipes,
-        integrantes,
-      }),
-    });
-    const codigo = randomCode();
-    if (res.status === 501) {
-      toast("info", tToast("backendPendente"));
-    } else if (res.ok) {
-      toast("ok", tToast("sessaoCriada", { code: codigo }));
-    } else {
-      toast("err", tToast("erroCriar"));
+    try {
+      const res = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo,
+          modo,
+          cenario: cenario || null,
+          numEquipes,
+          integrantes,
+        }),
+      });
+      const body = (await res.json().catch(() => null)) as {
+        event?: EventDTO;
+        error?: string;
+      } | null;
+      if (!res.ok || !body?.event) {
+        const code = body?.error;
+        toast(
+          "err",
+          code && tCommon.has(`errors.${code}`)
+            ? tCommon(`errors.${code}`)
+            : tToast("erroCriar"),
+        );
+        return;
+      }
+      toast("ok", tToast("sessaoCriada", { code: body.event.code }));
+      onCreated(body.event);
+      onClose();
+    } finally {
+      setSubmitting(false);
     }
-    onCreated({
-      id: crypto.randomUUID(),
-      titulo,
-      codigo,
-      status: "aguardando",
-      numEquipes,
-      integrantes,
-      modo,
-      cenario: cenario || null,
-    });
   }
 
   return (
@@ -138,9 +139,11 @@ export function CreateSessionModal({
               value={integrantes}
               onChange={(e) => setIntegrantes(Number(e.target.value))}
             >
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-              <option value={6}>6</option>
+              {TEAM_SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
             </select>
           </div>
         </div>

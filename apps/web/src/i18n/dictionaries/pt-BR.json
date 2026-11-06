@@ -5,6 +5,30 @@
     "back": "Voltar",
     "toasts": {
       "featurePendente": "{feature}: ainda em construção"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Verifique os dados enviados.",
+      "INVALID_URL": "O link precisa começar com https://",
+      "FILE_TYPE_NOT_ALLOWED": "Formato de arquivo não permitido.",
+      "FILE_TOO_LARGE": "O arquivo passa do limite permitido.",
+      "UNAUTHORIZED": "Sua sessão expirou. Entre novamente.",
+      "INVALID_CREDENTIALS": "E-mail ou senha incorretos.",
+      "FORBIDDEN": "Você não tem permissão para isso.",
+      "EVENT_NOT_FOUND": "Sessão não encontrada.",
+      "TEAM_NOT_FOUND": "Código de equipe inválido.",
+      "EMAIL_TAKEN": "Esse e-mail já está cadastrado.",
+      "TEAM_NAME_TAKEN": "Já existe uma equipe com esse nome neste evento.",
+      "NICKNAME_TAKEN": "Já existe alguém com esse apelido na equipe.",
+      "TEAM_FULL": "Essa equipe já está completa.",
+      "EVENT_FULL": "Esse evento já atingiu o limite de equipes.",
+      "EVENT_NOT_ACTIVE": "A sessão está pausada ou ainda não começou.",
+      "EVENT_FINISHED": "Essa sessão já terminou.",
+      "DEADLINE_PASSED": "O prazo de entrega já passou.",
+      "KEY_LOCKED": "Essa chave ainda está bloqueada.",
+      "PHASE_LOCKED": "Essa fase ainda está bloqueada.",
+      "INVALID_STATUS_TRANSITION": "Essa ação não é permitida no estado atual da sessão.",
+      "RATE_LIMITED": "Muitas tentativas. Espere um pouco e tente de novo.",
+      "INTERNAL_ERROR": "Algo deu errado do nosso lado. Tente novamente."
     }
   },
   "join": {
@@ -208,7 +232,8 @@
       "contextoObrigatorio": "Descreva o contexto de investigação",
       "sessaoCriada": "Sessão criada! Código: {code}",
       "backendPendente": "Backend em construção — sessão mostrada localmente.",
-      "erroCriar": "Não foi possível criar a sessão"
+      "erroCriar": "Não foi possível criar a sessão",
+      "alertasEncontrados": "{count} alerta(s) ativo(s)"
     },
     "equipesVazio": "Nenhuma equipe nesta sessão ainda. Compartilhe o código {codigo} com os participantes para que entrem.",
     "extensoesModal": {
@@ -229,6 +254,11 @@
           "descricao": "Cartões com conceitos e perguntas geradoras para apoio."
         }
       }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "Sem chave ativa",
+      "chaves": "chaves",
+      "entregou": "Entregou"
     }
   },
   "jogador": {

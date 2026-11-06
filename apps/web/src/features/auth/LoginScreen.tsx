@@ -44,22 +44,26 @@ export function LoginScreen() {
   const [jogNome, setJogNome] = useState("");
   const [jogCodigo, setJogCodigo] = useState("");
 
+  function authErrorMessage(code: string | undefined, fallback: string) {
+    return code && tCommon.has(`errors.${code}`)
+      ? tCommon(`errors.${code}`)
+      : fallback;
+  }
+
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
     const res = await postJson("/api/auth/login", {
       email: loginEmail,
       senha: loginSenha,
     });
-    if (res.status === 501) {
-      toast("info", t("toasts.backendPendingLogin"));
-      router.push("/mestre/dashboard");
-      return;
-    }
     if (res.ok) {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", t("toasts.invalidCredentials"));
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.invalidCredentials")));
   }
 
   async function handleCadastro(e: FormEvent) {
@@ -74,16 +78,14 @@ export function LoginScreen() {
       email: cadEmail,
       senha: cadSenha,
     });
-    if (res.status === 501) {
-      toast("info", t("toasts.backendPendingRegister"));
-      router.push("/mestre/dashboard");
-      return;
-    }
     if (res.ok) {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", t("toasts.registerError"));
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.registerError")));
   }
 
   function handleCodigo(e: FormEvent) {
@@ -255,6 +257,7 @@ export function LoginScreen() {
                     placeholder="••••••••"
                     value={cadSenha}
                     onChange={(e) => setCadSenha(e.target.value)}
+                    minLength={8}
                     required
                   />
                 </div>
@@ -265,6 +268,7 @@ export function LoginScreen() {
                     placeholder="••••••••"
                     value={cadConf}
                     onChange={(e) => setCadConf(e.target.value)}
+                    minLength={8}
                     required
                   />
                 </div>

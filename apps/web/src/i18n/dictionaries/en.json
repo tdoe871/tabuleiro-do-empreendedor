@@ -5,6 +5,30 @@
     "back": "Back",
     "toasts": {
       "featurePendente": "{feature}: still under construction"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Check the submitted data.",
+      "INVALID_URL": "The link must start with https://",
+      "FILE_TYPE_NOT_ALLOWED": "File format not allowed.",
+      "FILE_TOO_LARGE": "The file is over the allowed limit.",
+      "UNAUTHORIZED": "Your session expired. Sign in again.",
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
+      "FORBIDDEN": "You don't have permission to do that.",
+      "EVENT_NOT_FOUND": "Session not found.",
+      "TEAM_NOT_FOUND": "Invalid team code.",
+      "EMAIL_TAKEN": "That email is already registered.",
+      "TEAM_NAME_TAKEN": "There's already a team with that name in this event.",
+      "NICKNAME_TAKEN": "There's already someone with that nickname on the team.",
+      "TEAM_FULL": "That team is already full.",
+      "EVENT_FULL": "That event already reached its team limit.",
+      "EVENT_NOT_ACTIVE": "The session is paused or hasn't started yet.",
+      "EVENT_FINISHED": "That session already ended.",
+      "DEADLINE_PASSED": "The submission deadline already passed.",
+      "KEY_LOCKED": "That key is still locked.",
+      "PHASE_LOCKED": "That phase is still locked.",
+      "INVALID_STATUS_TRANSITION": "That action isn't allowed in the session's current state.",
+      "RATE_LIMITED": "Too many attempts. Wait a bit and try again.",
+      "INTERNAL_ERROR": "Something went wrong on our end. Try again."
     }
   },
   "join": {
@@ -208,7 +232,8 @@
       "contextoObrigatorio": "Describe the investigation context",
       "sessaoCriada": "Session created! Code: {code}",
       "backendPendente": "Backend still in progress — session shown locally.",
-      "erroCriar": "Couldn't create the session"
+      "erroCriar": "Couldn't create the session",
+      "alertasEncontrados": "{count} active alert(s)"
     },
     "equipesVazio": "No teams in this session yet. Share the code {codigo} with participants so they can join.",
     "extensoesModal": {
@@ -229,6 +254,11 @@
           "descricao": "Cards with concepts and prompting questions for support."
         }
       }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "No active key",
+      "chaves": "keys",
+      "entregou": "Submitted"
     }
   },
   "jogador": {

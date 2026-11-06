@@ -5,6 +5,30 @@
     "back": "Retour",
     "toasts": {
       "featurePendente": "{feature} : encore en construction"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Vérifiez les données envoyées.",
+      "INVALID_URL": "Le lien doit commencer par https://",
+      "FILE_TYPE_NOT_ALLOWED": "Format de fichier non autorisé.",
+      "FILE_TOO_LARGE": "Le fichier dépasse la limite autorisée.",
+      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous.",
+      "INVALID_CREDENTIALS": "E-mail ou mot de passe incorrect.",
+      "FORBIDDEN": "Vous n'avez pas la permission pour cela.",
+      "EVENT_NOT_FOUND": "Session introuvable.",
+      "TEAM_NOT_FOUND": "Code d'équipe invalide.",
+      "EMAIL_TAKEN": "Cet e-mail est déjà enregistré.",
+      "TEAM_NAME_TAKEN": "Il existe déjà une équipe avec ce nom dans cet événement.",
+      "NICKNAME_TAKEN": "Il y a déjà quelqu'un avec ce surnom dans l'équipe.",
+      "TEAM_FULL": "Cette équipe est déjà complète.",
+      "EVENT_FULL": "Cet événement a déjà atteint sa limite d'équipes.",
+      "EVENT_NOT_ACTIVE": "La session est en pause ou n'a pas encore commencé.",
+      "EVENT_FINISHED": "Cette session est déjà terminée.",
+      "DEADLINE_PASSED": "La date limite de soumission est déjà passée.",
+      "KEY_LOCKED": "Cette clé est encore verrouillée.",
+      "PHASE_LOCKED": "Cette phase est encore verrouillée.",
+      "INVALID_STATUS_TRANSITION": "Cette action n'est pas autorisée dans l'état actuel de la session.",
+      "RATE_LIMITED": "Trop de tentatives. Attendez un peu et réessayez.",
+      "INTERNAL_ERROR": "Une erreur est survenue de notre côté. Réessayez."
     }
   },
   "join": {
@@ -208,7 +232,8 @@
       "contextoObrigatorio": "Décrivez le contexte d'investigation",
       "sessaoCriada": "Session créée ! Code : {code}",
       "backendPendente": "Backend encore en construction — session affichée localement.",
-      "erroCriar": "Impossible de créer la session"
+      "erroCriar": "Impossible de créer la session",
+      "alertasEncontrados": "{count} alerte(s) active(s)"
     },
     "equipesVazio": "Aucune équipe dans cette session pour l'instant. Partagez le code {codigo} avec les participants pour qu'ils rejoignent.",
     "extensoesModal": {
@@ -229,6 +254,11 @@
           "descricao": "Cartes avec des concepts et des questions pour accompagner l'équipe."
         }
       }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "Aucune clé active",
+      "chaves": "clés",
+      "entregou": "Soumis"
     }
   },
   "jogador": {

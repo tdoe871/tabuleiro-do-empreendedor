@@ -10,11 +10,12 @@ import { useToast } from "@/components/providers/ToastProvider";
 import {
   KEY_IDS,
   KEY_COLOR_VAR,
+  type KeyId,
   type KeyTranslation,
 } from "@/features/event/keys";
 import { CreateSessionModal } from "./CreateSessionModal";
 
-export type SessionStatus = "aguardando" | "ativa" | "pausada";
+export type SessionStatus = "aguardando" | "ativa" | "pausada" | "finalizada";
 
 export interface EduSession {
   id: string;
@@ -27,9 +28,67 @@ export interface EduSession {
   cenario: string | null;
 }
 
-const NEXT_STATUS: Record<
-  SessionStatus,
-  { next: SessionStatus; actionKey: "iniciar" | "pausar" | "retomar" }
+// Shape of docs/backend/api.md's EventDTO — what POST/GET /api/events and
+// PATCH /api/events/:id/status actually return.
+export interface EventDTO {
+  id: string;
+  code: string;
+  name: string;
+  mode: "escolar" | "personalizado";
+  scenario: string | null;
+  status: "DRAFT" | "ACTIVE" | "PAUSED" | "FINISHED";
+  maxTeams: number;
+  maxTeamSize: number;
+}
+
+const STATUS_FROM_API: Record<EventDTO["status"], SessionStatus> = {
+  DRAFT: "aguardando",
+  ACTIVE: "ativa",
+  PAUSED: "pausada",
+  FINISHED: "finalizada",
+};
+
+function eventToSession(event: EventDTO): EduSession {
+  return {
+    id: event.id,
+    titulo: event.name,
+    codigo: event.code,
+    status: STATUS_FROM_API[event.status],
+    numEquipes: event.maxTeams,
+    integrantes: event.maxTeamSize,
+    modo: event.mode,
+    cenario: event.scenario,
+  };
+}
+
+type OverviewKeyStatus = "ativa" | "concluida" | "bloqueada";
+
+interface OverviewTeam {
+  id: string;
+  name: string;
+  memberCount: number;
+  score: number;
+  keys: Record<KeyId, OverviewKeyStatus>;
+  submission: { type: string } | null;
+}
+
+interface OverviewAlert {
+  id: string;
+  severity: "INFO" | "WARNING" | "CRITICAL";
+  message: string;
+}
+
+interface Overview {
+  metrics: { activeTeams: number; participants: number; keysCompleted: number };
+  teams: OverviewTeam[];
+  alerts: OverviewAlert[];
+}
+
+const NEXT_STATUS: Partial<
+  Record<
+    SessionStatus,
+    { next: SessionStatus; actionKey: "iniciar" | "pausar" | "retomar" }
+  >
 > = {
   aguardando: { next: "ativa", actionKey: "iniciar" },
   ativa: { next: "pausada", actionKey: "pausar" },
@@ -52,6 +111,8 @@ const EXTENSOES_ICON: Record<(typeof EXTENSOES_IDS)[number], string> = {
   cartasPedagogicas: "📚",
 };
 
+const OVERVIEW_POLL_MS = 15_000;
+
 export function EducadorPanel() {
   const t = useTranslations("educador");
   const tKeys = useTranslations("keys");
@@ -61,6 +122,13 @@ export function EducadorPanel() {
 
   const [sessions, setSessions] = useState<EduSession[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [overviewState, setOverviewState] = useState<
+    (Overview & { sessionId: string }) | null
+  >(null);
+  const overview =
+    overviewState && overviewState.sessionId === selectedId
+      ? overviewState
+      : null;
   const [showCreate, setShowCreate] = useState(false);
   const [showExtensoes, setShowExtensoes] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
@@ -78,6 +146,59 @@ export function EducadorPanel() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const selected = sessions.find((s) => s.id === selectedId) ?? null;
+
+  function errorMessage(code: string | undefined, fallback: string) {
+    return code && tCommon.has(`errors.${code}`)
+      ? tCommon(`errors.${code}`)
+      : fallback;
+  }
+
+  // The educator's own sessions, for the sidebar list.
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const res = await fetch("/api/events");
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as {
+        events?: EventDTO[];
+      } | null;
+      if (!cancelled && res.ok && body?.events) {
+        setSessions(body.events.map(eventToSession));
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  // Metrics/teams/alerts for the selected session — refreshed on selection
+  // and polled while a hackathon is live, so the educator sees progress
+  // without reloading the page.
+  useEffect(() => {
+    if (!selectedId) return;
+    let cancelled = false;
+    async function load() {
+      const res = await fetch(`/api/events/${selectedId}/overview`);
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as Overview | null;
+      if (!cancelled && res.ok && body && selectedId) {
+        setOverviewState({ ...body, sessionId: selectedId });
+      }
+    }
+    load();
+    const interval = setInterval(load, OVERVIEW_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [selectedId, router]);
 
   useEffect(() => {
     if (!timerRunning) {
@@ -102,16 +223,50 @@ export function EducadorPanel() {
     setSelectedId(id);
   }
 
+  async function changeStatus(target: "ACTIVE" | "PAUSED" | "FINISHED") {
+    if (!selected) {
+      toast("err", t("toasts.selecioneSessao"));
+      return;
+    }
+    try {
+      const res = await fetch(`/api/events/${selected.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: target }),
+      });
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as {
+        event?: EventDTO;
+        error?: string;
+      } | null;
+      if (!res.ok || !body?.event) {
+        toast(
+          "err",
+          errorMessage(body?.error, tCommon("errors.INTERNAL_ERROR")),
+        );
+        return;
+      }
+      const updated = eventToSession(body.event);
+      setSessions((prev) =>
+        prev.map((s) => (s.id === updated.id ? updated : s)),
+      );
+      toast("ok", t(`status.${updated.status}`));
+    } catch {
+      toast("err", tCommon("errors.INTERNAL_ERROR"));
+    }
+  }
+
   function handleSessionAction() {
     if (!selected) {
       toast("err", t("toasts.selecioneSessao"));
       return;
     }
-    const { next } = NEXT_STATUS[selected.status];
-    setSessions((prev) =>
-      prev.map((s) => (s.id === selected.id ? { ...s, status: next } : s)),
-    );
-    toast("ok", t(`status.${next}`));
+    const target = NEXT_STATUS[selected.status];
+    if (!target) return;
+    void changeStatus(target.next === "ativa" ? "ACTIVE" : "PAUSED");
   }
 
   function handleVerificarAlertas() {
@@ -119,7 +274,12 @@ export function EducadorPanel() {
       toast("err", t("toasts.selecioneSessao"));
       return;
     }
-    toast("ok", t("toasts.nenhumAlertaNovo"));
+    const count = overview?.alerts.length ?? 0;
+    if (count > 0) {
+      toast("err", t("toasts.alertasEncontrados", { count }));
+    } else {
+      toast("ok", t("toasts.nenhumAlertaNovo"));
+    }
   }
 
   function handlePending(label: string) {
@@ -154,6 +314,10 @@ export function EducadorPanel() {
     return `${m}:${s}`;
   }
 
+  const canStart = selected?.status === "aguardando";
+  const canPause = selected?.status === "ativa";
+  const canResume = selected?.status === "pausada";
+
   return (
     <div id="tela-educador">
       <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
@@ -187,20 +351,19 @@ export function EducadorPanel() {
           >
             ☕ {t("extensoes")}
           </button>
-          <button
-            className="btn btn-sm"
-            style={{
-              background: "var(--parc-bg)",
-              color: "var(--parc)",
-              border: "1.5px solid var(--parc-bd)",
-            }}
-            onClick={handleSessionAction}
-          >
-            ▶{" "}
-            {selected
-              ? t(`acao.${NEXT_STATUS[selected.status].actionKey}`)
-              : t("acao.iniciar")}
-          </button>
+          {selected && selected.status !== "finalizada" && (
+            <button
+              className="btn btn-sm"
+              style={{
+                background: "var(--parc-bg)",
+                color: "var(--parc)",
+                border: "1.5px solid var(--parc-bd)",
+              }}
+              onClick={handleSessionAction}
+            >
+              ▶ {t(`acao.${NEXT_STATUS[selected.status]?.actionKey}`)}
+            </button>
+          )}
           <button
             className="btn btn-sm"
             style={{
@@ -314,7 +477,7 @@ export function EducadorPanel() {
                 }}
               />
               <div className="m-val" style={{ color: "var(--prob)" }}>
-                {selected ? selected.numEquipes : "—"}
+                {selected ? (overview?.metrics.activeTeams ?? "…") : "—"}
               </div>
               <div className="m-lbl">{t("metrics.equipesAtivas")}</div>
             </div>
@@ -329,7 +492,9 @@ export function EducadorPanel() {
                   background: "var(--sol)",
                 }}
               />
-              <div className="m-val">0</div>
+              <div className="m-val">
+                {selected ? (overview?.metrics.participants ?? "…") : "0"}
+              </div>
               <div className="m-lbl">{t("metrics.participantes")}</div>
             </div>
             <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-purple/40 hover:shadow-glow-purple">
@@ -344,7 +509,7 @@ export function EducadorPanel() {
                 }}
               />
               <div className="m-val" style={{ color: "var(--sol)" }}>
-                0
+                {selected ? (overview?.metrics.keysCompleted ?? "…") : "0"}
               </div>
               <div className="m-lbl">{t("metrics.chavesConcluidas")}</div>
             </div>
@@ -372,6 +537,13 @@ export function EducadorPanel() {
           <div className="prog-row">
             {KEY_IDS.map((id) => {
               const key = tKeys.raw(id) as KeyTranslation;
+              const teams = overview?.teams ?? [];
+              const completed = teams.filter(
+                (team) => team.keys[id] === "concluida",
+              ).length;
+              const pct = teams.length
+                ? Math.round((completed / teams.length) * 100)
+                : 0;
               return (
                 <div
                   className="prog-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/35 hover:shadow-glow-lime"
@@ -390,13 +562,15 @@ export function EducadorPanel() {
                     >
                       {key.name}
                     </div>
-                    <div className="pc-ct">0/{selected?.numEquipes ?? 0}</div>
+                    <div className="pc-ct">
+                      {completed}/{teams.length}
+                    </div>
                   </div>
                   <div className="pc-bar">
                     <div
                       className="pc-fill"
                       style={{
-                        width: "0%",
+                        width: `${pct}%`,
                         background: `var(${KEY_COLOR_VAR[id]})`,
                       }}
                     />
@@ -412,7 +586,7 @@ export function EducadorPanel() {
                 {t("toasts.selecioneSessao")}
               </div>
             )}
-            {selected && (
+            {selected && overview && overview.teams.length === 0 && (
               <div
                 className="card card-pad"
                 style={{
@@ -427,32 +601,188 @@ export function EducadorPanel() {
                 </div>
               </div>
             )}
+            {selected &&
+              overview &&
+              overview.teams.map((team, i) => {
+                const activeKey = KEY_IDS.find(
+                  (id) => team.keys[id] === "ativa",
+                );
+                const completed = KEY_IDS.filter(
+                  (id) => team.keys[id] === "concluida",
+                ).length;
+                const pct = Math.round((completed / KEY_IDS.length) * 100);
+                return (
+                  <div className="eq-card" key={team.id}>
+                    <div className="eq-card-head">
+                      <div
+                        className="eq-card-av"
+                        style={{
+                          background: AVATAR_COLORS[i % AVATAR_COLORS.length],
+                        }}
+                      >
+                        E{i + 1}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div className="eq-card-nm">{team.name}</div>
+                        <div className="eq-card-st">
+                          {activeKey
+                            ? (tKeys.raw(activeKey) as KeyTranslation).name
+                            : t("equipeCard.semChaveAtiva")}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="eq-card-dots">
+                      {KEY_IDS.map((id) => {
+                        const status = team.keys[id];
+                        const opacity =
+                          status === "concluida"
+                            ? 1
+                            : status === "ativa"
+                              ? 0.6
+                              : 0.15;
+                        return (
+                          <div
+                            key={id}
+                            className="eq-card-dot"
+                            style={{
+                              background: `var(${KEY_COLOR_VAR[id]})`,
+                              opacity,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="eq-prog-bar">
+                      <div
+                        className="eq-prog-fill"
+                        style={{
+                          width: `${pct}%`,
+                          background: activeKey
+                            ? `var(${KEY_COLOR_VAR[activeKey]})`
+                            : "var(--t3)",
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div
+                        className="badge tiny"
+                        style={{
+                          background: "rgba(255,255,255,.05)",
+                          color: "var(--t3)",
+                          borderColor: "var(--border)",
+                        }}
+                      >
+                        {completed}/4 {t("equipeCard.chaves")}
+                      </div>
+                      <div
+                        className="badge tiny"
+                        style={{
+                          background: "rgba(255,255,255,.05)",
+                          color: "var(--t3)",
+                          borderColor: "var(--border)",
+                        }}
+                      >
+                        👤 {team.memberCount}
+                      </div>
+                      {team.submission && (
+                        <div
+                          className="badge tiny"
+                          style={{
+                            background: "rgba(34,197,94,.12)",
+                            color: "#22c55e",
+                            borderColor: "rgba(34,197,94,.3)",
+                          }}
+                        >
+                          ✓ {t("equipeCard.entregou")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
 
         <div className="edu-right bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
           <div className="panel-title">{t("right.alertasMediacao")}</div>
-          <div style={{ fontSize: 11, color: "var(--t3)" }}>
-            {t("right.nenhumAlerta")}
-          </div>
+          {!overview || overview.alerts.length === 0 ? (
+            <div style={{ fontSize: 11, color: "var(--t3)" }}>
+              {t("right.nenhumAlerta")}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {overview.alerts.map((alert) => {
+                const color =
+                  alert.severity === "CRITICAL"
+                    ? "#ef4444"
+                    : alert.severity === "WARNING"
+                      ? "var(--gold)"
+                      : "var(--parc)";
+                const bg =
+                  alert.severity === "CRITICAL"
+                    ? "rgba(239,68,68,.1)"
+                    : alert.severity === "WARNING"
+                      ? "var(--gold-bg)"
+                      : "var(--parc-bg)";
+                const bd =
+                  alert.severity === "CRITICAL"
+                    ? "1.5px solid rgba(239,68,68,.3)"
+                    : alert.severity === "WARNING"
+                      ? "1.5px solid var(--gold-bd)"
+                      : "1.5px solid var(--parc-bd)";
+                const icon =
+                  alert.severity === "CRITICAL"
+                    ? "⚠"
+                    : alert.severity === "WARNING"
+                      ? "⏱"
+                      : "★";
+                return (
+                  <div
+                    key={alert.id}
+                    className="alert-card"
+                    style={{ background: bg, border: bd }}
+                  >
+                    <div
+                      className="alert-icon"
+                      style={{ background: bg, fontSize: 14 }}
+                    >
+                      {icon}
+                    </div>
+                    <div>
+                      <div className="alert-nm" style={{ color }}>
+                        {alert.message}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="sidebar-divider" />
           <div className="panel-title">{t("right.controlesSessao")}</div>
           <div className="ctrl-grid">
             <div
-              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-lime/40 hover:text-white hover:shadow-glow-lime"
-              onClick={handleSessionAction}
+              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-lime/40 hover:text-white hover:shadow-glow-lime ${!canStart ? "opacity-40 pointer-events-none" : ""}`}
+              onClick={() => canStart && changeStatus("ACTIVE")}
             >
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-amber/40 hover:text-white hover:shadow-glow-amber"
-              onClick={handleSessionAction}
+              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-amber/40 hover:text-white hover:shadow-glow-amber ${!canPause ? "opacity-40 pointer-events-none" : ""}`}
+              onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-cyan/40 hover:text-white hover:shadow-glow-cyan"
-              onClick={handleSessionAction}
+              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-cyan/40 hover:text-white hover:shadow-glow-cyan ${!canResume ? "opacity-40 pointer-events-none" : ""}`}
+              onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
@@ -606,7 +936,8 @@ export function EducadorPanel() {
       {showCreate && (
         <CreateSessionModal
           onClose={() => setShowCreate(false)}
-          onCreated={(session) => {
+          onCreated={(event) => {
+            const session = eventToSession(event);
             setSessions((prev) => [session, ...prev]);
             setSelectedId(session.id);
             setShowCreate(false);
