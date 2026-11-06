@@ -110,6 +110,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   const [showSubmission, setShowSubmission] = useState(false);
   const [submission, setSubmission] = useState<SubmissionData | null>(null);
   const tSubmission = useTranslations("submission");
+  const [showEncerramento, setShowEncerramento] = useState(false);
 
   const activeKey = KEY_IDS.find((id) => keys[id].status === "ativa") ?? null;
   const allDone = KEY_IDS.every((id) => keys[id].status === "concluida");
@@ -317,12 +318,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               color: "var(--gold)",
               border: "1px solid rgba(255,215,0,.35)",
             }}
-            onClick={() =>
-              toast(
-                "ok",
-                `${t("score.verResumo")}: ${score} ${t("score.unidade")}`,
-              )
-            }
+            onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
           </button>
@@ -834,6 +830,113 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             >
               {t("congrats.continuar")}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showEncerramento && (
+        <div id="overlay-encerramento">
+          <div
+            style={{
+              background: "var(--bg2)",
+              borderRadius: 22,
+              border: ".5px solid var(--border2)",
+              padding: "28px 28px 24px",
+              maxWidth: 520,
+              width: "100%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+          >
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  letterSpacing: "-.5px",
+                }}
+              >
+                {t("encerramento.titulo")}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                {t("encerramento.subTpl", {
+                  equipe: members[0] ?? nickname,
+                  pontos: score,
+                })}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                marginBottom: 20,
+              }}
+            >
+              {KEY_IDS.map((id) => {
+                const keyInfo = tKeys.raw(id) as KeyTranslation;
+                const colorVar = `var(${KEY_COLOR_VAR[id]})`;
+                const fasesComConteudo = [1, 2, 3]
+                  .map((numero) => ({
+                    numero,
+                    conteudo: keys[id].phases[numero]?.conteudo,
+                    nome: t(`fases.${id}.${numero - 1}.nome`),
+                  }))
+                  .filter((f) => f.conteudo);
+                return (
+                  <div key={id} className="enc-chave-card">
+                    <div
+                      className="enc-chave-titulo"
+                      style={{
+                        color: colorVar,
+                        borderBottom: `1px solid var(${KEY_COLOR_VAR[id]}-bd)`,
+                        paddingBottom: 8,
+                      }}
+                    >
+                      {keyInfo.icon} {keyInfo.name}
+                    </div>
+                    {fasesComConteudo.length === 0 ? (
+                      <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                        {t("encerramento.semFases")}
+                      </div>
+                    ) : (
+                      fasesComConteudo.map((f) => (
+                        <div key={f.numero} className="enc-fase">
+                          <div
+                            className="enc-fase-nome"
+                            style={{ color: colorVar }}
+                          >
+                            {f.nome}
+                          </div>
+                          <div className="enc-fase-conteudo">{f.conteudo}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                className="btn btn-ghost"
+                style={{ flex: 1 }}
+                onClick={() => setShowEncerramento(false)}
+              >
+                {t("encerramento.revisar")}
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  setShowEncerramento(false);
+                  setShowSubmission(true);
+                }}
+              >
+                {t("encerramento.entregar")}
+              </button>
+            </div>
           </div>
         </div>
       )}

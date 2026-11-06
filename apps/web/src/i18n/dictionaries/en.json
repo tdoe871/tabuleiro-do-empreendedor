@@ -360,6 +360,13 @@
       "perspectiva": "Perspective",
       "confirmar": "Take on this role",
       "trocarPapel": "Change role"
+    },
+    "encerramento": {
+      "titulo": "Investigation complete!",
+      "subTpl": "Team: {equipe} · {pontos} pts",
+      "semFases": "No phase recorded",
+      "revisar": "← Review",
+      "entregar": "Submit project →"
     }
   },
   "socializacao": {

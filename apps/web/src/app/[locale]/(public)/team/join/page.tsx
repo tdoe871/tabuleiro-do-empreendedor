@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
+import { TeamFlowHeader } from "@/components/shared/TeamFlowHeader";
 
 export default function JoinTeamPage() {
   const t = useTranslations("team");
@@ -42,34 +43,45 @@ export default function JoinTeamPage() {
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         padding: 24,
       }}
     >
-      <form
-        className="card card-pad"
-        style={{ maxWidth: 420, width: "100%" }}
-        onSubmit={handleSubmit}
+      <TeamFlowHeader />
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <div className="field">
-          <label>{t("joinCodeLabel")}</label>
-          <input
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value)}
-            style={{
-              textTransform: "uppercase",
-              letterSpacing: ".15em",
-              fontWeight: 700,
-            }}
-            required
-            autoFocus
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w100">
-          {t("joinTeam")}
-        </button>
-      </form>
+        <form
+          className="card card-pad anim-in bg-white/5 backdrop-blur-md border border-white/10"
+          style={{ maxWidth: 420, width: "100%" }}
+          onSubmit={handleSubmit}
+        >
+          <div className="field">
+            <label>{t("joinCodeLabel")}</label>
+            <input
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value)}
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: ".15em",
+                fontWeight: 700,
+              }}
+              required
+              autoFocus
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w100">
+            {t("joinTeam")}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

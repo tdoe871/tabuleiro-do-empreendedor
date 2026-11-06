@@ -360,6 +360,13 @@
       "perspectiva": "Perspectiva",
       "confirmar": "Assumir este papel",
       "trocarPapel": "Trocar papel"
+    },
+    "encerramento": {
+      "titulo": "Investigação concluída!",
+      "subTpl": "Equipe: {equipe} · {pontos} pts",
+      "semFases": "Nenhuma fase registrada",
+      "revisar": "← Revisar",
+      "entregar": "Entregar projeto →"
     }
   },
   "socializacao": {

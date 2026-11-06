@@ -360,6 +360,13 @@
       "perspectiva": "Perspective",
       "confirmar": "Adopter ce rôle",
       "trocarPapel": "Changer de rôle"
+    },
+    "encerramento": {
+      "titulo": "Enquête terminée !",
+      "subTpl": "Équipe : {equipe} · {pontos} pts",
+      "semFases": "Aucune phase enregistrée",
+      "revisar": "← Revoir",
+      "entregar": "Soumettre le projet →"
     }
   },
   "socializacao": {
