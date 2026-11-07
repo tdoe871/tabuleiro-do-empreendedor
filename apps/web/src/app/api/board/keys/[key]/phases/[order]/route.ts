@@ -13,6 +13,7 @@ import {
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
+import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 
 // PUT /api/board/keys/:key/phases/:order — save the team's answer and
 // complete the phase. Unlocks the next phase, or the next key after phase 3.
@@ -84,6 +85,10 @@ export async function PUT(
           error.code === "P2002";
         if (!alreadyDone) throw error;
       }
+      notify(
+        { topic: teamTopic(player.team.id), signal: "board" },
+        { topic: staffTopic(player.event.id), signal: "overview" },
+      );
     }
 
     // ALREADY_DONE also lands here: answer with the current board.
