@@ -8,6 +8,7 @@ import {
 } from "@/features/event/server/event";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
+import { eventTopic, notify, staffTopic } from "@/lib/realtime/server";
 
 // PATCH /api/events/:id/status — start, pause, resume or finish a session.
 // Body: { status: "ACTIVE" | "PAUSED" | "FINISHED" }. Rules in
@@ -44,6 +45,10 @@ export async function PATCH(
       data: change.data,
     });
     if (count === 0) return apiError("INVALID_STATUS_TRANSITION");
+    notify(
+      { topic: eventTopic(id), signal: "event" },
+      { topic: staffTopic(id), signal: "overview" },
+    );
 
     const updated = await prisma.event.findUniqueOrThrow({ where: { id } });
     return NextResponse.json({ event: toEventDTO(updated) });

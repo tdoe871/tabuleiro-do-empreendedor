@@ -41,7 +41,7 @@
   { "error": "VALIDATION_ERROR", "fields": { "nickname": "TOO_LONG" } }
   ```
 
-  La lista completa está en la [sección 5](#5-códigos-de-error).
+  La lista completa está en la [sección 6](#6-códigos-de-error).
 
 - **Fechas** en ISO 8601 UTC. Las respuestas que tienen timer incluyen `serverNow` para que el
   cliente calcule el tiempo restante sin depender del reloj del dispositivo.
@@ -439,6 +439,80 @@ entrega esté abierta. Errores: `FILE_NOT_FOUND`, `EVENT_NOT_ACTIVE`, `DEADLINE_
 baja el archivo con su nombre original. Pueden descargar los miembros del equipo y el educador
 dueño del evento (también después de que termina). Errores: `UNAUTHORIZED`, `FILE_NOT_FOUND`.
 
+### Chat del equipo — Jugador
+
+**Implementado.** Reemplaza el chat que hoy vive solo en el estado local de `PlayerBoard`. Tres
+tipos de mensaje:
+
+| `type`    | En `PlayerBoard`  | Lo ven                                |
+| --------- | ----------------- | ------------------------------------- |
+| `TEAM`    | `balao`           | Todo el equipo                        |
+| `PRIVATE` | `sussurro`        | Solo quien lo manda y quien lo recibe |
+| `NUDGE`   | `cutucar` (toque) | Solo quien lo manda y quien lo recibe |
+
+Los avisos de `sistema` (fase concluida, etc.) siguen siendo locales: no pasan por la API.
+
+`POST /api/messages` — manda un mensaje.
+
+```json
+{ "type": "TEAM", "text": "¿Quién toma la fase 2?", "clientId": "6f1c2a9e-3b7d-4c1a-9e8f-2d4b6a8c0e1f" }
+{ "type": "PRIVATE", "text": "...", "toParticipantId": "uuid", "clientId": "..." }
+{ "type": "NUDGE", "toParticipantId": "uuid", "clientId": "..." }
+// 201 (o 200 si ese clientId ya se había mandado)
+{ "message": MessageDTO }
+```
+
+```json
+// MessageDTO
+{
+  "id": 42,
+  "type": "PRIVATE",
+  "text": "...",
+  "from": { "id": "uuid", "nickname": "Ana" },
+  "to": { "id": "uuid", "nickname": "Bruno" },
+  "mine": true,
+  "clientId": "...",
+  "createdAt": "2026-11-12T15:00:00.000Z"
+}
+```
+
+- **`clientId`**: lo genera el navegador (`crypto.randomUUID()`), de 8 a 64 caracteres
+  (letras, números, `-` y `_`). Si se reintenta con el mismo `clientId` (se cortó la conexión), el
+  backend responde el mensaje que ya guardó y no lo duplica.
+- `text`: obligatorio en `TEAM` y `PRIVATE`, máximo **1000** caracteres; en `NUDGE` se ignora.
+- `toParticipantId`: obligatorio en `PRIVATE` y `NUDGE`; tiene que ser otro miembro del mismo
+  equipo. Sale de `members[].id` de `GET /api/board`.
+- Se puede mandar mientras la sesión está `ACTIVE` y con tiempo (igual que el tablero). Leer se
+  puede siempre, también en pausa y al terminar.
+- Límites: **30 mensajes por minuto** por jugador, y **un toque cada 30 s** a la misma persona.
+- `from` / `to` llegan `null` si ese participante ya no existe.
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`type` → `INVALID`, `text` → `REQUIRED` /
+  `TOO_LONG`, `toParticipantId` → `REQUIRED` / `INVALID`, `clientId` → `INVALID`),
+  `EVENT_NOT_ACTIVE`, `EVENT_FINISHED`, `RATE_LIMITED`.
+
+`GET /api/messages` — los mensajes que el jugador puede ver, **del más viejo al más nuevo**.
+
+| Query          | Devuelve                                                |
+| -------------- | ------------------------------------------------------- |
+| (nada)         | Los últimos 100 (al abrir el tablero)                   |
+| `?after=<id>`  | Los más nuevos que `id`, hasta 100 (para refrescar)     |
+| `?before=<id>` | Los más viejos que `id`, hasta 100 (historial anterior) |
+
+```json
+{ "serverNow": "...", "messages": [MessageDTO], "hasMore": false, "cursor": 42 }
+```
+
+- **Cómo refrescar:** guardar `cursor` y pedir `?after=<cursor>` cada pocos segundos. Si
+  `hasMore` es `true`, pedir otra vez enseguida.
+- Con la carga inicial o con `?before=`, `hasMore: true` quiere decir que hay mensajes más viejos
+  (pedirlos con `?before=<id del primero>`). Con `?before=`, `cursor` llega `null`.
+- **Juntar por `id`:** el mensaje propio llega en la respuesta del `POST` y otra vez en un
+  refresco; no hay que pintarlo dos veces.
+- Un mensaje tarda **1 segundo** en aparecer en `GET` (evita que un refresco se salte un mensaje
+  que se estaba guardando al mismo tiempo). Quien lo manda lo ve al instante por la respuesta del
+  `POST`.
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`query` → `INVALID`).
+
 ### `POST /api/auth/logout` — Staff o Jugador
 
 Borra las cookies de educador y de jugador. `204`. **Implementado.**
@@ -548,7 +622,68 @@ Se define cuando el resto esté funcionando.
 
 ---
 
-## 5. Códigos de error
+## 5. Tiempo real
+
+**Implementado del lado del backend.** Cuando algo cambia, el backend manda un **aviso sin datos**
+("cambió el chat", "cambió el tablero"); la pantalla vuelve a pedir lo que muestra a la API de
+siempre, que revisa la sesión. Si el tiempo real no está disponible, la pantalla refresca sola cada
+pocos segundos: funciona igual, solo más lento.
+
+### Para el frontend: `useRealtime`
+
+```tsx
+import { useRealtime } from "@/lib/realtime/useRealtime";
+
+// Jugador (PlayerBoard)
+const { connected } = useRealtime((signal) => {
+  if (signal === "messages" || signal === "refresh") loadNewMessages(); // GET /api/messages?after=<cursor>
+  if (signal !== "messages") loadBoard(); // GET /api/board
+});
+
+// Educador (EducadorPanel)
+useRealtime(() => loadOverview(), { eventId }); // GET /api/events/:id/overview
+```
+
+| Aviso      | Cuándo                                                                                     | Quién lo recibe    | Qué volver a pedir                 |
+| ---------- | ------------------------------------------------------------------------------------------ | ------------------ | ---------------------------------- |
+| `messages` | Mensaje nuevo en el chat                                                                   | El equipo          | `GET /api/messages?after=<cursor>` |
+| `board`    | Fase concluida, entrega o archivo, nuevo integrante, rol, nuevo código del equipo          | El equipo          | `GET /api/board`                   |
+| `event`    | El educador inicia, pausa, retoma o termina la sesión                                      | Todos en el evento | `GET /api/board` o el resumen      |
+| `overview` | Cualquier cambio que afecta el resumen (equipos, fases, entregas, estado)                  | El educador        | `GET /api/events/:id/overview`     |
+| `refresh`  | Lo genera el propio hook: refresco periódico, pestaña visible otra vez, internet de vuelta | —                  | Todo lo que muestra la pantalla    |
+
+- El hook junta avisos seguidos: diez mensajes en un segundo producen una sola llamada.
+- `connected` es `true` mientras llegan avisos en vivo (se puede mostrar un indicador). Conectado,
+  refresca cada 60 s por seguridad; desconectado, cada 5 s.
+- Un `401` en la llamada que hace la pantalla sigue significando "mandar al login".
+
+### `GET /api/realtime` — Jugador o Staff
+
+Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Educador:
+`?eventId=<id>` de uno de sus eventos.
+
+```json
+{
+  "provider": "supabase",
+  "supabase": {
+    "url": "https://<proyecto>.supabase.co",
+    "key": "sb_publishable_..."
+  },
+  "topics": ["tdoe:team:...", "tdoe:event:..."],
+  "pollMs": { "connected": 60000, "disconnected": 5000 }
+}
+```
+
+- `provider`: `supabase` (Supabase Broadcast) o `none` (solo refresco). Se elige con la variable
+  `REALTIME_PROVIDER` del servidor, sin cambiar código. `socketio` está reservado para el plan de
+  servidor propio y todavía no está implementado.
+- Los nombres de canal van firmados con `AUTH_SECRET`: con el id de un equipo no se puede adivinar
+  su canal, y los jugadores nunca reciben el canal del educador.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (evento de otro educador).
+
+---
+
+## 6. Códigos de error
 
 | Código                      | HTTP | Cuándo                                                           |
 | --------------------------- | ---- | ---------------------------------------------------------------- |
@@ -580,13 +715,9 @@ Se define cuando el resto esté funcionando.
 
 ---
 
-## 6. Pendiente de decidir con el equipo (no está en este contrato)
+## 7. Pendiente de decidir con el equipo (no está en este contrato)
 
-- **Chat del equipo** (mensaje al equipo, mensaje privado y toque para llamar la atención). Hoy solo existe en el estado local de
-  `PlayerBoard`. Si entra (decisión 6.2.2 del contexto), propuesta:
-  `GET /api/messages?after=<id>` y
-  `POST /api/messages { type: "TEAM" | "PRIVATE" | "NUDGE", text?, toParticipantId?, clientId }`.
-  `clientId` evita duplicados al reintentar.
+- **Chat:** ¿el educador (o un mentor) puede leer los mensajes del equipo, para moderar? Hoy no.
 - **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
   tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
 - **Mentores y calificación** (decisión 6.2.3): no hay rol ni modelo todavía.
@@ -594,7 +725,7 @@ Se define cuando el resto esté funcionando.
 
 ---
 
-## 7. Resumen de cambios para el frontend
+## 8. Resumen de cambios para el frontend
 
 1. `CreateSessionModal`: usar `event.code` de la respuesta en vez de `randomCode()`.
 2. `team/create`: con `201`, mostrar el código y el link usando `team.joinCode` de la respuesta.
@@ -606,8 +737,13 @@ Se define cuando el resto esté funcionando.
    `KeyStatus`; el avance entre llaves lo hace el backend.
 6. `EducadorPanel` / `SocializacaoPanel`: cargar de `GET /api/events` y
    `GET /api/events/:id/overview`.
-7. Traducir los códigos de error de la sección 5 en los 4 diccionarios.
+7. Traducir los códigos de error de la sección 6 en los 4 diccionarios.
 8. Si una llamada responde `401`, mandar al login (`/[locale]`) tanto al jugador como al educador.
 9. `SubmissionModal`: para archivos, seguir los 3 pasos de "Archivos de la entrega" (pedir URL,
    subir directo a Storage, confirmar). Mostrar la lista de `files` con su `downloadUrl` y un botón
    para borrar. Opcional: un campo para los links extra (`links`).
+10. `PlayerBoard` (chat): mandar `balao`, `sussurro` y `cutucar` con `POST /api/messages`
+    (`TEAM`, `PRIVATE`, `NUDGE`) usando los `id` de `members` en vez de los nombres, y cargar la
+    conversación con `GET /api/messages` + `?after=<cursor>`. Juntar por `id`.
+11. `PlayerBoard` y `EducadorPanel`: usar `useRealtime` (sección 5) para volver a pedir el chat, el
+    tablero o el resumen cuando llegue un aviso, en vez de refrescar con un temporizador propio.

@@ -9,6 +9,7 @@ import {
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
+import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 
 async function loadDelivery(teamId: string) {
   const [submission, files] = await Promise.all([
@@ -69,6 +70,10 @@ export async function PUT(request: NextRequest) {
       create: { teamId: player.team.id, ...data },
       update: data,
     });
+    notify(
+      { topic: teamTopic(player.team.id), signal: "board" },
+      { topic: staffTopic(player.event.id), signal: "overview" },
+    );
     return NextResponse.json(await loadDelivery(player.team.id));
   } catch (error) {
     console.error("Save submission failed:", error);
