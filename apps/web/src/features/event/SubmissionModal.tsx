@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Ban, FileImage, GitBranch, Loader2, Rocket } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/providers/ToastProvider";
 import type { SubmissionType } from "@/types/domain";
@@ -18,6 +19,34 @@ const TYPES: SubmissionType[] = [
   "FILE_OR_IMAGE",
   "NONE",
 ];
+
+const TYPE_ICON: Record<SubmissionType, typeof Rocket> = {
+  DEPLOY_LINK: Rocket,
+  REPO_LINK: GitBranch,
+  FILE_OR_IMAGE: FileImage,
+  NONE: Ban,
+};
+
+const URL_MAX_LENGTH = 2048;
+const DESCRIPTION_MAX_LENGTH = 500;
+const FILE_MAX_BYTES = 10 * 1024 * 1024; // 10MB
+const ALLOWED_FILE_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "application/pdf",
+];
+
+// Only http(s) may ever reach an href/fetch built from user input — blocks
+// javascript:, data:, file:, vbscript: etc. being stored as a "deploy link".
+function isSafeHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export function SubmissionModal({
   onClose,
@@ -36,6 +65,10 @@ export function SubmissionModal({
   );
   const [url, setUrl] = useState(initial?.url ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
+  const [file, setFile] = useState<File | null>(null);
+  const [urlTouched, setUrlTouched] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const typeLabel: Record<SubmissionType, string> = {
     DEPLOY_LINK: t("deployLink"),
@@ -44,65 +77,149 @@ export function SubmissionModal({
     NONE: t("none"),
   };
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const res = await fetch("/api/submissions", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type,
-        url: url || undefined,
-        description: description || undefined,
-      }),
-    });
-    if (res.status !== 501 && !res.ok) {
-      toast("err", "Error");
+  const needsUrl = type === "DEPLOY_LINK" || type === "REPO_LINK";
+  const needsFile = type === "FILE_OR_IMAGE";
+  const urlValid = !needsUrl || isSafeHttpUrl(url.trim());
+  const fileValid = !needsFile || (file !== null && !fileError);
+  const canSubmit = urlValid && fileValid && !submitting;
+
+  function handleFileChange(selected: File | null) {
+    if (!selected) {
+      setFile(null);
+      setFileError(null);
       return;
     }
-    toast("info", t("saved"));
-    onSaved({
-      type,
-      url: url || undefined,
-      description: description || undefined,
-    });
-    onClose();
+    if (!ALLOWED_FILE_TYPES.includes(selected.type)) {
+      setFile(null);
+      setFileError(t("fileInvalidType"));
+      return;
+    }
+    if (selected.size > FILE_MAX_BYTES) {
+      setFile(null);
+      setFileError(t("fileTooLarge"));
+      return;
+    }
+    setFile(selected);
+    setFileError(null);
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!canSubmit) {
+      if (needsUrl) setUrlTouched(true);
+      if (needsFile && !file) setFileError(t("fileRequired"));
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      let res: Response;
+      if (needsFile && file) {
+        const formData = new FormData();
+        formData.append("type", type);
+        formData.append("file", file);
+        if (description) formData.append("description", description);
+        res = await fetch("/api/submissions", {
+          method: "PUT",
+          body: formData,
+        });
+      } else {
+        const trimmedUrl = needsUrl ? url.trim() : undefined;
+        res = await fetch("/api/submissions", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type,
+            url: trimmedUrl,
+            description: description || undefined,
+          }),
+        });
+      }
+
+      if (res.status !== 501 && !res.ok) {
+        toast("err", "Error");
+        return;
+      }
+      toast("info", t("saved"));
+      onSaved({
+        type,
+        url: needsUrl ? url.trim() : undefined,
+        description: description || undefined,
+      });
+      onClose();
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
-    <Modal onClose={onClose} maxWidth={480}>
+    <Modal onClose={onClose} maxWidth={520}>
       <h3>{t("title")}</h3>
       <form onSubmit={handleSubmit}>
         <div className="field">
           <label>{t("chooseType")}</label>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value as SubmissionType)}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 10,
+            }}
           >
-            {TYPES.map((ty) => (
-              <option key={ty} value={ty}>
-                {typeLabel[ty]}
-              </option>
-            ))}
-          </select>
+            {TYPES.map((ty) => {
+              const Icon = TYPE_ICON[ty];
+              const selected = type === ty;
+              return (
+                <button
+                  key={ty}
+                  type="button"
+                  className="option-card"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setType(ty);
+                    setUrlTouched(false);
+                  }}
+                >
+                  <span className="option-card-icon">
+                    <Icon size={16} />
+                  </span>
+                  <span className="option-card-title">{typeLabel[ty]}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {(type === "DEPLOY_LINK" || type === "REPO_LINK") && (
+        {needsUrl && (
           <div className="field">
             <label>{t("urlLabel")}</label>
             <input
               type="url"
               placeholder={t("urlPlaceholder")}
               value={url}
+              maxLength={URL_MAX_LENGTH}
               onChange={(e) => setUrl(e.target.value)}
+              onBlur={() => setUrlTouched(true)}
               required
             />
+            {urlTouched && !urlValid && (
+              <p className="field-error">{t("invalidUrl")}</p>
+            )}
           </div>
         )}
 
-        {type === "FILE_OR_IMAGE" && (
+        {needsFile && (
           <div className="field">
             <label>{t("fileOrImage")}</label>
-            <input type="file" accept="image/*,.pdf" />
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,application/pdf"
+              onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+            />
+            {fileError ? (
+              <p className="field-error">{fileError}</p>
+            ) : (
+              <p className="field-hint">{t("fileHint")}</p>
+            )}
           </div>
         )}
 
@@ -112,16 +229,36 @@ export function SubmissionModal({
             placeholder={t("descriptionPlaceholder")}
             style={{ height: 70, resize: "vertical" }}
             value={description}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             onChange={(e) => setDescription(e.target.value)}
           />
+          <p className="field-count">
+            {description.length}/{DESCRIPTION_MAX_LENGTH}
+          </p>
         </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={onClose}
+            disabled={submitting}
+          >
             Cancelar
           </button>
-          <button type="submit" className="btn btn-primary">
-            {t("submit")}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!canSubmit}
+          >
+            {submitting ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                {t("saving")}
+              </>
+            ) : (
+              t("submit")
+            )}
           </button>
         </div>
       </form>

@@ -2,7 +2,34 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "toasts": {
+      "featurePendente": "{feature}: still under construction"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Check the submitted data.",
+      "INVALID_URL": "The link must start with https://",
+      "FILE_TYPE_NOT_ALLOWED": "File format not allowed.",
+      "FILE_TOO_LARGE": "The file is over the allowed limit.",
+      "UNAUTHORIZED": "Your session expired. Sign in again.",
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
+      "FORBIDDEN": "You don't have permission to do that.",
+      "EVENT_NOT_FOUND": "Session not found.",
+      "TEAM_NOT_FOUND": "Invalid team code.",
+      "EMAIL_TAKEN": "That email is already registered.",
+      "TEAM_NAME_TAKEN": "There's already a team with that name in this event.",
+      "NICKNAME_TAKEN": "There's already someone with that nickname on the team.",
+      "TEAM_FULL": "That team is already full.",
+      "EVENT_FULL": "That event already reached its team limit.",
+      "EVENT_NOT_ACTIVE": "The session is paused or hasn't started yet.",
+      "EVENT_FINISHED": "That session already ended.",
+      "DEADLINE_PASSED": "The submission deadline already passed.",
+      "KEY_LOCKED": "That key is still locked.",
+      "PHASE_LOCKED": "That phase is still locked.",
+      "INVALID_STATUS_TRANSITION": "That action isn't allowed in the session's current state.",
+      "RATE_LIMITED": "Too many attempts. Wait a bit and try again.",
+      "INTERNAL_ERROR": "Something went wrong on our end. Try again."
+    }
   },
   "join": {
     "title": "Join the event",
@@ -17,7 +44,15 @@
     "createNameLabel": "Team name",
     "joinCodeLabel": "Team code (or use the link your leader sent you)",
     "youAreLeader": "You are this team's leader",
-    "shareLink": "Share this link with your team"
+    "shareLink": "Share this link with your team",
+    "enterBoardPreview": "Enter the board (preview) →",
+    "toasts": {
+      "backendPendingCreate": "Create team: backend under construction — local preview.",
+      "created": "Team created",
+      "createError": "Couldn't create the team",
+      "backendPendingJoin": "Join team: backend under construction — opening the board in preview mode.",
+      "invalidCode": "Invalid team code"
+    }
   },
   "submission": {
     "title": "Project submission",
@@ -34,7 +69,13 @@
     "saved": "Submission saved locally — still needs to connect to the backend.",
     "editar": "✏️ Edit submission",
     "abrir": "📦 Submit project",
-    "status": "Submission recorded"
+    "status": "Submission recorded",
+    "invalidUrl": "The link must start with http:// or https://",
+    "fileHint": "Max 10MB · PDF, PNG, JPG or WEBP",
+    "fileTooLarge": "The file is over the 10MB limit.",
+    "fileInvalidType": "Format not allowed. Use PDF, PNG, JPG or WEBP.",
+    "fileRequired": "Select a file before saving.",
+    "saving": "Saving…"
   },
   "keys": {
     "problema": {
@@ -90,6 +131,14 @@
       "entrarJogo": "Join the game →",
       "codeHint1": "Code provided by your educator",
       "codeHint2": "Ask for the 6-letter code to get started"
+    },
+    "toasts": {
+      "backendPendingLogin": "Educator login: backend under construction — opening the panel in preview mode.",
+      "invalidCredentials": "Invalid credentials",
+      "passwordMismatch": "Passwords don't match",
+      "backendPendingRegister": "Educator sign-up: backend under construction — opening the panel in preview mode.",
+      "registerError": "Couldn't create the account",
+      "missingFields": "Fill in your name and the code"
     }
   },
   "educador": {
@@ -170,10 +219,11 @@
       "contextoLabel": "Investigation context",
       "contextoPlaceholder": "e.g. You are change agents for the Novo Horizonte neighborhood…",
       "contextoAjuda": "This text will be shown to teams when the session starts.",
-      "numEquipesLabel": "Number of teams (up to 80 — no 10-team cap)",
+      "numEquipesLabel": "Number of teams",
       "integrantesLabel": "Members per team",
       "cancelar": "Cancel",
-      "criar": "Create session →"
+      "criar": "Create session →",
+      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap)."
     },
     "toasts": {
       "selecioneSessao": "Select a session",
@@ -181,7 +231,34 @@
       "tituloObrigatorio": "Enter a title for the session",
       "contextoObrigatorio": "Describe the investigation context",
       "sessaoCriada": "Session created! Code: {code}",
-      "backendPendente": "Backend still in progress — session shown locally."
+      "backendPendente": "Backend still in progress — session shown locally.",
+      "erroCriar": "Couldn't create the session",
+      "alertasEncontrados": "{count} active alert(s)"
+    },
+    "equipesVazio": "No teams in this session yet. Share the code {codigo} with participants so they can join.",
+    "extensoesModal": {
+      "subtitulo": "Features planned for upcoming versions of TdoE",
+      "emBreve": "Coming soon",
+      "fechar": "Close",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Extra challenges",
+          "descricao": "Additional deck the educator can release manually."
+        },
+        "coringas": {
+          "nome": "Wildcards",
+          "descricao": "Special cards the team can use once per session."
+        },
+        "cartasPedagogicas": {
+          "nome": "Teaching cards",
+          "descricao": "Cards with concepts and prompting questions for support."
+        }
+      }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "No active key",
+      "chaves": "keys",
+      "entregou": "Submitted"
     }
   },
   "jogador": {
@@ -193,12 +270,18 @@
       "unidade": "pts",
       "verResumo": "View summary"
     },
-    "timer": { "label": "Phase time" },
+    "timer": {
+      "label": "Phase time"
+    },
     "cenario": {
       "titulo": "Investigation session",
       "sub": "You are a change agent."
     },
-    "membros": { "titulo": "Team members", "voce": "you", "ativo": "active" },
+    "membros": {
+      "titulo": "Team members",
+      "voce": "you",
+      "ativo": "active"
+    },
     "comm": {
       "equipe": "Team",
       "individual": "Individual",
@@ -239,7 +322,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Context", "pergunta": "Where does the problem happen?" },
+        {
+          "nome": "Context",
+          "pergunta": "Where does the problem happen?"
+        },
         {
           "nome": "Characteristics",
           "pergunta": "How does the problem affect the context?"
@@ -295,7 +381,8 @@
     "comm2": {
       "cutucou": "You poked {nome}",
       "paraDestino": "You → {nome}",
-      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed"
+      "faseConcluidaLog": "✓ Phase {nome} of {chave} completed",
+      "cutucarTitle": "Nudge"
     },
     "rpg": {
       "escolherTitulo": "Choose your role",
@@ -303,6 +390,13 @@
       "perspectiva": "Perspective",
       "confirmar": "Take on this role",
       "trocarPapel": "Change role"
+    },
+    "encerramento": {
+      "titulo": "Investigation complete!",
+      "subTpl": "Team: {equipe} · {pontos} pts",
+      "semFases": "No phase recorded",
+      "revisar": "← Review",
+      "entregar": "Submit project →"
     }
   },
   "socializacao": {

@@ -44,31 +44,32 @@ export function LoginScreen() {
   const [jogNome, setJogNome] = useState("");
   const [jogCodigo, setJogCodigo] = useState("");
 
+  function authErrorMessage(code: string | undefined, fallback: string) {
+    return code && tCommon.has(`errors.${code}`)
+      ? tCommon(`errors.${code}`)
+      : fallback;
+  }
+
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
     const res = await postJson("/api/auth/login", {
       email: loginEmail,
       senha: loginSenha,
     });
-    if (res.status === 501) {
-      toast(
-        "info",
-        "Login de educador: backend em construção — abrindo painel em modo de visualização.",
-      );
-      router.push("/mestre/dashboard");
-      return;
-    }
     if (res.ok) {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", "Credenciais inválidas");
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.invalidCredentials")));
   }
 
   async function handleCadastro(e: FormEvent) {
     e.preventDefault();
     if (cadSenha !== cadConf) {
-      toast("err", "As senhas não coincidem");
+      toast("err", t("toasts.passwordMismatch"));
       return;
     }
     const res = await postJson("/api/auth/register", {
@@ -77,25 +78,20 @@ export function LoginScreen() {
       email: cadEmail,
       senha: cadSenha,
     });
-    if (res.status === 501) {
-      toast(
-        "info",
-        "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
-      );
-      router.push("/mestre/dashboard");
-      return;
-    }
     if (res.ok) {
       router.push("/mestre/dashboard");
       return;
     }
-    toast("err", "Não foi possível criar a conta");
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.registerError")));
   }
 
   function handleCodigo(e: FormEvent) {
     e.preventDefault();
     if (!jogNome.trim() || !jogCodigo.trim()) {
-      toast("err", "Preencha seu nome e o código");
+      toast("err", t("toasts.missingFields"));
       return;
     }
     const params = new URLSearchParams({
@@ -110,7 +106,7 @@ export function LoginScreen() {
   return (
     <>
       <div id="tela-login">
-        <div className="login-hero">
+        <div className="login-hero bg-transparent">
           <div className="glow-prob" />
           <div className="glow-parc" />
           <div className="glow-opor" />
@@ -119,7 +115,7 @@ export function LoginScreen() {
           </div>
           <div className="login-hero-content anim-in">
             <div className="logo-row">
-              <div className="logo-gem">
+              <div className="logo-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
                 <GemLogo />
               </div>
               <div>
@@ -140,7 +136,7 @@ export function LoginScreen() {
                   return (
                     <div
                       key={id}
-                      className="badge"
+                      className="badge backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -159,22 +155,22 @@ export function LoginScreen() {
           <div className="hero-bar" />
         </div>
 
-        <div className="login-panel">
-          <div className="login-tabs">
+        <div className="login-panel bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
+          <div className="login-tabs bg-white/5 backdrop-blur-md border border-white/10">
             <div
-              className={`login-tab ${tab === "login" ? "on" : ""}`}
+              className={`login-tab transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab ${tab === "cadastro" ? "on" : ""}`}
+              className={`login-tab transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab ${tab === "codigo" ? "on" : ""}`}
+              className={`login-tab transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
@@ -261,6 +257,7 @@ export function LoginScreen() {
                     placeholder="••••••••"
                     value={cadSenha}
                     onChange={(e) => setCadSenha(e.target.value)}
+                    minLength={8}
                     required
                   />
                 </div>
@@ -271,6 +268,7 @@ export function LoginScreen() {
                     placeholder="••••••••"
                     value={cadConf}
                     onChange={(e) => setCadConf(e.target.value)}
+                    minLength={8}
                     required
                   />
                 </div>
@@ -312,7 +310,7 @@ export function LoginScreen() {
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk">
+                <div className="code-blk backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
                   <div className="code-gem">
                     <GemLogo size={20} />
                   </div>

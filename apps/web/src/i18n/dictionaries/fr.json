@@ -2,7 +2,34 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continuer",
-    "back": "Retour"
+    "back": "Retour",
+    "toasts": {
+      "featurePendente": "{feature} : encore en construction"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Vérifiez les données envoyées.",
+      "INVALID_URL": "Le lien doit commencer par https://",
+      "FILE_TYPE_NOT_ALLOWED": "Format de fichier non autorisé.",
+      "FILE_TOO_LARGE": "Le fichier dépasse la limite autorisée.",
+      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous.",
+      "INVALID_CREDENTIALS": "E-mail ou mot de passe incorrect.",
+      "FORBIDDEN": "Vous n'avez pas la permission pour cela.",
+      "EVENT_NOT_FOUND": "Session introuvable.",
+      "TEAM_NOT_FOUND": "Code d'équipe invalide.",
+      "EMAIL_TAKEN": "Cet e-mail est déjà enregistré.",
+      "TEAM_NAME_TAKEN": "Il existe déjà une équipe avec ce nom dans cet événement.",
+      "NICKNAME_TAKEN": "Il y a déjà quelqu'un avec ce surnom dans l'équipe.",
+      "TEAM_FULL": "Cette équipe est déjà complète.",
+      "EVENT_FULL": "Cet événement a déjà atteint sa limite d'équipes.",
+      "EVENT_NOT_ACTIVE": "La session est en pause ou n'a pas encore commencé.",
+      "EVENT_FINISHED": "Cette session est déjà terminée.",
+      "DEADLINE_PASSED": "La date limite de soumission est déjà passée.",
+      "KEY_LOCKED": "Cette clé est encore verrouillée.",
+      "PHASE_LOCKED": "Cette phase est encore verrouillée.",
+      "INVALID_STATUS_TRANSITION": "Cette action n'est pas autorisée dans l'état actuel de la session.",
+      "RATE_LIMITED": "Trop de tentatives. Attendez un peu et réessayez.",
+      "INTERNAL_ERROR": "Une erreur est survenue de notre côté. Réessayez."
+    }
   },
   "join": {
     "title": "Rejoindre l'événement",
@@ -17,7 +44,15 @@
     "createNameLabel": "Nom de l'équipe",
     "joinCodeLabel": "Code de l'équipe (ou utilisez le lien envoyé par le chef)",
     "youAreLeader": "Vous êtes le chef de cette équipe",
-    "shareLink": "Partagez ce lien avec votre équipe"
+    "shareLink": "Partagez ce lien avec votre équipe",
+    "enterBoardPreview": "Entrer dans le plateau (aperçu) →",
+    "toasts": {
+      "backendPendingCreate": "Créer une équipe : backend en construction — aperçu local.",
+      "created": "Équipe créée",
+      "createError": "Impossible de créer l'équipe",
+      "backendPendingJoin": "Rejoindre l'équipe : backend en construction — ouverture du plateau en mode aperçu.",
+      "invalidCode": "Code d'équipe invalide"
+    }
   },
   "submission": {
     "title": "Soumission du projet",
@@ -34,7 +69,13 @@
     "saved": "Soumission enregistrée localement — il faut encore la connecter au backend.",
     "editar": "✏️ Modifier la soumission",
     "abrir": "📦 Soumettre le projet",
-    "status": "Soumission enregistrée"
+    "status": "Soumission enregistrée",
+    "invalidUrl": "Le lien doit commencer par http:// ou https://",
+    "fileHint": "Max 10 Mo · PDF, PNG, JPG ou WEBP",
+    "fileTooLarge": "Le fichier dépasse la limite de 10 Mo.",
+    "fileInvalidType": "Format non autorisé. Utilisez PDF, PNG, JPG ou WEBP.",
+    "fileRequired": "Sélectionnez un fichier avant d'enregistrer.",
+    "saving": "Enregistrement…"
   },
   "keys": {
     "problema": {
@@ -90,6 +131,14 @@
       "entrarJogo": "Rejoindre la partie →",
       "codeHint1": "Code fourni par le formateur",
       "codeHint2": "Demandez le code à 6 lettres pour commencer"
+    },
+    "toasts": {
+      "backendPendingLogin": "Connexion formateur : backend en construction — ouverture du panneau en mode aperçu.",
+      "invalidCredentials": "Identifiants invalides",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "backendPendingRegister": "Inscription formateur : backend en construction — ouverture du panneau en mode aperçu.",
+      "registerError": "Impossible de créer le compte",
+      "missingFields": "Renseignez votre nom et le code"
     }
   },
   "educador": {
@@ -170,10 +219,11 @@
       "contextoLabel": "Contexte d'investigation",
       "contextoPlaceholder": "Ex : Vous êtes des agents de transformation du quartier Novo Horizonte…",
       "contextoAjuda": "Ce texte sera affiché aux équipes au démarrage de la session.",
-      "numEquipesLabel": "Nombre d'équipes (jusqu'à 80 — sans limite de 10)",
+      "numEquipesLabel": "Nombre d'équipes",
       "integrantesLabel": "Membres par équipe",
       "cancelar": "Annuler",
-      "criar": "Créer la session →"
+      "criar": "Créer la session →",
+      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10)."
     },
     "toasts": {
       "selecioneSessao": "Sélectionnez une session",
@@ -181,7 +231,34 @@
       "tituloObrigatorio": "Saisissez un titre pour la session",
       "contextoObrigatorio": "Décrivez le contexte d'investigation",
       "sessaoCriada": "Session créée ! Code : {code}",
-      "backendPendente": "Backend encore en construction — session affichée localement."
+      "backendPendente": "Backend encore en construction — session affichée localement.",
+      "erroCriar": "Impossible de créer la session",
+      "alertasEncontrados": "{count} alerte(s) active(s)"
+    },
+    "equipesVazio": "Aucune équipe dans cette session pour l'instant. Partagez le code {codigo} avec les participants pour qu'ils rejoignent.",
+    "extensoesModal": {
+      "subtitulo": "Fonctionnalités prévues pour les prochaines versions de TdoE",
+      "emBreve": "Bientôt disponible",
+      "fechar": "Fermer",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Défis supplémentaires",
+          "descricao": "Jeu de cartes additionnel que le formateur peut lancer manuellement."
+        },
+        "coringas": {
+          "nome": "Jokers",
+          "descricao": "Cartes spéciales utilisables une fois par session par l'équipe."
+        },
+        "cartasPedagogicas": {
+          "nome": "Cartes pédagogiques",
+          "descricao": "Cartes avec des concepts et des questions pour accompagner l'équipe."
+        }
+      }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "Aucune clé active",
+      "chaves": "clés",
+      "entregou": "Soumis"
     }
   },
   "jogador": {
@@ -193,7 +270,9 @@
       "unidade": "pts",
       "verResumo": "Voir le résumé"
     },
-    "timer": { "label": "Temps de la phase" },
+    "timer": {
+      "label": "Temps de la phase"
+    },
     "cenario": {
       "titulo": "Session d'investigation",
       "sub": "Vous êtes un agent de transformation."
@@ -243,7 +322,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Contexte", "pergunta": "Où le problème se produit-il ?" },
+        {
+          "nome": "Contexte",
+          "pergunta": "Où le problème se produit-il ?"
+        },
         {
           "nome": "Caractéristiques",
           "pergunta": "Comment le problème affecte-t-il le contexte ?"
@@ -299,7 +381,8 @@
     "comm2": {
       "cutucou": "Vous avez interpellé {nome}",
       "paraDestino": "Vous → {nome}",
-      "faseConcluidaLog": "✓ Phase {nome} de {chave} terminée"
+      "faseConcluidaLog": "✓ Phase {nome} de {chave} terminée",
+      "cutucarTitle": "Interpeller"
     },
     "rpg": {
       "escolherTitulo": "Choisissez votre rôle",
@@ -307,6 +390,13 @@
       "perspectiva": "Perspective",
       "confirmar": "Adopter ce rôle",
       "trocarPapel": "Changer de rôle"
+    },
+    "encerramento": {
+      "titulo": "Enquête terminée !",
+      "subTpl": "Équipe : {equipe} · {pontos} pts",
+      "semFases": "Aucune phase enregistrée",
+      "revisar": "← Revoir",
+      "entregar": "Soumettre le projet →"
     }
   },
   "socializacao": {

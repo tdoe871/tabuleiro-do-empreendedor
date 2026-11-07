@@ -49,10 +49,15 @@ const AVATAR_GRADIENTS = [
 function initialKeys(): Record<KeyId, KeyState> {
   const keys = {} as Record<KeyId, KeyState>;
   for (const id of KEY_IDS) {
+    // Solução/Parcerias/Oportunidades depend on Problema being completed
+    // first (enforced in ativarChave/abrirFase) — their phase 1 must start
+    // locked, otherwise a player could open and submit it directly from the
+    // card without ever clearing that dependency.
+    const startsUnlocked = !DEPENDENTES.includes(id);
     keys[id] = {
       status: "disponivel",
       phases: {
-        1: { status: "disponivel" },
+        1: { status: startsUnlocked ? "disponivel" : "bloqueada" },
         2: { status: "bloqueada" },
         3: { status: "bloqueada" },
       },
@@ -105,6 +110,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   const [showSubmission, setShowSubmission] = useState(false);
   const [submission, setSubmission] = useState<SubmissionData | null>(null);
   const tSubmission = useTranslations("submission");
+  const [showEncerramento, setShowEncerramento] = useState(false);
 
   const activeKey = KEY_IDS.find((id) => keys[id].status === "ativa") ?? null;
   const allDone = KEY_IDS.every((id) => keys[id].status === "concluida");
@@ -136,6 +142,12 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   }
 
   function abrirFase(keyId: KeyId, numero: number) {
+    // Defense in depth: even if a phase's own status were ever left
+    // "disponivel" by mistake, the Problema dependency must still hold.
+    if (DEPENDENTES.includes(keyId) && keys.problema.status !== "concluida") {
+      toast("err", t("chave.bloqueadaPorProblema"));
+      return;
+    }
     const phase = keys[keyId].phases[numero] ?? {
       status: "bloqueada" as const,
     };
@@ -250,9 +262,9 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
   return (
     <div id="tela-jogadores">
-      <div className="topbar">
+      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
         <div className="tb-logo">
-          <div className="tb-gem">
+          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>
@@ -283,7 +295,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
       </div>
 
-      <div className="score-strip">
+      <div className="score-strip bg-white/[0.03] backdrop-blur-md border-b border-white/10">
         <div>
           <div className="score-label">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
@@ -306,12 +318,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               color: "var(--gold)",
               border: "1px solid rgba(255,215,0,.35)",
             }}
-            onClick={() =>
-              toast(
-                "ok",
-                `${t("score.verResumo")}: ${score} ${t("score.unidade")}`,
-              )
-            }
+            onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
           </button>
@@ -320,7 +327,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
       <div className="jog-layout">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card">
+          <div className="cenario-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
             <div className="cen-icon">⌖</div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>
@@ -354,13 +361,13 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 return (
                   <div
                     key={name}
-                    className={`membro-card ${i === 0 ? "ativo" : ""}`}
+                    className={`membro-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${i === 0 ? "ativo" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {i !== 0 && (
                       <div
                         className="cutucar-btn"
-                        title="Cutucar"
+                        title={t("comm2.cutucarTitle")}
                         onClick={() => cutucar(name)}
                       >
                         👆
@@ -407,7 +414,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             </div>
           </div>
 
-          <div className="card card-pad">
+          <div className="card card-pad bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/20">
             <div className="comm-tabs">
               <div
                 className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
@@ -596,16 +603,25 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   100,
               );
 
+              const hoverGlowClass =
+                id === "problema"
+                  ? "hover:shadow-glow-amber hover:ring-1 hover:ring-neon-amber/40"
+                  : id === "solucao"
+                    ? "hover:shadow-glow-lime hover:ring-1 hover:ring-neon-lime/40"
+                    : id === "parcerias"
+                      ? "hover:shadow-glow-purple hover:ring-1 hover:ring-neon-purple/40"
+                      : "hover:shadow-glow-cyan hover:ring-1 hover:ring-neon-cyan/40";
+
               return (
                 <div
                   key={id}
-                  className="chave-card"
+                  className={`chave-card bg-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
                   style={{
                     background: concluida
                       ? `var(${KEY_COLOR_VAR[id]}-bg)`
                       : ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                        : "rgba(255,255,255,.02)",
+                        : "rgba(255,255,255,.04)",
                     borderColor:
                       concluida || ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bd)`
@@ -666,7 +682,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }
@@ -814,6 +830,113 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             >
               {t("congrats.continuar")}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showEncerramento && (
+        <div id="overlay-encerramento">
+          <div
+            style={{
+              background: "var(--bg2)",
+              borderRadius: 22,
+              border: ".5px solid var(--border2)",
+              padding: "28px 28px 24px",
+              maxWidth: 520,
+              width: "100%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+          >
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  letterSpacing: "-.5px",
+                }}
+              >
+                {t("encerramento.titulo")}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                {t("encerramento.subTpl", {
+                  equipe: members[0] ?? nickname,
+                  pontos: score,
+                })}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                marginBottom: 20,
+              }}
+            >
+              {KEY_IDS.map((id) => {
+                const keyInfo = tKeys.raw(id) as KeyTranslation;
+                const colorVar = `var(${KEY_COLOR_VAR[id]})`;
+                const fasesComConteudo = [1, 2, 3]
+                  .map((numero) => ({
+                    numero,
+                    conteudo: keys[id].phases[numero]?.conteudo,
+                    nome: t(`fases.${id}.${numero - 1}.nome`),
+                  }))
+                  .filter((f) => f.conteudo);
+                return (
+                  <div key={id} className="enc-chave-card">
+                    <div
+                      className="enc-chave-titulo"
+                      style={{
+                        color: colorVar,
+                        borderBottom: `1px solid var(${KEY_COLOR_VAR[id]}-bd)`,
+                        paddingBottom: 8,
+                      }}
+                    >
+                      {keyInfo.icon} {keyInfo.name}
+                    </div>
+                    {fasesComConteudo.length === 0 ? (
+                      <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                        {t("encerramento.semFases")}
+                      </div>
+                    ) : (
+                      fasesComConteudo.map((f) => (
+                        <div key={f.numero} className="enc-fase">
+                          <div
+                            className="enc-fase-nome"
+                            style={{ color: colorVar }}
+                          >
+                            {f.nome}
+                          </div>
+                          <div className="enc-fase-conteudo">{f.conteudo}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                className="btn btn-ghost"
+                style={{ flex: 1 }}
+                onClick={() => setShowEncerramento(false)}
+              >
+                {t("encerramento.revisar")}
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  setShowEncerramento(false);
+                  setShowSubmission(true);
+                }}
+              >
+                {t("encerramento.entregar")}
+              </button>
+            </div>
           </div>
         </div>
       )}

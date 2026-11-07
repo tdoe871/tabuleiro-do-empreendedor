@@ -18,11 +18,11 @@ export function LangSwitcher() {
   const router = useRouter();
 
   return (
-    <div className="lang-sel">
+    <div className="lang-sel bg-white/5 backdrop-blur-md border-white/10">
       {routing.locales.map((l) => (
         <button
           key={l}
-          className={`lang-btn ${l === locale ? "on" : ""}`}
+          className={`lang-btn transition-all duration-200 hover:text-white ${l === locale ? "on" : ""}`}
           onClick={() => router.replace(pathname, { locale: l })}
         >
           {LABELS[l]}
