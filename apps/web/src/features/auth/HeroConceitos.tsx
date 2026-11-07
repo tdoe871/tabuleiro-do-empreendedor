@@ -34,7 +34,7 @@ export function HeroConceitos() {
         return (
           <div
             key={id}
-            className={`hc-card ${open ? "open" : ""}`}
+            className={`hc-card backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime ${open ? "open" : ""}`}
             style={{
               background: `var(${KEY_COLOR_VAR[id]}-bg)`,
               borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
