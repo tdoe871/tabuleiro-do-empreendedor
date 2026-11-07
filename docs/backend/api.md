@@ -439,6 +439,80 @@ entrega esté abierta. Errores: `FILE_NOT_FOUND`, `EVENT_NOT_ACTIVE`, `DEADLINE_
 baja el archivo con su nombre original. Pueden descargar los miembros del equipo y el educador
 dueño del evento (también después de que termina). Errores: `UNAUTHORIZED`, `FILE_NOT_FOUND`.
 
+### Chat del equipo — Jugador
+
+**Implementado.** Reemplaza el chat que hoy vive solo en el estado local de `PlayerBoard`. Tres
+tipos de mensaje:
+
+| `type`    | En `PlayerBoard`  | Lo ven                                |
+| --------- | ----------------- | ------------------------------------- |
+| `TEAM`    | `balao`           | Todo el equipo                        |
+| `PRIVATE` | `sussurro`        | Solo quien lo manda y quien lo recibe |
+| `NUDGE`   | `cutucar` (toque) | Solo quien lo manda y quien lo recibe |
+
+Los avisos de `sistema` (fase concluida, etc.) siguen siendo locales: no pasan por la API.
+
+`POST /api/messages` — manda un mensaje.
+
+```json
+{ "type": "TEAM", "text": "¿Quién toma la fase 2?", "clientId": "6f1c2a9e-3b7d-4c1a-9e8f-2d4b6a8c0e1f" }
+{ "type": "PRIVATE", "text": "...", "toParticipantId": "uuid", "clientId": "..." }
+{ "type": "NUDGE", "toParticipantId": "uuid", "clientId": "..." }
+// 201 (o 200 si ese clientId ya se había mandado)
+{ "message": MessageDTO }
+```
+
+```json
+// MessageDTO
+{
+  "id": 42,
+  "type": "PRIVATE",
+  "text": "...",
+  "from": { "id": "uuid", "nickname": "Ana" },
+  "to": { "id": "uuid", "nickname": "Bruno" },
+  "mine": true,
+  "clientId": "...",
+  "createdAt": "2026-11-12T15:00:00.000Z"
+}
+```
+
+- **`clientId`**: lo genera el navegador (`crypto.randomUUID()`), de 8 a 64 caracteres
+  (letras, números, `-` y `_`). Si se reintenta con el mismo `clientId` (se cortó la conexión), el
+  backend responde el mensaje que ya guardó y no lo duplica.
+- `text`: obligatorio en `TEAM` y `PRIVATE`, máximo **1000** caracteres; en `NUDGE` se ignora.
+- `toParticipantId`: obligatorio en `PRIVATE` y `NUDGE`; tiene que ser otro miembro del mismo
+  equipo. Sale de `members[].id` de `GET /api/board`.
+- Se puede mandar mientras la sesión está `ACTIVE` y con tiempo (igual que el tablero). Leer se
+  puede siempre, también en pausa y al terminar.
+- Límites: **30 mensajes por minuto** por jugador, y **un toque cada 30 s** a la misma persona.
+- `from` / `to` llegan `null` si ese participante ya no existe.
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`type` → `INVALID`, `text` → `REQUIRED` /
+  `TOO_LONG`, `toParticipantId` → `REQUIRED` / `INVALID`, `clientId` → `INVALID`),
+  `EVENT_NOT_ACTIVE`, `EVENT_FINISHED`, `RATE_LIMITED`.
+
+`GET /api/messages` — los mensajes que el jugador puede ver, **del más viejo al más nuevo**.
+
+| Query          | Devuelve                                                |
+| -------------- | ------------------------------------------------------- |
+| (nada)         | Los últimos 100 (al abrir el tablero)                   |
+| `?after=<id>`  | Los más nuevos que `id`, hasta 100 (para refrescar)     |
+| `?before=<id>` | Los más viejos que `id`, hasta 100 (historial anterior) |
+
+```json
+{ "serverNow": "...", "messages": [MessageDTO], "hasMore": false, "cursor": 42 }
+```
+
+- **Cómo refrescar:** guardar `cursor` y pedir `?after=<cursor>` cada pocos segundos. Si
+  `hasMore` es `true`, pedir otra vez enseguida.
+- Con la carga inicial o con `?before=`, `hasMore: true` quiere decir que hay mensajes más viejos
+  (pedirlos con `?before=<id del primero>`). Con `?before=`, `cursor` llega `null`.
+- **Juntar por `id`:** el mensaje propio llega en la respuesta del `POST` y otra vez en un
+  refresco; no hay que pintarlo dos veces.
+- Un mensaje tarda **1 segundo** en aparecer en `GET` (evita que un refresco se salte un mensaje
+  que se estaba guardando al mismo tiempo). Quien lo manda lo ve al instante por la respuesta del
+  `POST`.
+- Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`query` → `INVALID`).
+
 ### `POST /api/auth/logout` — Staff o Jugador
 
 Borra las cookies de educador y de jugador. `204`. **Implementado.**
@@ -582,11 +656,7 @@ Se define cuando el resto esté funcionando.
 
 ## 6. Pendiente de decidir con el equipo (no está en este contrato)
 
-- **Chat del equipo** (mensaje al equipo, mensaje privado y toque para llamar la atención). Hoy solo existe en el estado local de
-  `PlayerBoard`. Si entra (decisión 6.2.2 del contexto), propuesta:
-  `GET /api/messages?after=<id>` y
-  `POST /api/messages { type: "TEAM" | "PRIVATE" | "NUDGE", text?, toParticipantId?, clientId }`.
-  `clientId` evita duplicados al reintentar.
+- **Chat:** ¿el educador (o un mentor) puede leer los mensajes del equipo, para moderar? Hoy no.
 - **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
   tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
 - **Mentores y calificación** (decisión 6.2.3): no hay rol ni modelo todavía.
@@ -611,3 +681,6 @@ Se define cuando el resto esté funcionando.
 9. `SubmissionModal`: para archivos, seguir los 3 pasos de "Archivos de la entrega" (pedir URL,
    subir directo a Storage, confirmar). Mostrar la lista de `files` con su `downloadUrl` y un botón
    para borrar. Opcional: un campo para los links extra (`links`).
+10. `PlayerBoard` (chat): mandar `balao`, `sussurro` y `cutucar` con `POST /api/messages`
+    (`TEAM`, `PRIVATE`, `NUDGE`) usando los `id` de `members` en vez de los nombres, y cargar la
+    conversación con `GET /api/messages` + `?after=<cursor>` cada 3-5 s. Juntar por `id`.
