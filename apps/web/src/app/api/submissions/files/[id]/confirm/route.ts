@@ -13,6 +13,7 @@ import {
 import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
+import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 import { readObjectStart, removeObjects } from "@/lib/storage/submissions";
 
 // POST /api/submissions/files/:id/confirm — after the browser uploaded the
@@ -61,6 +62,10 @@ export async function POST(
       where: { id: file.id },
       data: { status: "READY", size: uploaded.size },
     });
+    notify(
+      { topic: teamTopic(player.team.id), signal: "board" },
+      { topic: staffTopic(player.event.id), signal: "overview" },
+    );
     return NextResponse.json({
       file: { ...toFileDTO(ready), status: "READY" },
     });

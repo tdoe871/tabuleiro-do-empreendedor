@@ -10,6 +10,7 @@ import {
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
+import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 
 // Generous on purpose: at the venue hundreds of people share one public IP.
 const isRateLimited = createRateLimiter({ windowMs: 5 * 60 * 1000, max: 300 });
@@ -81,6 +82,12 @@ export async function POST(request: NextRequest) {
       joined.participant,
       joined.team.eventId,
     );
+    if (!joined.recovered) {
+      notify(
+        { topic: teamTopic(joined.team.id), signal: "board" },
+        { topic: staffTopic(joined.team.eventId), signal: "overview" },
+      );
+    }
     return response;
   } catch (error) {
     if (error instanceof ApiFailure) return apiError(error.code);

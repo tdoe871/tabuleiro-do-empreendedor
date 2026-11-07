@@ -6,6 +6,7 @@ import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
 import { getStaffFromRequest } from "@/lib/auth/staff";
+import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 import {
   createSignedDownloadUrl,
   removeObjects,
@@ -62,6 +63,10 @@ export async function DELETE(request: NextRequest, { params }: Context) {
 
     await removeObjects([file.path]);
     await prisma.submissionFile.delete({ where: { id: file.id } });
+    notify(
+      { topic: teamTopic(player.team.id), signal: "board" },
+      { topic: staffTopic(player.event.id), signal: "overview" },
+    );
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("Delete file failed:", error);

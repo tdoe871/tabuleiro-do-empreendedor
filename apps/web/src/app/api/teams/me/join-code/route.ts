@@ -4,6 +4,7 @@ import { Prisma, prisma } from "@tdoe/db";
 import { apiError } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
 import { generateCode } from "@/lib/codes";
+import { notify, teamTopic } from "@/lib/realtime/server";
 
 const MAX_CODE_ATTEMPTS = 5;
 
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
         data: { joinCode: generateCode() },
         select: { joinCode: true },
       });
+      notify({ topic: teamTopic(player.team.id), signal: "board" });
       return NextResponse.json(team);
     } catch (error) {
       const collision =
