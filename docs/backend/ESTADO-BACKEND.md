@@ -2,7 +2,7 @@
 
 > Bitácora del backend y la base de datos (responsable: Eddy). Dice **qué está hecho, dónde está,
 > cómo se trabaja y qué sigue**, para que cualquiera (o Claude en una sesión nueva) retome sin
-> perder el hilo. Última actualización: **6 nov 2026**.
+> perder el hilo. Última actualización: **6 nov 2026 (noche)**.
 >
 > Documentos relacionados:
 >
@@ -22,9 +22,10 @@
 - Un solo deploy de Next.js 16 (API en route handlers) + Prisma 7 sobre Postgres de Supabase.
 - **Hechos y probados contra Supabase real:** base de datos, login del educador, sesiones del
   educador (crear / listar / iniciar / pausar / terminar / resumen), equipos y jugadores, tablero con
-  avance automático entre llaves, entregas con links y archivos.
-- **Falta:** chat del equipo, tiempo real, mentores y calificación, y las partes del panel del
-  educador que no se han definido (timer con presets, carta de reto, alertas, exportar).
+  avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
+  equipo, privados y toques).
+- **Falta:** tiempo real, mentores y calificación, y las partes del panel del educador que no se
+  han definido (timer con presets, carta de reto, alertas, exportar).
 
 ---
 
@@ -35,14 +36,19 @@
 | #2  | `feature/backend-base`  | `dev`             | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
 | #3  | `feature/staff-auth`    | `dev`             | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
 | #7  | `feature/players`       | `dev`             | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
-| #8  | `feature/submissions`   | `feature/players` | **Abierto**  | Bloque de entregas (montado sobre #7; al hacer merge del #7, GitHub lo pasa a `dev`)              |
+| #8  | `feature/submissions`   | `feature/players` | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
+| —   | `feature/chat`          | `feature/players` | Por abrir    | Bloque de chat del equipo (montado sobre #7)                                                      |
 | #6  | `ui/theme-sandbox-test` | `dev`             | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`    | `qa`              | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
-- **Rama local actual de Eddy:** `feature/submissions` (incluye todo lo de #7).
+- **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
+  alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
+- Ramas locales de Eddy: `local/prueba` (= `feature/players` + `dev`, **solo para probar en local,
+  no se sube**) y `feature/chat` (en la carpeta aparte `../tabuleiro-chat`, un `git worktree`, con
+  un enlace a `apps/web/.env`).
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
-- **Orden de merge:** primero #7, luego #8.
+- **Orden de merge:** primero #7, luego el de chat.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
 
@@ -120,6 +126,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261105231454_event_mode_and_scenario`      | `Event.mode` (`SCHOOL`/`CUSTOM`) y `Event.scenario`                                                                                                |
 | `20261106011207_team_phase_completed_by`      | Quita `TeamPhase.keyActivated`; agrega `completedById` (quién contestó)                                                                            |
 | `20261106161554_submission_files_and_links`   | `Submission.links` y tabla `SubmissionFile` (con RLS)                                                                                              |
+| `20261107002643_team_messages`                | Tabla `Message` (chat: `TEAM` / `PRIVATE` / `NUDGE`, id secuencial, `clientId` único por remitente) con RLS                                        |
 
 ### Reglas de la base
 
@@ -178,7 +185,10 @@ apps/web/src/
   features/submission/server/
     rules.ts                    tipos de archivo, firmas (primeros bytes), tamaños, links https, validación
     dto.ts                      formatos de respuesta de entregas y archivos
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, features/event-server, players, submissions
+  features/communication/server/
+    rules.ts                    chat: validar mensajes y query, quién ve qué, límites
+    dto.ts                      formato de respuesta de los mensajes
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, features/event-server, players, submissions, messages
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -215,10 +225,11 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Entregas  | `GET /api/submissions`, `PUT /api/submissions`                                      | Jugador              |
 | Entregas  | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id` | Jugador              |
 | Entregas  | `GET /api/submissions/files/:id` (descarga)                                         | Equipo o su educador |
+| Chat      | `GET /api/messages` (`?after=` / `?before=`), `POST /api/messages`                  | Jugador              |
 | —         | `GET /api/health`                                                                   | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **51 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **61 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -236,18 +247,22 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Defaults tomados (se cambian sin rehacer nada)
 
-| Tema                           | Default                                                             | Dónde se cambia                                |
-| ------------------------------ | ------------------------------------------------------------------- | ---------------------------------------------- |
-| Entrar al equipo               | Código del equipo + nickname, sin contraseña                        | —                                              |
-| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                     | `app/api/participants/route.ts`                |
-| Quién contesta fases y entrega | Cualquier miembro                                                   | —                                              |
-| Editar una fase concluida      | No se puede                                                         | `features/event/server/board.ts`               |
-| Puntos por fase                | 0                                                                   | `POINTS_PER_PHASE` en `board.ts`               |
-| Rol del juego de rol           | Se puede repetir en el equipo                                       | `app/api/participants/me/rpg-role/route.ts`    |
-| Carta de reto                  | `cartaAtiva` siempre `null`                                         | `board.ts`                                     |
-| Duración del evento            | 24 h, timer global                                                  | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
-| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra | `features/submission/server/rules.ts`          |
-| Registro de educadores         | Abierto a cualquiera                                                | `app/api/auth/register/route.ts`               |
+| Tema                           | Default                                                                | Dónde se cambia                                |
+| ------------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------- |
+| Entrar al equipo               | Código del equipo + nickname, sin contraseña                           | —                                              |
+| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                        | `app/api/participants/route.ts`                |
+| Quién contesta fases y entrega | Cualquier miembro                                                      | —                                              |
+| Editar una fase concluida      | No se puede                                                            | `features/event/server/board.ts`               |
+| Puntos por fase                | 0                                                                      | `POINTS_PER_PHASE` en `board.ts`               |
+| Rol del juego de rol           | Se puede repetir en el equipo                                          | `app/api/participants/me/rpg-role/route.ts`    |
+| Carta de reto                  | `cartaAtiva` siempre `null`                                            | `board.ts`                                     |
+| Duración del evento            | 24 h, timer global                                                     | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
+| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra    | `features/submission/server/rules.ts`          |
+| Registro de educadores         | Abierto a cualquiera                                                   | `app/api/auth/register/route.ts`               |
+| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino    | `features/communication/server/rules.ts`       |
+| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre            | `app/api/messages/route.ts`                    |
+| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona | `rules.ts` y `route.ts` del chat               |
+| Chat: el educador lee mensajes | No                                                                     | —                                              |
 
 ---
 
@@ -255,22 +270,24 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Siguientes bloques (avanzar con defaults, sin bloquearse)
 
-1. **Chat del equipo:** mensajes al equipo, mensajes privados y "toque" para llamar la atención. Hoy
-   solo existe en el estado local de `PlayerBoard`. Propuesta en `api.md` sección 6
-   (`GET/POST /api/messages`, con `clientId` para no duplicar).
-2. **Tiempo real:** que el timer, el tablero y el panel se actualicen solos. Propuesta: Supabase
-   Broadcast enviado desde el servidor; mientras tanto, el frontend refresca `GET /api/board` cada
-   10-15 s. Ojo con el límite de conexiones de Supabase gratis (200) contra ~300 personas.
-3. **Mentores y calificación:** no existe rol ni modelo todavía.
-4. **Panel del educador pendiente:** timer con presets, carta de reto, alertas y exportar.
-5. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
+1. **Tiempo real:** que el chat, el timer, el tablero y el panel se actualicen solos. Propuesta:
+   Supabase Broadcast enviado desde el servidor (un aviso de "hay algo nuevo" y el cliente pide
+   `GET /api/messages?after=` o `GET /api/board`). Mientras tanto, el frontend refresca por su
+   cuenta. **Ojo con el costo:** 300 personas refrescando el chat cada 4 s son ~75 llamadas por
+   segundo (~6.5 millones al día), y Vercel Hobby incluye 1 millón al mes. Sin tiempo real hace
+   falta Vercel Pro o refrescar menos seguido. También el límite de conexiones de Supabase gratis
+   (200) contra ~300 personas.
+2. **Mentores y calificación:** no existe rol ni modelo todavía.
+3. **Panel del educador pendiente:** timer con presets, carta de reto, alertas y exportar.
+4. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
    registro de actividad para la investigación, avisos generales, recuperar contraseña por correo,
    script de 60 equipos / 300 participantes para pruebas de carga.
 
 ### Decisiones abiertas (ver ❓ en `api.md`)
 
 - ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
-- ¿Entra el chat? ¿Cómo califican los mentores (criterios, escala, a qué equipos)?
+- ¿El educador puede leer el chat de los equipos (moderación)? ¿Cómo califican los mentores
+  (criterios, escala, a qué equipos)?
 - ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
 - Presupuesto de hosting (Supabase/Vercel Pro antes del evento).
 - Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera).
@@ -280,7 +297,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 - **JP:** conectar pantallas según la sección 7 de `api.md` (crear evento con el código del backend,
   crear/unirse a equipo, campo de nickname en el link de invitación, tablero desde `GET /api/board`,
   estado `bloqueada` y quitar el botón de activar llave, modal de entrega en 3 pasos, traducir
-  códigos de error, mandar al login con `401`). Para ver los paneles en local hay que registrarse
+  códigos de error, mandar al login con `401`) y conectar el chat (punto 10 de esa sección). Para ver los paneles en local hay que registrarse
   como educador y crear o unirse a un equipo (por ejemplo en `QATEST`).
 - **Brandon:** variables en GitHub y Vercel con los nombres de `.env.example`
   (`SUPABASE_SECRET_KEY` es indispensable para archivos).
@@ -301,7 +318,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. `nvm use` y `git status`: ¿en qué rama estás? ¿Ya se hizo merge de #7 y #8?
+1. `nvm use` y `git status`: ¿en qué rama estás? ¿Ya se hizo merge del #7 y del de chat?
    (`gh pr list --state all`).
 2. Si ya se hizo merge: `git switch dev && git pull`, y crear la rama del siguiente bloque.
 3. `pnpm install && pnpm db:generate`.
