@@ -18,6 +18,7 @@ import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
 import { createRateLimiter } from "@/lib/auth/rate-limit";
+import { notify, teamTopic } from "@/lib/realtime/server";
 
 // Per participant: enough for a fast conversation, not for flooding the team.
 const isRateLimited = createRateLimiter({ windowMs: 60 * 1000, max: 30 });
@@ -135,6 +136,7 @@ export async function POST(request: NextRequest) {
       },
       include: MESSAGE_PEOPLE,
     });
+    notify({ topic: teamTopic(player.team.id), signal: "messages" });
     return NextResponse.json(
       { message: toMessageDTO(message, me) },
       { status: 201 },

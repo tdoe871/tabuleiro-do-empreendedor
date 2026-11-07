@@ -4,6 +4,7 @@ import { prisma } from "@tdoe/db";
 import { RPG_ROLE_IDS, type RpgRoleId } from "@/features/event/rpgRoles";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
+import { notify, teamTopic } from "@/lib/realtime/server";
 
 // PUT /api/participants/me/rpg-role — pick, change or clear (null) the
 // player's role. Body: { rpgRole }. Teammates may pick the same role.
@@ -22,6 +23,7 @@ export async function PUT(request: NextRequest) {
       data: { rpgRole: rpgRole as RpgRoleId | null },
       select: { rpgRole: true },
     });
+    notify({ topic: teamTopic(player.team.id), signal: "board" });
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Set RPG role failed:", error);

@@ -12,6 +12,7 @@ import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
 import { generateCode } from "@/lib/codes";
+import { notify, staffTopic } from "@/lib/realtime/server";
 
 const MAX_CODE_ATTEMPTS = 5;
 
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
         created.participant,
         created.event.id,
       );
+      notify({ topic: staffTopic(created.event.id), signal: "overview" });
       return response;
     } catch (error) {
       if (error instanceof ApiFailure) return apiError(error.code);
