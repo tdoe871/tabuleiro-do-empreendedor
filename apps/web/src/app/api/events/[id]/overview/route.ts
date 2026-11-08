@@ -3,6 +3,7 @@ import { prisma } from "@tdoe/db";
 
 import { toEventDTO } from "@/features/event/server/event";
 import { computeKeyStatuses } from "@/features/event/server/progress";
+import { summarizeEvaluations } from "@/features/mentor/server/rubric";
 import { toFileDTO, toSubmissionDTO } from "@/features/submission/server/dto";
 import { apiError } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
@@ -53,6 +54,7 @@ export async function GET(
                 size: true,
               },
             },
+            evaluations: { select: { scores: true } },
           },
         },
         alerts: {
@@ -78,6 +80,10 @@ export async function GET(
           ? toSubmissionDTO(team.submission)
           : null,
         files: team.files.map(toFileDTO),
+        // Mentors' grades: count and average (detail in GET .../evaluations).
+        evaluation: (({ count, average }) => ({ count, average }))(
+          summarizeEvaluations(team.evaluations),
+        ),
       };
     });
 

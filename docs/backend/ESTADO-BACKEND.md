@@ -23,8 +23,9 @@
 - **Hechos y probados contra Supabase real:** base de datos, login del educador, sesiones del
   educador (crear / listar / iniciar / pausar / terminar / resumen), equipos y jugadores, tablero con
   avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
-  equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo).
-- **Falta:** mentores y calificación, las partes del panel del educador que no se han definido
+  equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
+  mentores y calificación.
+- **Falta:** las partes del panel del educador que no se han definido
   (timer con presets, carta de reto, alertas, exportar) y la prueba de carga.
 
 ---
@@ -37,19 +38,21 @@
 | #3  | `feature/staff-auth`    | `dev`             | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
 | #7  | `feature/players`       | `dev`             | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
 | #8  | `feature/submissions`   | `feature/players` | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
-| #9  | `feature/chat`          | `feature/players` | **Abierto**  | Bloque de chat del equipo (montado sobre #7)                                                      |
-| —   | `feature/realtime`      | `feature/chat`    | Por abrir    | Bloque de tiempo real (montado sobre #9)                                                          |
+| #9  | `feature/chat`          | `feature/players` | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
+| #10 | `feature/realtime`      | `feature/chat`    | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
+| —   | `feature/mentors`       | `feature/players` | Por abrir    | Mentores y calificación (montado sobre #7)                                                        |
 | #6  | `ui/theme-sandbox-test` | `dev`             | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`    | `qa`              | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
 - **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
   alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
 - Ramas locales de Eddy: `local/prueba` (= `feature/players` + `dev`, **solo para probar en local,
-  no se sube**) y `feature/chat` / `feature/realtime` (en la carpeta aparte `../tabuleiro-chat`, un
+  no se sube**) y las ramas de bloque (en la carpeta aparte `../tabuleiro-chat`, un
   `git worktree`, con un enlace a `apps/web/.env`).
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
-- **Orden de merge:** #7, luego #9 (chat), luego el de tiempo real.
+- **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
+  real. **Orden de merge:** #7, luego el de mentores.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
 
@@ -129,6 +132,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261106011207_team_phase_completed_by`      | Quita `TeamPhase.keyActivated`; agrega `completedById` (quién contestó)                                                                            |
 | `20261106161554_submission_files_and_links`   | `Submission.links` y tabla `SubmissionFile` (con RLS)                                                                                              |
 | `20261107002643_team_messages`                | Tabla `Message` (chat: `TEAM` / `PRIVATE` / `NUDGE`, id secuencial, `clientId` único por remitente) con RLS                                        |
+| `20261108220835_mentors_and_evaluations`      | `Event.mentorCode`, tablas `Mentor` y `Evaluation` (calificación en JSON) con RLS                                                                  |
 
 ### Reglas de la base
 
@@ -192,10 +196,13 @@ apps/web/src/
   features/submission/server/
     rules.ts                    tipos de archivo, firmas (primeros bytes), tamaños, links https, validación
     dto.ts                      formatos de respuesta de entregas y archivos
+  features/mentor/server/
+    rubric.ts                   rúbrica (5 criterios, 1-5), validar calificaciones, promedios
+    dto.ts                      formato de respuesta de una calificación
   features/communication/server/
     rules.ts                    chat: validar mensajes y query, quién ve qué, límites
     dto.ts                      formato de respuesta de los mensajes
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -218,26 +225,28 @@ packages/db/                    esquema, migraciones, seed, prisma.config.ts
 
 Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
-| Bloque      | Endpoint                                                                            | Quién                |
-| ----------- | ----------------------------------------------------------------------------------- | -------------------- |
-| Educador    | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`          | Público              |
-| Educador    | `POST /api/events`, `GET /api/events`                                               | Educador             |
-| Educador    | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                 | Educador             |
-| Educador    | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)       | Educador             |
-| Jugadores   | `POST /api/teams`, `GET /api/teams?eventCode=`                                      | Público              |
-| Jugadores   | `POST /api/participants` (unirse o recuperar sesión)                                | Público              |
-| Jugadores   | `POST /api/teams/me/join-code` (nuevo código)                                       | Líder                |
-| Jugadores   | `GET /api/board`, `PUT /api/board/keys/:key/phases/:order`                          | Jugador              |
-| Jugadores   | `PUT /api/participants/me/rpg-role`                                                 | Jugador              |
-| Entregas    | `GET /api/submissions`, `PUT /api/submissions`                                      | Jugador              |
-| Entregas    | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id` | Jugador              |
-| Entregas    | `GET /api/submissions/files/:id` (descarga)                                         | Equipo o su educador |
-| Chat        | `GET /api/messages` (`?after=` / `?before=`), `POST /api/messages`                  | Jugador              |
-| Tiempo real | `GET /api/realtime` (`?eventId=` para el educador)                                  | Jugador o educador   |
-| —           | `GET /api/health`                                                                   | Público              |
+| Bloque      | Endpoint                                                                               | Quién                |
+| ----------- | -------------------------------------------------------------------------------------- | -------------------- |
+| Educador    | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`             | Público              |
+| Educador    | `POST /api/events`, `GET /api/events`                                                  | Educador             |
+| Educador    | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                    | Educador             |
+| Educador    | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)          | Educador             |
+| Jugadores   | `POST /api/teams`, `GET /api/teams?eventCode=`                                         | Público              |
+| Jugadores   | `POST /api/participants` (unirse o recuperar sesión)                                   | Público              |
+| Jugadores   | `POST /api/teams/me/join-code` (nuevo código)                                          | Líder                |
+| Jugadores   | `GET /api/board`, `PUT /api/board/keys/:key/phases/:order`                             | Jugador              |
+| Jugadores   | `PUT /api/participants/me/rpg-role`                                                    | Jugador              |
+| Entregas    | `GET /api/submissions`, `PUT /api/submissions`                                         | Jugador              |
+| Entregas    | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id`    | Jugador              |
+| Entregas    | `GET /api/submissions/files/:id` (descarga)                                            | Equipo o su educador |
+| Chat        | `GET /api/messages` (`?after=` / `?before=`), `POST /api/messages`                     | Jugador              |
+| Tiempo real | `GET /api/realtime` (`?eventId=` para el educador)                                     | Jugador o educador   |
+| Mentores    | `POST /api/events/:id/mentor-code`, `GET /api/events/:id/evaluations`                  | Educador             |
+| Mentores    | `POST /api/mentors` (entrar), `GET /api/mentor`, `PUT /api/mentor/evaluations/:teamId` | Público / Mentor     |
+| —           | `GET /api/health`                                                                      | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **73 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **84 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -255,24 +264,27 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Defaults tomados (se cambian sin rehacer nada)
 
-| Tema                           | Default                                                                     | Dónde se cambia                                |
-| ------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------- |
-| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                | —                                              |
-| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                             | `app/api/participants/route.ts`                |
-| Quién contesta fases y entrega | Cualquier miembro                                                           | —                                              |
-| Editar una fase concluida      | No se puede                                                                 | `features/event/server/board.ts`               |
-| Puntos por fase                | 0                                                                           | `POINTS_PER_PHASE` en `board.ts`               |
-| Rol del juego de rol           | Se puede repetir en el equipo                                               | `app/api/participants/me/rpg-role/route.ts`    |
-| Carta de reto                  | `cartaAtiva` siempre `null`                                                 | `board.ts`                                     |
-| Duración del evento            | 24 h, timer global                                                          | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
-| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra         | `features/submission/server/rules.ts`          |
-| Registro de educadores         | Abierto a cualquiera                                                        | `app/api/auth/register/route.ts`               |
-| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino         | `features/communication/server/rules.ts`       |
-| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                 | `app/api/messages/route.ts`                    |
-| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona      | `rules.ts` y `route.ts` del chat               |
-| Chat: el educador lee mensajes | No                                                                          | —                                              |
-| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
-| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                            | `POLL_MS` en `lib/realtime/server.ts`          |
+| Tema                           | Default                                                                        | Dónde se cambia                                |
+| ------------------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------- |
+| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                   | —                                              |
+| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                                | `app/api/participants/route.ts`                |
+| Quién contesta fases y entrega | Cualquier miembro                                                              | —                                              |
+| Editar una fase concluida      | No se puede                                                                    | `features/event/server/board.ts`               |
+| Puntos por fase                | 0                                                                              | `POINTS_PER_PHASE` en `board.ts`               |
+| Rol del juego de rol           | Se puede repetir en el equipo                                                  | `app/api/participants/me/rpg-role/route.ts`    |
+| Carta de reto                  | `cartaAtiva` siempre `null`                                                    | `board.ts`                                     |
+| Duración del evento            | 24 h, timer global                                                             | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
+| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra            | `features/submission/server/rules.ts`          |
+| Registro de educadores         | Abierto a cualquiera                                                           | `app/api/auth/register/route.ts`               |
+| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino            | `features/communication/server/rules.ts`       |
+| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                    | `app/api/messages/route.ts`                    |
+| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona         | `rules.ts` y `route.ts` del chat               |
+| Chat: el educador lee mensajes | No                                                                             | —                                              |
+| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos    | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
+| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                               | `POLL_MS` en `lib/realtime/server.ts`          |
+| Mentores: acceso               | Código de mentores del evento + nombre, sin contraseña; máx. 50                | `features/mentor/server/rubric.ts`             |
+| Mentores: rúbrica              | 5 criterios (problema, solución, impacto, viabilidad, presentación) del 1 al 5 | `RUBRIC` en `rubric.ts` (sin migración)        |
+| Mentores: a quién califican    | A todos los equipos del evento, en cualquier estado                            | `app/api/mentor/evaluations/[teamId]/route.ts` |
 
 ---
 
@@ -282,7 +294,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 1. **Prueba de carga:** script de 60 equipos / 300 participantes. Es lo que confirma si alcanza el
    plan de hosting (sobre todo las conexiones a la base).
-2. **Mentores y calificación:** no existe rol ni modelo todavía.
+2. **Exportar** (CSV de entregas, avance y calificaciones).
 3. **Panel del educador pendiente:** timer con presets, carta de reto, alertas y exportar.
 4. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
    registro de actividad para la investigación, avisos generales, recuperar contraseña por correo,
@@ -291,8 +303,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 ### Decisiones abiertas (ver ❓ en `api.md`)
 
 - ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
-- ¿El educador puede leer el chat de los equipos (moderación)? ¿Cómo califican los mentores
-  (criterios, escala, a qué equipos)?
+- ¿El educador puede leer el chat de los equipos (moderación)? ¿La rúbrica de mentores (5 criterios
+  del 1 al 5, a todos los equipos) está bien?
 - ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
 - Presupuesto de hosting. **Recomendación:** Vercel Pro + Supabase Pro antes del martes 10 (≈45 USD
   al mes más quizá 10-30 USD de consumo el día del evento). Revisar el tope de gasto de Supabase

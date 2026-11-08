@@ -48,6 +48,9 @@ enum TimerMode {
 model Event {
   id              String      @id @default(uuid())
   code            String      @unique // short code to join as a participant
+  // Short code the educator shares with the event's mentors (judges). Null
+  // until the educator creates it; regenerating it stops new entries.
+  mentorCode      String?     @unique
   name            String
   mode            EventMode   @default(SCHOOL)
   scenario        String? // required when mode = CUSTOM
@@ -63,6 +66,7 @@ model Event {
   phases          Phase[]
   teams           Team[]
   alerts          Alert[]
+  mentors         Mentor[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -113,6 +117,7 @@ model Team {
   submission    Submission?
   files         SubmissionFile[]
   messages      Message[]
+  evaluations   Evaluation[]
   createdAt     DateTime         @default(now())
 
   @@unique([eventId, name])
@@ -234,6 +239,38 @@ model Message {
   @@unique([senderId, clientId])
   @@index([teamId, id])
   @@index([recipientId])
+}
+
+// A mentor (judge) of one event. Like players, mentors have no password:
+// they enter with the event's mentorCode and their name, and the same name
+// recovers the session.
+model Mentor {
+  id          String       @id @default(uuid())
+  eventId     String
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  evaluations Evaluation[]
+  joinedAt    DateTime     @default(now())
+
+  @@unique([eventId, name])
+}
+
+// One mentor's grade for one team. `scores` maps each rubric criterion to a
+// 1-5 score; the rubric lives in code (features/mentor/server/rubric.ts) so
+// it can change without a migration.
+model Evaluation {
+  id        String   @id @default(uuid())
+  mentorId  String
+  mentor    Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  scores    Json
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mentorId, teamId])
+  @@index([teamId])
 }
 
 enum AlertSeverity {

@@ -122,6 +122,56 @@ export async function verifyPlayerSession(
   }
 }
 
+// Mentor session: a judge of one event. Same length as the player session,
+// so mentors can keep grading after the event ends.
+export const MENTOR_SESSION_COOKIE = "tdoe_mentor";
+export const MENTOR_SESSION_DURATION_SECONDS = 60 * 60 * 36;
+
+export type MentorSession = { mentorId: string; eventId: string };
+
+export async function createMentorSession(
+  session: MentorSession,
+): Promise<string> {
+  const key = getSecretKey();
+  if (!key) {
+    throw new Error(
+      `AUTH_SECRET is not set or is shorter than ${MIN_SECRET_LENGTH} characters`,
+    );
+  }
+
+  return new SignJWT({ kind: "mentor", eventId: session.eventId })
+    .setProtectedHeader({ alg: ALGORITHM })
+    .setSubject(session.mentorId)
+    .setIssuedAt()
+    .setExpirationTime(`${MENTOR_SESSION_DURATION_SECONDS}s`)
+    .sign(key);
+}
+
+export async function verifyMentorSession(
+  token: string | undefined,
+): Promise<MentorSession | null> {
+  if (!token) return null;
+
+  const key = getSecretKey();
+  if (!key) return null;
+
+  try {
+    const { payload } = await jwtVerify(token, key, {
+      algorithms: [ALGORITHM],
+    });
+    if (
+      payload.kind !== "mentor" ||
+      typeof payload.sub !== "string" ||
+      typeof payload.eventId !== "string"
+    ) {
+      return null;
+    }
+    return { mentorId: payload.sub, eventId: payload.eventId };
+  } catch {
+    return null;
+  }
+}
+
 export function sessionCookieOptions(maxAge: number) {
   return {
     httpOnly: true,

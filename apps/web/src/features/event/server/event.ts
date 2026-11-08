@@ -22,6 +22,9 @@ const MODE_FROM_DB: Record<EventMode, ApiMode> = {
 export type EventDTO = {
   id: string;
   code: string;
+  // For the educator only (this DTO never reaches players): the code mentors
+  // use to enter; null until it is created.
+  mentorCode: string | null;
   name: string;
   mode: ApiMode;
   scenario: string | null;
@@ -38,6 +41,7 @@ export function toEventDTO(event: Event): EventDTO {
   return {
     id: event.id,
     code: event.code,
+    mentorCode: event.mentorCode,
     name: event.name,
     mode: MODE_FROM_DB[event.mode],
     scenario: event.scenario,

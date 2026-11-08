@@ -159,6 +159,7 @@ describe("toEventDTO", () => {
     const event = {
       id: "e1",
       code: "QATEST",
+      mentorCode: null,
       name: "Prueba",
       mode: "CUSTOM",
       scenario: "Escenario",

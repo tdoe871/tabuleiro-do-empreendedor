@@ -588,6 +588,97 @@ agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `
   que el mural los pinte como quiera.
 - ❓ El campo `proposta` del mural (la propuesta del equipo): ¿es la descripción de la entrega o algo aparte?
 
+### Mentores y calificación — Staff y Mentor 🆕
+
+**Implementado.** Defaults (se cambian sin migración, en `features/mentor/server/rubric.ts`):
+
+- El educador genera un **código de mentores** para su evento y se lo pasa a los mentores. Cada
+  mentor entra con ese código y su nombre, sin contraseña (como los jugadores). El mismo nombre
+  recupera la sesión.
+- **Rúbrica:** 5 criterios del **1 al 5**: `problema`, `solucao`, `impacto`, `viabilidade`,
+  `apresentacao` (el frontend los traduce). Todos son obligatorios; comentario opcional (máx.
+  2000).
+- Cualquier mentor del evento califica a **cualquier equipo**, una calificación por equipo que
+  puede editar. Se puede calificar en cualquier estado, también después de terminar.
+- Máximo 50 mentores por evento.
+
+**Educador**
+
+`POST /api/events/:id/mentor-code` — crea o cambia el código (el anterior deja de servir; los
+mentores que ya entraron siguen dentro). `200 { "mentorCode": "K7XM2Q" }`. El código también llega
+en `EventDTO.mentorCode` (`null` hasta crearlo). Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`.
+
+`GET /api/events/:id/evaluations` — calificaciones para el educador, **ordenadas de mayor a menor
+promedio** (los equipos sin calificar al final).
+
+```json
+{
+  "rubric": {
+    "criteria": [
+      "problema",
+      "solucao",
+      "impacto",
+      "viabilidade",
+      "apresentacao"
+    ],
+    "min": 1,
+    "max": 5
+  },
+  "mentorCode": "K7XM2Q",
+  "mentors": [{ "id": "uuid", "name": "Dra. López", "evaluated": 12 }],
+  "teams": [
+    {
+      "id": "uuid",
+      "name": "Los Innovadores",
+      "summary": {
+        "count": 2,
+        "average": 4.2,
+        "byCriterion": { "problema": 4.5, "...": 4 }
+      },
+      "evaluations": [
+        {
+          "mentor": { "id": "uuid", "name": "Dra. López" },
+          "teamId": "uuid",
+          "scores": { "problema": 5, "...": 4 },
+          "average": 4.2,
+          "comment": "...",
+          "updatedAt": "..."
+        }
+      ]
+    }
+  ]
+}
+```
+
+`GET /api/events/:id/overview` ahora trae en cada equipo `evaluation: { count, average }`.
+
+**Mentor** (cookie `tdoe_mentor`, 36 h; las páginas `/[locale]/mentor/*` sin sesión mandan al login)
+
+`POST /api/mentors` — Público. `{ "mentorCode": "K7XM2Q", "name": "Dra. López" }` →
+`201 { mentor: { id, name }, event: { name, status } }` (o `200` con `recovered: true`). Errores:
+`VALIDATION_ERROR` (`mentorCode` / `name` → `REQUIRED` / `TOO_LONG`), `EVENT_NOT_FOUND` (código
+inválido o cambiado), `TOO_MANY_MENTORS`, `RATE_LIMITED`.
+
+`GET /api/mentor` — todo lo de su pantalla en una llamada: `event` (nombre, estado, horario),
+`mentor`, `rubric` y `teams` (cada uno con `memberCount`, `keys`, `submission`, `files` con su
+`downloadUrl` y `myEvaluation`, `null` hasta calificarlo). Errores: `UNAUTHORIZED`.
+
+`PUT /api/mentor/evaluations/:teamId` — guarda o edita su calificación.
+
+```json
+{ "scores": { "problema": 5, "solucao": 4, "impacto": 4, "viabilidade": 3, "apresentacao": 5 }, "comment": "..." }
+// 200
+{ "evaluation": { "teamId": "uuid", "scores": { ... }, "average": 4.2, "comment": "...", "updatedAt": "..." } }
+```
+
+Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`scores` → `REQUIRED` / `UNKNOWN_CRITERION`,
+`scores.<criterio>` → `REQUIRED` / `INVALID`, `comment` → `TOO_LONG`), `TEAM_NOT_FOUND` (equipo de
+otro evento). Al guardar, el educador recibe el aviso `overview` en tiempo real.
+
+Los mentores pueden **descargar los archivos** de los equipos de su evento
+(`GET /api/submissions/files/:id`). Con cualquier sesión que no tenga permiso, la descarga responde
+`FILE_NOT_FOUND`; sin sesión, `UNAUTHORIZED`.
+
 ### Timer del educador ❓
 
 `EducadorPanel` tiene un timer con presets, iniciar/parar y "mostrar a los estudiantes", aparte del
@@ -705,6 +796,7 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 | `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
 | `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
 | `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
+| `TOO_MANY_MENTORS`          | 409  | El evento llegó al máximo de mentores                            |
 | `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                  |
 | `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
 | `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
@@ -720,7 +812,8 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 - **Chat:** ¿el educador (o un mentor) puede leer los mensajes del equipo, para moderar? Hoy no.
 - **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
   tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
-- **Mentores y calificación** (decisión 6.2.3): no hay rol ni modelo todavía.
+- **Mentores:** ¿la rúbrica de 5 criterios del 1 al 5 está bien? ¿Cada mentor califica a todos o a
+  equipos asignados? (hoy: a todos).
 - **Registro del líder** (decisión 6.2.1).
 
 ---
