@@ -42,7 +42,7 @@
 | #10 | `feature/realtime`          | `feature/chat`              | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
 | #11 | `feature/mentors`           | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
 | #12 | `feature/educator-controls` | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
-| —   | `feature/load-test`         | `feature/educator-controls` | Por abrir    | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #13 | `feature/load-test`         | `feature/educator-controls` | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
 | #6  | `ui/theme-sandbox-test`     | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`        | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
@@ -54,7 +54,8 @@
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
-  real. **Orden de merge:** #7, #11 (mentores), #12 (controles del educador), luego el de carga.
+  real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13 (carga).
+  Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
 
@@ -309,9 +310,15 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
    `pnpm load-test --base https://<url> --duration 300`. Ver "Prueba de carga" abajo.
 2. **Limpieza antes del evento:** quitar el seed (`QATEST`) y los eventos de prueba del equipo
    (hoy: `Prueba Hackaton` / `FVR7SM` y `Prueba Proyecto` / `WDAFL7`).
-3. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
-   registro de actividad para la investigación, avisos generales, recuperar contraseña por correo,
-   script de 60 equipos / 300 participantes para pruebas de carga.
+3. **Siguientes tareas de backend propuestas (8 nov), en este orden:**
+   1. **Avisos generales:** el educador manda un mensaje a todo el evento (nuevo aviso de tiempo
+      real; los jugadores lo ven en el tablero).
+   2. **Interruptores de emergencia:** apagar chat, entregas o entradas sin volver a desplegar
+      (banderas en la base, revisadas por cada ruta).
+   3. **Registro de actividad para la investigación:** quién hizo qué y cuándo, exportable a CSV.
+   4. **Recuperar la contraseña del educador por correo** (necesita el dominio verificado en Resend).
+   5. **Dejar el proyecto listo para la VM de Azure** si el equipo elige ese plan: build
+      `standalone`, `DATABASE_POOL_MAX=10-20`, pasos documentados.
 
 ### Decisiones abiertas (ver ❓ en `api.md`)
 
@@ -347,6 +354,12 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Antes del evento
 
+- **Probar desde el wifi del lugar del evento** (5 min): subir un PDF en la entrega y ver que el chat
+  llegue en vivo. La red de la escuela bloquea la base (puertos 5432/6543), pero eso no afecta a la
+  app hospedada: el navegador solo habla con la app por HTTPS. Lo único que el navegador hace directo
+  con `*.supabase.co` (también por HTTPS 443) es **subir archivos** (fallaría si bloquean ese dominio)
+  y **escuchar avisos en vivo** (si falla, la pantalla refresca sola cada 5 s).
+- Correr `pnpm load-test --base <url>` contra el hosting real.
 - Auditoría completa de seguridad (pedida por Eddy para el final). La lista de pendientes la lleva
   Claude en su memoria; incluye: cambiar la contraseña de la base, `.env` compartido completo,
   registro abierto de educadores, aviso del advisor sobre `rls_auto_enable()`, límite de intentos
@@ -359,12 +372,19 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. `nvm use` y `git status`: ¿en qué rama estás? ¿Ya se hizo merge del #7, el #9 y el de tiempo real?
-   (`gh pr list --state all`).
-2. Si ya se hizo merge: `git switch dev && git pull`, y crear la rama del siguiente bloque.
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13, el código y esta
+   bitácora al día viven en la rama **`feature/load-test`**, en la carpeta aparte
+   **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
+   carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
+   una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
+2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12 y #13?
+   - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
+     `feature/load-test` y abrir el PR con base `feature/load-test`.
+   - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
+   - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
 4. `pnpm --filter @tdoe/db exec prisma migrate status`: debe decir "Database schema is up to date".
-5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento.
+5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento ("Qué sigue").
 6. Antes de cada PR: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, prueba en vivo contra
    Supabase (y borrar los datos de prueba) y actualizar `api.md` y este documento.
 
