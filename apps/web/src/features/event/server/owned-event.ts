@@ -21,6 +21,12 @@ export async function loadOwnedEvent(
   return { event };
 }
 
+// Everyone in the event (players and the educator, who also listens to the
+// event topic) refreshes what shows announcements.
+export function notifyAnnouncementsChanged(eventId: string): void {
+  notify({ topic: eventTopic(eventId), signal: "announcements" });
+}
+
 // Players refresh their board and the educator their overview.
 export function notifyEventChanged(eventId: string): void {
   notify(

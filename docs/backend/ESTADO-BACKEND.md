@@ -2,7 +2,7 @@
 
 > Bitácora del backend y la base de datos (responsable: Eddy). Dice **qué está hecho, dónde está,
 > cómo se trabaja y qué sigue**, para que cualquiera (o Claude en una sesión nueva) retome sin
-> perder el hilo. Última actualización: **6 nov 2026 (noche)**.
+> perder el hilo. Última actualización: **8 nov 2026 (noche)**.
 >
 > Documentos relacionados:
 >
@@ -25,8 +25,8 @@
   avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
   equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
   mentores y calificación, controles del educador (timer de actividad, carta de reto, alertas
-  automáticas, exportar a CSV).
-- **Falta:** la prueba de carga y lo que el equipo pida en QA.
+  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador.
+- **Falta:** correr la prueba de carga contra el hosting real y lo que el equipo pida en QA.
 
 ---
 
@@ -43,6 +43,7 @@
 | #11 | `feature/mentors`           | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
 | #12 | `feature/educator-controls` | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
 | #13 | `feature/load-test`         | `feature/educator-controls` | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #14 | `feature/announcements`     | `feature/load-test`         | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
 | #6  | `ui/theme-sandbox-test`     | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`        | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
@@ -54,7 +55,8 @@
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
-  real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13 (carga).
+  real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13
+  (carga) → #14 (avisos generales).
   Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
@@ -138,6 +140,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261107002643_team_messages`                     | Tabla `Message` (chat: `TEAM` / `PRIVATE` / `NUDGE`, id secuencial, `clientId` único por remitente) con RLS                                               |
 | `20261108220835_mentors_and_evaluations`           | `Event.mentorCode`, tablas `Mentor` y `Evaluation` (calificación en JSON) con RLS                                                                         |
 | `20261108221623_activity_timer_and_challenge_card` | `Event`: timer de actividad (`activityEndsAt`, `activitySeconds`, `activityVisible`) y carta de reto (`challengeKey`, `challengeText`, `challengeSentAt`) |
+| `20261108230000_announcements`                     | Tabla `Announcement` (avisos generales del educador: `eventId`, `text`, `createdAt`) con RLS                                                              |
 
 ### Reglas de la base
 
@@ -189,7 +192,7 @@ apps/web/src/
   lib/storage/submissions.ts    Storage por REST: bucket, URL de subida, lectura de bytes, URL de descarga, borrar
   lib/csv.ts                    CSV con BOM y celdas protegidas contra fórmulas
   lib/realtime/
-    signals.ts                  tipos de aviso (messages, board, event, overview) y de configuración
+    signals.ts                  tipos de aviso (messages, board, event, overview, announcements) y de configuración
     server.ts                   proveedor, nombres de canal firmados, notify() (se envía después de responder)
     batcher.ts                  junta avisos seguidos en el navegador (uno por tipo cada segundo)
     useRealtime.ts              hook del frontend: escucha, refresca de respaldo y se pone al día
@@ -197,6 +200,7 @@ apps/web/src/
     event.ts                    validación de crear evento, transiciones de estado, EventDTO
     progress.ts                 estado de cada llave a partir de las fases concluidas
     controls.ts                 timer de actividad y carta de reto (validación y DTOs)
+    announcements.ts            avisos generales: validar, DTO, cuántos se muestran, límite por minuto
     alerts.ts                   alertas de mediación calculadas (equipo detenido, sin entrega, incompleto)
     owned-event.ts              cargar el evento del educador y avisar cambios
     board.ts                    arma GET /api/board, orden de fases, POINTS_PER_PHASE
@@ -211,7 +215,7 @@ apps/web/src/
   features/communication/server/
     rules.ts                    chat: validar mensajes y query, quién ve qué, límites
     dto.ts                      formato de respuesta de los mensajes
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -254,10 +258,11 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Mentores    | `POST /api/mentors` (entrar), `GET /api/mentor`, `PUT /api/mentor/evaluations/:teamId`         | Público / Mentor     |
 | Educador    | `PUT/PATCH/DELETE /api/events/:id/activity-timer`, `PUT/DELETE /api/events/:id/challenge-card` | Educador             |
 | Educador    | `GET /api/events/:id/export?type=report\|proposals` (CSV)                                      | Educador             |
+| Educador    | `GET/POST /api/events/:id/announcements`, `DELETE .../announcements/:announcementId`           | Educador             |
 | —           | `GET /api/health`                                                                              | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **98 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **101 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -299,6 +304,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Timer de actividad             | 1-180 min; los jugadores lo ven solo si está visible                                    | `features/event/server/controls.ts`            |
 | Carta de reto                  | Una a la vez, para todos los equipos; 500 caracteres                                    | `controls.ts`                                  |
 | Alertas                        | Detenido 60 min; sin entrega a 2 h del final (crítica a 30 min); menos de 2 integrantes | `features/event/server/alerts.ts`              |
+| Avisos generales               | 1000 caracteres; en cualquier estado; se muestran los últimos 20; 10 por minuto         | `features/event/server/announcements.ts`       |
+| Avisos generales: leídos       | El backend no lleva quién leyó qué (el navegador recuerda el último que mostró)         | —                                              |
 
 ---
 
@@ -311,8 +318,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 2. **Limpieza antes del evento:** quitar el seed (`QATEST`) y los eventos de prueba del equipo
    (hoy: `Prueba Hackaton` / `FVR7SM` y `Prueba Proyecto` / `WDAFL7`).
 3. **Siguientes tareas de backend propuestas (8 nov), en este orden:**
-   1. **Avisos generales:** el educador manda un mensaje a todo el evento (nuevo aviso de tiempo
-      real; los jugadores lo ven en el tablero).
+   1. ~~**Avisos generales**~~ **hecho (#14):** el educador manda un mensaje a todo el evento;
+      jugadores y mentores lo ven, aviso de tiempo real `announcements`.
    2. **Interruptores de emergencia:** apagar chat, entregas o entradas sin volver a desplegar
       (banderas en la base, revisadas por cada ruta).
    3. **Registro de actividad para la investigación:** quién hizo qué y cuándo, exportable a CSV.
@@ -372,14 +379,14 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13, el código y esta
-   bitácora al día viven en la rama **`feature/load-test`**, en la carpeta aparte
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14, el código y
+   esta bitácora al día viven en la rama **`feature/announcements`**, en la carpeta aparte
    **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
    carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
    una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
 2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12 y #13?
    - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
-     `feature/load-test` y abrir el PR con base `feature/load-test`.
+     `feature/announcements` y abrir el PR con base `feature/announcements`.
    - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
    - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.

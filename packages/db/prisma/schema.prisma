@@ -46,38 +46,39 @@ enum TimerMode {
 }
 
 model Event {
-  id              String      @id @default(uuid())
-  code            String      @unique // short code to join as a participant
+  id              String         @id @default(uuid())
+  code            String         @unique // short code to join as a participant
   // Short code the educator shares with the event's mentors (judges). Null
   // until the educator creates it; regenerating it stops new entries.
-  mentorCode      String?     @unique
+  mentorCode      String?        @unique
   name            String
-  mode            EventMode   @default(SCHOOL)
+  mode            EventMode      @default(SCHOOL)
   scenario        String? // required when mode = CUSTOM
-  status          EventStatus @default(DRAFT)
-  timerMode       TimerMode   @default(GLOBAL)
+  status          EventStatus    @default(DRAFT)
+  timerMode       TimerMode      @default(GLOBAL)
   durationMinutes Int? // used when timerMode = GLOBAL
-  maxTeams        Int         @default(60)
-  maxTeamSize     Int         @default(5)
+  maxTeams        Int            @default(60)
+  maxTeamSize     Int            @default(5)
   startedAt       DateTime?
   endsAt          DateTime?
   // Short activity timer the educator runs on top of the event clock (for
   // example 15 min for pitches). Players see it only while it is visible.
   activityEndsAt  DateTime?
   activitySeconds Int? // its full length, to draw progress
-  activityVisible Boolean     @default(false)
+  activityVisible Boolean        @default(false)
   // The educator's challenge card: one at a time, for every team.
   challengeKey    BoardKey?
   challengeText   String?
   challengeSentAt DateTime?
   hostId          String
-  host            Staff       @relation(fields: [hostId], references: [id])
+  host            Staff          @relation(fields: [hostId], references: [id])
   phases          Phase[]
   teams           Team[]
   alerts          Alert[]
   mentors         Mentor[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  announcements   Announcement[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   // `code` is already indexed by @unique; hostId backs the FK to Staff.
   @@index([hostId])
@@ -280,6 +281,18 @@ model Evaluation {
 
   @@unique([mentorId, teamId])
   @@index([teamId])
+}
+
+// The educator's announcements to the whole event ("lunch is ready", "pitches
+// start at 3 pm"). Players and mentors see the newest ones on their screens.
+model Announcement {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([eventId, createdAt])
 }
 
 enum AlertSeverity {

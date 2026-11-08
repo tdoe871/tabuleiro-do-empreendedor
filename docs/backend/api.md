@@ -340,6 +340,8 @@ que no haya que convertir nada.
 - `event.playable`: `true` si ahora mismo se puede contestar (sesión activa y con tiempo). Sirve para
   deshabilitar los botones en pausa.
 - `cartaAtiva`: la carta de reto del educador (`{ key, text, sentAt }`) o `null`.
+- `announcements`: los últimos 20 avisos generales del educador, del más nuevo al más viejo
+  (`[{ id, text, createdAt }]`). Ver "Avisos generales" en la sección 4.
 - `event.activityTimer`: el timer de actividad del educador mientras lo muestra (`{ endsAt, seconds,
 visible }`) o `null`.
 - Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar al login).
@@ -653,7 +655,8 @@ promedio** (los equipos sin calificar al final).
 }
 ```
 
-`GET /api/events/:id/overview` ahora trae en cada equipo `evaluation: { count, average }`.
+`GET /api/events/:id/overview` ahora trae en cada equipo `evaluation: { count, average }`, y al
+final `announcements` (los últimos 20 avisos generales).
 
 **Mentor** (cookie `tdoe_mentor`, 36 h; las páginas `/[locale]/mentor/*` sin sesión mandan al login)
 
@@ -664,7 +667,8 @@ inválido o cambiado), `TOO_MANY_MENTORS`, `RATE_LIMITED`.
 
 `GET /api/mentor` — todo lo de su pantalla en una llamada: `event` (nombre, estado, horario),
 `mentor`, `rubric` y `teams` (cada uno con `memberCount`, `keys`, `submission`, `files` con su
-`downloadUrl` y `myEvaluation`, `null` hasta calificarlo). Errores: `UNAUTHORIZED`.
+`downloadUrl` y `myEvaluation`, `null` hasta calificarlo) y `announcements` (los últimos 20 avisos
+generales del educador). Errores: `UNAUTHORIZED`.
 
 `PUT /api/mentor/evaluations/:teamId` — guarda o edita su calificación.
 
@@ -727,6 +731,38 @@ min en el panel), aparte del reloj de 24 h del evento.
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`key` → `INVALID`, `text` →
   `REQUIRED` / `TOO_LONG`), `EVENT_FINISHED`.
 
+### Avisos generales — Staff 🆕
+
+**Implementado.** El educador manda un mensaje a todo el evento ("la comida está lista", "los
+pitches empiezan a las 3"). Lo ven todos los jugadores en el tablero y los mentores en su pantalla.
+
+```json
+// POST /api/events/:id/announcements
+{ "text": "La comida está lista en el patio" }
+// 201
+{ "announcement": { "id": "uuid", "text": "La comida está lista en el patio", "createdAt": "..." } }
+
+// GET /api/events/:id/announcements → 200 (todos, del más nuevo al más viejo, hasta 200)
+{ "announcements": [AnnouncementDTO] }
+
+// DELETE /api/events/:id/announcements/:announcementId → 204
+```
+
+- Texto de 1 a 1000 caracteres (se le quitan los espacios de los lados). Se puede mandar en
+  **cualquier estado**: antes de iniciar ("empezamos a las 9"), en pausa y después de terminar
+  ("resultados a las 6").
+- Dónde llegan (los últimos 20, del más nuevo al más viejo): jugadores en `GET /api/board` →
+  `announcements`; mentores en `GET /api/mentor` → `announcements`; el educador en
+  `GET /api/events/:id/overview` → `announcements`.
+- Borrar uno (un error de dedo, una hora equivocada) lo quita de todas las pantallas.
+- Al mandar o borrar, todos en el evento reciben el aviso de tiempo real `announcements` (sección
+  5). **Para mostrar un aviso emergente solo con los nuevos:** guardar en el navegador el `id` del
+  más reciente que ya se mostró y avisar de los que aparezcan arriba de él. El backend no lleva
+  quién leyó qué.
+- Límite: 10 avisos por minuto por educador (para que un botón trabado no inunde las pantallas).
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`text` → `REQUIRED` /
+  `TOO_LONG`), `RATE_LIMITED`; al borrar, `ANNOUNCEMENT_NOT_FOUND`.
+
 ### Alertas de mediación — en `GET /api/events/:id/overview` 🆕
 
 **Implementado.** Se calculan en cada consulta del resumen a partir del avance (no se guardan):
@@ -782,20 +818,21 @@ import { useRealtime } from "@/lib/realtime/useRealtime";
 // Jugador (PlayerBoard)
 const { connected } = useRealtime((signal) => {
   if (signal === "messages" || signal === "refresh") loadNewMessages(); // GET /api/messages?after=<cursor>
-  if (signal !== "messages") loadBoard(); // GET /api/board
+  if (signal !== "messages") loadBoard(); // GET /api/board (incluye los avisos generales)
 });
 
 // Educador (EducadorPanel)
 useRealtime(() => loadOverview(), { eventId }); // GET /api/events/:id/overview
 ```
 
-| Aviso      | Cuándo                                                                                     | Quién lo recibe    | Qué volver a pedir                 |
-| ---------- | ------------------------------------------------------------------------------------------ | ------------------ | ---------------------------------- |
-| `messages` | Mensaje nuevo en el chat                                                                   | El equipo          | `GET /api/messages?after=<cursor>` |
-| `board`    | Fase concluida, entrega o archivo, nuevo integrante, rol, nuevo código del equipo          | El equipo          | `GET /api/board`                   |
-| `event`    | El educador inicia, pausa, retoma o termina la sesión                                      | Todos en el evento | `GET /api/board` o el resumen      |
-| `overview` | Cualquier cambio que afecta el resumen (equipos, fases, entregas, estado)                  | El educador        | `GET /api/events/:id/overview`     |
-| `refresh`  | Lo genera el propio hook: refresco periódico, pestaña visible otra vez, internet de vuelta | —                  | Todo lo que muestra la pantalla    |
+| Aviso           | Cuándo                                                                                     | Quién lo recibe    | Qué volver a pedir                 |
+| --------------- | ------------------------------------------------------------------------------------------ | ------------------ | ---------------------------------- |
+| `messages`      | Mensaje nuevo en el chat                                                                   | El equipo          | `GET /api/messages?after=<cursor>` |
+| `board`         | Fase concluida, entrega o archivo, nuevo integrante, rol, nuevo código del equipo          | El equipo          | `GET /api/board`                   |
+| `event`         | El educador inicia, pausa, retoma o termina la sesión                                      | Todos en el evento | `GET /api/board` o el resumen      |
+| `overview`      | Cualquier cambio que afecta el resumen (equipos, fases, entregas, estado)                  | El educador        | `GET /api/events/:id/overview`     |
+| `announcements` | El educador manda o borra un aviso general                                                 | Todos en el evento | `GET /api/board` o el resumen      |
+| `refresh`       | Lo genera el propio hook: refresco periódico, pestaña visible otra vez, internet de vuelta | —                  | Todo lo que muestra la pantalla    |
 
 - El hook junta avisos seguidos: diez mensajes en un segundo producen una sola llamada.
 - `connected` es `true` mientras llegan avisos en vivo (se puede mostrar un indicador). Conectado,
@@ -841,6 +878,7 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 | `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
 | `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
 | `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                             |
+| `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                       |
 | `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
 | `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
 | `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
@@ -896,3 +934,6 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
     tablero o el resumen cuando llegue un aviso, en vez de refrescar con un temporizador propio.
 12. `EducadorPanel`: timer, carta, alertas y exportar contra los endpoints de la sección 4 (hoy son
     estado local o `handlePending`).
+13. Avisos generales: en `EducadorPanel`, un campo para mandar el aviso y la lista con botón de
+    borrar; en `PlayerBoard` (y la pantalla del mentor), mostrar `announcements` y un aviso
+    emergente con los nuevos (ver "Avisos generales" en la sección 4).

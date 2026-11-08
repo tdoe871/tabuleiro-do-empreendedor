@@ -2,6 +2,7 @@ import { prisma } from "@tdoe/db";
 
 import type { Player } from "@/lib/auth/player";
 
+import { NEWEST_ANNOUNCEMENTS } from "./announcements";
 import { buildBoard, type BoardDTO, type CompletedPhase } from "./board";
 
 // The team's completed phases, in the shape the board rules use.
@@ -26,7 +27,7 @@ export async function loadCompletedPhases(
 
 // Everything GET /api/board returns for the player's team.
 export async function loadBoard(player: Player): Promise<BoardDTO> {
-  const [team, completed] = await Promise.all([
+  const [team, completed, announcements] = await Promise.all([
     prisma.team.findUniqueOrThrow({
       where: { id: player.team.id },
       include: {
@@ -36,6 +37,10 @@ export async function loadBoard(player: Player): Promise<BoardDTO> {
       },
     }),
     loadCompletedPhases(player.team.id),
+    prisma.announcement.findMany({
+      where: { eventId: player.event.id },
+      ...NEWEST_ANNOUNCEMENTS,
+    }),
   ]);
 
   const { participants, submission, files, ...teamRow } = team;
@@ -47,6 +52,7 @@ export async function loadBoard(player: Player): Promise<BoardDTO> {
     completed,
     submission,
     files,
+    announcements,
     now: new Date(),
   });
 }
