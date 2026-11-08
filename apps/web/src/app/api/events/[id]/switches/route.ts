@@ -9,6 +9,7 @@ import {
   parseSwitchesBody,
   toSwitchesDTO,
 } from "@/features/event/server/switches";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 
 type Context = { params: Promise<{ id: string }> };
@@ -32,6 +33,12 @@ export async function PATCH(request: NextRequest, { params }: Context) {
     });
     // Players refresh their board, which says what is turned off.
     notifyEventChanged(updated.id);
+    await recordActivity({
+      ...asStaff(loaded.staff, updated.id),
+      action: "SWITCHES_CHANGED",
+      // Only the ones this request changed, with their API names.
+      details: body as Record<string, boolean>,
+    });
     return NextResponse.json({ switches: toSwitchesDTO(updated) });
   } catch (error) {
     console.error("Update switches failed:", error);

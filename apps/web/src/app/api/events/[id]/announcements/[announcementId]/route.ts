@@ -5,6 +5,7 @@ import {
   loadOwnedEvent,
   notifyAnnouncementsChanged,
 } from "@/features/event/server/owned-event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError } from "@/lib/api/errors";
 
 type Context = { params: Promise<{ id: string; announcementId: string }> };
@@ -22,6 +23,11 @@ export async function DELETE(request: NextRequest, { params }: Context) {
     });
     if (count === 0) return apiError("ANNOUNCEMENT_NOT_FOUND");
     notifyAnnouncementsChanged(loaded.event.id);
+    await recordActivity({
+      ...asStaff(loaded.staff, loaded.event.id),
+      action: "ANNOUNCEMENT_DELETED",
+      details: { announcementId },
+    });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("Delete announcement failed:", error);

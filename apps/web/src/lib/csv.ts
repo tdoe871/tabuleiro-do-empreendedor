@@ -2,6 +2,8 @@
 
 function csvCell(value: unknown): string {
   if (value === null || value === undefined) return "";
+  // Numbers are safe as they are (a negative one is not a formula).
+  if (typeof value === "number") return String(value);
   let text = value instanceof Date ? value.toISOString() : String(value);
   // A cell starting with = + - @ would run as a formula in Excel/Sheets.
   if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;

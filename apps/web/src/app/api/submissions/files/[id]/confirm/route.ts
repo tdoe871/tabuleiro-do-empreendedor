@@ -10,6 +10,7 @@ import {
   matchesSignature,
   type FileExtension,
 } from "@/features/submission/server/rules";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
@@ -69,6 +70,16 @@ export async function POST(
       { topic: teamTopic(player.team.id), signal: "board" },
       { topic: staffTopic(player.event.id), signal: "overview" },
     );
+    await recordActivity({
+      ...asPlayer(player),
+      action: "FILE_UPLOADED",
+      details: {
+        fileId: ready.id,
+        fileName: ready.fileName,
+        contentType: ready.contentType,
+        size: ready.size,
+      },
+    });
     return NextResponse.json({
       file: { ...toFileDTO(ready), status: "READY" },
     });

@@ -831,18 +831,94 @@ resumen.
 
 ### Exportar — Staff 🆕
 
-**Implementado.** `GET /api/events/:id/export?type=report|proposals` → descarga un CSV (UTF-8 con
-BOM, abre bien en Excel y Google Sheets), una fila por equipo. Encabezados en español.
+**Implementado.** `GET /api/events/:id/export?type=report|proposals|activity` → descarga un CSV
+(UTF-8 con BOM, abre bien en Excel y Google Sheets). Encabezados en español.
 
 - `report` ("Reporte"): integrantes y líder, estado de cada llave, fases concluidas, última
   actividad, entrega (tipo, links, descripción, fecha), archivos y calificaciones de mentores
   (cantidad, promedio y promedio por criterio).
 - `proposals` ("Exportar propuestas"): la respuesta del equipo a cada una de las 12 fases (con
   quién y cuándo) y su entrega.
+- `activity`: el registro de actividad completo, una fila por acción (ver "Registro de actividad").
 - Para descargarlo basta un enlace o `window.location` a la URL (la cookie del educador va sola).
 - Las celdas que empiezan con `=`, `+`, `-` o `@` se guardan con un `'` adelante para que Excel no
-  las ejecute como fórmula.
+  las ejecute como fórmula (los números, también los negativos, quedan como números).
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
+
+### Registro de actividad — Staff 🆕
+
+**Implementado.** Para la investigación: quién hizo qué y cuándo en el evento. El backend lo
+escribe solo en cada acción; nadie lo edita. **Nunca guarda contenido**: ni el texto del chat ni las
+respuestas de las fases (esas están en "Exportar propuestas"), solo que pasaron.
+
+`GET /api/events/:id/activity` — del más nuevo al más viejo, 100 por página.
+
+| Query          | Devuelve                                        |
+| -------------- | ----------------------------------------------- |
+| (nada)         | Las 100 acciones más recientes                  |
+| `?before=<id>` | Las 100 anteriores a `id` (página siguiente)    |
+| `?teamId=<id>` | Solo las de un equipo (se combina con `before`) |
+
+```json
+{
+  "serverNow": "...",
+  "activity": [
+    {
+      "id": 42,
+      "createdAt": "2026-11-12T10:30:59.000Z",
+      "minutesFromStart": 90,
+      "actor": { "type": "PARTICIPANT", "id": "uuid", "name": "Ana" },
+      "team": { "id": "uuid", "name": "Los Innovadores" },
+      "action": "PHASE_COMPLETED",
+      "details": { "key": "problema", "order": 2, "answerLength": 312 }
+    }
+  ],
+  "hasMore": true,
+  "cursor": 42
+}
+```
+
+- `actor.type`: `PARTICIPANT` | `MENTOR` | `STAFF`. `team` es `null` en las acciones del educador.
+- `minutesFromStart`: minutos desde que el educador inició la sesión (negativo antes de iniciar;
+  `null` si nunca se inició).
+- Los nombres se copian al guardar: una fila sigue legible aunque el participante ya no exista.
+- **Siguiente página:** si `hasMore` es `true`, pedir `?before=<cursor>`.
+- Todo el registro en CSV (del más viejo al más nuevo): `GET /api/events/:id/export?type=activity`.
+  Columnas: #, fecha (UTC), minutos desde el inicio, tipo de actor, id y nombre del actor, id y
+  nombre del equipo, acción (en español), código de acción y detalle (`clave=valor; ...`). Los ids
+  sirven para anonimizar: basta borrar las columnas de nombres.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`before` → `INVALID`).
+
+| `action`                             | Quién        | `details`                                       |
+| ------------------------------------ | ------------ | ----------------------------------------------- |
+| `EVENT_CREATED`                      | Educador     | `mode`, `maxTeams`, `maxTeamSize`               |
+| `EVENT_STATUS_CHANGED`               | Educador     | `from`, `to`                                    |
+| `ACTIVITY_TIMER_STARTED`             | Educador     | `minutes`, `visible`                            |
+| `ACTIVITY_TIMER_VISIBILITY_CHANGED`  | Educador     | `visible`                                       |
+| `ACTIVITY_TIMER_STOPPED`             | Educador     | —                                               |
+| `CHALLENGE_CARD_SENT`                | Educador     | `key`                                           |
+| `CHALLENGE_CARD_REMOVED`             | Educador     | —                                               |
+| `ANNOUNCEMENT_SENT` / `_DELETED`     | Educador     | `announcementId`                                |
+| `SWITCHES_CHANGED`                   | Educador     | Los que cambió (`chat`, `submissions`, `joins`) |
+| `MENTOR_CODE_CHANGED`                | Educador     | —                                               |
+| `TEAM_CREATED`                       | Participante | —                                               |
+| `PARTICIPANT_JOINED`                 | Participante | —                                               |
+| `SESSION_RECOVERED`                  | Participante | — (volvió a entrar con su nickname)             |
+| `JOIN_CODE_REGENERATED`              | Participante | —                                               |
+| `RPG_ROLE_CHANGED`                   | Participante | `rpgRole`                                       |
+| `PHASE_COMPLETED`                    | Participante | `key`, `order`, `answerLength` (caracteres)     |
+| `SUBMISSION_SAVED`                   | Participante | `type`, `extraLinks`                            |
+| `FILE_UPLOADED`                      | Participante | `fileId`, `fileName`, `contentType`, `size`     |
+| `FILE_DELETED`                       | Participante | `fileId`, `fileName`                            |
+| `MESSAGE_SENT`                       | Participante | `type` y, en privados y toques, `toId` y `to`   |
+| `MENTOR_JOINED` / `MENTOR_RECOVERED` | Mentor       | —                                               |
+| `EVALUATION_SAVED`                   | Mentor       | `average` (con `team`)                          |
+
+- Lo repetido no se registra dos veces: concluir una fase que ya estaba concluida, reenviar un
+  mensaje con el mismo `clientId` o confirmar un archivo dos veces.
+- ❓ **Mensajes privados:** hoy el registro guarda **a quién** le escribió cada participante (no
+  el texto), útil para estudiar cómo colaboran los equipos. Si el equipo prefiere no guardarlo,
+  se quitan `toId` y `to` en `app/api/messages/route.ts`.
 
 ---
 
@@ -987,3 +1063,6 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
     contra `PATCH /api/events/:id/switches`; en `PlayerBoard`, deshabilitar el chat o la entrega
     según `event.switches`, y en `team/create` / `team/join` avisar si `joinsEnabled` es `false`.
     Traducir `CHAT_DISABLED`, `SUBMISSIONS_DISABLED` y `JOINS_DISABLED`.
+15. Registro de actividad (opcional, para el educador o el equipo de investigación): una lista con
+    `GET /api/events/:id/activity` (traducir `action`) y un botón "Exportar actividad" que abra
+    `GET /api/events/:id/export?type=activity`.

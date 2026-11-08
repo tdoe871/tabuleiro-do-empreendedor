@@ -25,28 +25,29 @@
   avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
   equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
   mentores y calificación, controles del educador (timer de actividad, carta de reto, alertas
-  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador e interruptores de emergencia.
+  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador, interruptores de emergencia y registro de actividad.
 - **Falta:** correr la prueba de carga contra el hosting real y lo que el equipo pida en QA.
 
 ---
 
 ## 2. Dónde estamos ahora (git y PRs)
 
-| PR  | Rama                         | Base                        | Estado       | Contenido                                                                                         |
-| --- | ---------------------------- | --------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
-| #2  | `feature/backend-base`       | `dev`                       | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
-| #3  | `feature/staff-auth`         | `dev`                       | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
-| #7  | `feature/players`            | `dev`                       | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
-| #8  | `feature/submissions`        | `feature/players`           | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
-| #9  | `feature/chat`               | `feature/players`           | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
-| #10 | `feature/realtime`           | `feature/chat`              | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
-| #11 | `feature/mentors`            | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
-| #12 | `feature/educator-controls`  | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
-| #13 | `feature/load-test`          | `feature/educator-controls` | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
-| #14 | `feature/announcements`      | `feature/load-test`         | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
-| #15 | `feature/emergency-switches` | `feature/announcements`     | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
-| #6  | `ui/theme-sandbox-test`      | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
-| #5  | `test/initial-tests`         | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
+| PR  | Rama                         | Base                         | Estado       | Contenido                                                                                         |
+| --- | ---------------------------- | ---------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| #2  | `feature/backend-base`       | `dev`                        | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
+| #3  | `feature/staff-auth`         | `dev`                        | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
+| #7  | `feature/players`            | `dev`                        | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
+| #8  | `feature/submissions`        | `feature/players`            | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
+| #9  | `feature/chat`               | `feature/players`            | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
+| #10 | `feature/realtime`           | `feature/chat`               | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
+| #11 | `feature/mentors`            | `feature/players`            | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
+| #12 | `feature/educator-controls`  | `feature/mentors`            | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
+| #13 | `feature/load-test`          | `feature/educator-controls`  | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #14 | `feature/announcements`      | `feature/load-test`          | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
+| #15 | `feature/emergency-switches` | `feature/announcements`      | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
+| #16 | `feature/activity-log`       | `feature/emergency-switches` | **Abierto**  | Registro de actividad para la investigación, con CSV (montado sobre #15)                          |
+| #6  | `ui/theme-sandbox-test`      | `dev`                        | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #5  | `test/initial-tests`         | `qa`                         | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
 - **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
   alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
@@ -57,7 +58,7 @@
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
   real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13
-  (carga) → #14 (avisos generales) → #15 (interruptores).
+  (carga) → #14 (avisos generales) → #15 (interruptores) → #16 (registro de actividad).
   Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
@@ -143,6 +144,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261108221623_activity_timer_and_challenge_card` | `Event`: timer de actividad (`activityEndsAt`, `activitySeconds`, `activityVisible`) y carta de reto (`challengeKey`, `challengeText`, `challengeSentAt`) |
 | `20261108230000_announcements`                     | Tabla `Announcement` (avisos generales del educador: `eventId`, `text`, `createdAt`) con RLS                                                              |
 | `20261108233000_emergency_switches`                | `Event`: interruptores de emergencia `chatEnabled`, `submissionsEnabled`, `joinsEnabled` (todos `true` por defecto)                                       |
+| `20261109000000_activity_log`                      | Enum `ActorType` y tabla `ActivityLog` (registro de actividad: actor, equipo, acción, detalle; sin llaves foráneas salvo el evento) con RLS               |
 
 ### Reglas de la base
 
@@ -208,6 +210,9 @@ apps/web/src/
     owned-event.ts              cargar el evento del educador y avisar cambios
     board.ts                    arma GET /api/board, orden de fases, POINTS_PER_PHASE
     load-board.ts               consultas para el tablero
+  features/activity/server/
+    actions.ts                  acciones del registro (con su nombre en español), DTO, fila del CSV, query
+    record.ts                   recordActivity() (escribe sin lanzar errores) y asPlayer/asStaff/asMentor
   features/team/server/team.ts  nombres, nicknames, códigos, cuándo se puede unir y jugar
   features/submission/server/
     rules.ts                    tipos de archivo, firmas (primeros bytes), tamaños, links https, validación
@@ -218,7 +223,7 @@ apps/web/src/
   features/communication/server/
     rules.ts                    chat: validar mensajes y query, quién ve qué, límites
     dto.ts                      formato de respuesta de los mensajes
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements, switches
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements, switches, activity
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -263,10 +268,11 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Educador    | `GET /api/events/:id/export?type=report\|proposals` (CSV)                                      | Educador             |
 | Educador    | `GET/POST /api/events/:id/announcements`, `DELETE .../announcements/:announcementId`           | Educador             |
 | Educador    | `PATCH /api/events/:id/switches` (apagar chat, entregas o entradas)                            | Educador             |
+| Educador    | `GET /api/events/:id/activity` (registro de actividad) y `export?type=activity` (CSV)          | Educador             |
 | —           | `GET /api/health`                                                                              | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **105 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **109 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -284,34 +290,36 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Defaults tomados (se cambian sin rehacer nada)
 
-| Tema                           | Default                                                                                 | Dónde se cambia                                |
-| ------------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                            | —                                              |
-| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                                         | `app/api/participants/route.ts`                |
-| Quién contesta fases y entrega | Cualquier miembro                                                                       | —                                              |
-| Editar una fase concluida      | No se puede                                                                             | `features/event/server/board.ts`               |
-| Puntos por fase                | 0                                                                                       | `POINTS_PER_PHASE` en `board.ts`               |
-| Rol del juego de rol           | Se puede repetir en el equipo                                                           | `app/api/participants/me/rpg-role/route.ts`    |
-| Carta de reto                  | `cartaAtiva` siempre `null`                                                             | `board.ts`                                     |
-| Duración del evento            | 24 h, timer global                                                                      | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
-| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra                     | `features/submission/server/rules.ts`          |
-| Registro de educadores         | Abierto a cualquiera                                                                    | `app/api/auth/register/route.ts`               |
-| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino                     | `features/communication/server/rules.ts`       |
-| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                             | `app/api/messages/route.ts`                    |
-| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona                  | `rules.ts` y `route.ts` del chat               |
-| Chat: el educador lee mensajes | No                                                                                      | —                                              |
-| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos             | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
-| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                                        | `POLL_MS` en `lib/realtime/server.ts`          |
-| Mentores: acceso               | Código de mentores del evento + nombre, sin contraseña; máx. 50                         | `features/mentor/server/rubric.ts`             |
-| Mentores: rúbrica              | 5 criterios (problema, solución, impacto, viabilidad, presentación) del 1 al 5          | `RUBRIC` en `rubric.ts` (sin migración)        |
-| Mentores: a quién califican    | A todos los equipos del evento, en cualquier estado                                     | `app/api/mentor/evaluations/[teamId]/route.ts` |
-| Timer de actividad             | 1-180 min; los jugadores lo ven solo si está visible                                    | `features/event/server/controls.ts`            |
-| Carta de reto                  | Una a la vez, para todos los equipos; 500 caracteres                                    | `controls.ts`                                  |
-| Alertas                        | Detenido 60 min; sin entrega a 2 h del final (crítica a 30 min); menos de 2 integrantes | `features/event/server/alerts.ts`              |
-| Avisos generales               | 1000 caracteres; en cualquier estado; se muestran los últimos 20; 10 por minuto         | `features/event/server/announcements.ts`       |
-| Avisos generales: leídos       | El backend no lleva quién leyó qué (el navegador recuerda el último que mostró)         | —                                              |
-| Interruptores                  | Por evento, los maneja su educador; leer y descargar siguen funcionando                 | `features/event/server/switches.ts`            |
-| Entradas cerradas              | Bloquea equipos e integrantes nuevos; recuperar sesión y entrar mentores, sí            | `app/api/participants/route.ts`                |
+| Tema                           | Default                                                                                      | Dónde se cambia                                |
+| ------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                                 | —                                              |
+| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                                              | `app/api/participants/route.ts`                |
+| Quién contesta fases y entrega | Cualquier miembro                                                                            | —                                              |
+| Editar una fase concluida      | No se puede                                                                                  | `features/event/server/board.ts`               |
+| Puntos por fase                | 0                                                                                            | `POINTS_PER_PHASE` en `board.ts`               |
+| Rol del juego de rol           | Se puede repetir en el equipo                                                                | `app/api/participants/me/rpg-role/route.ts`    |
+| Carta de reto                  | `cartaAtiva` siempre `null`                                                                  | `board.ts`                                     |
+| Duración del evento            | 24 h, timer global                                                                           | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
+| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra                          | `features/submission/server/rules.ts`          |
+| Registro de educadores         | Abierto a cualquiera                                                                         | `app/api/auth/register/route.ts`               |
+| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino                          | `features/communication/server/rules.ts`       |
+| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                                  | `app/api/messages/route.ts`                    |
+| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona                       | `rules.ts` y `route.ts` del chat               |
+| Chat: el educador lee mensajes | No                                                                                           | —                                              |
+| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos                  | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
+| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                                             | `POLL_MS` en `lib/realtime/server.ts`          |
+| Mentores: acceso               | Código de mentores del evento + nombre, sin contraseña; máx. 50                              | `features/mentor/server/rubric.ts`             |
+| Mentores: rúbrica              | 5 criterios (problema, solución, impacto, viabilidad, presentación) del 1 al 5               | `RUBRIC` en `rubric.ts` (sin migración)        |
+| Mentores: a quién califican    | A todos los equipos del evento, en cualquier estado                                          | `app/api/mentor/evaluations/[teamId]/route.ts` |
+| Timer de actividad             | 1-180 min; los jugadores lo ven solo si está visible                                         | `features/event/server/controls.ts`            |
+| Carta de reto                  | Una a la vez, para todos los equipos; 500 caracteres                                         | `controls.ts`                                  |
+| Alertas                        | Detenido 60 min; sin entrega a 2 h del final (crítica a 30 min); menos de 2 integrantes      | `features/event/server/alerts.ts`              |
+| Avisos generales               | 1000 caracteres; en cualquier estado; se muestran los últimos 20; 10 por minuto              | `features/event/server/announcements.ts`       |
+| Avisos generales: leídos       | El backend no lleva quién leyó qué (el navegador recuerda el último que mostró)              | —                                              |
+| Interruptores                  | Por evento, los maneja su educador; leer y descargar siguen funcionando                      | `features/event/server/switches.ts`            |
+| Entradas cerradas              | Bloquea equipos e integrantes nuevos; recuperar sesión y entrar mentores, sí                 | `app/api/participants/route.ts`                |
+| Registro de actividad          | Toda acción que cambia algo; sin texto del chat ni respuestas; se escribe antes de responder | `features/activity/server/actions.ts`          |
+| Registro: mensajes privados    | Guarda a quién se le escribió (no el texto) ❓                                               | `app/api/messages/route.ts`                    |
 
 ---
 
@@ -328,7 +336,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
       jugadores y mentores lo ven, aviso de tiempo real `announcements`.
    2. ~~**Interruptores de emergencia**~~ **hecho (#15):** apagar chat, entregas o entradas sin
       volver a desplegar (banderas en `Event`, revisadas por cada ruta).
-   3. **Registro de actividad para la investigación:** quién hizo qué y cuándo, exportable a CSV.
+   3. ~~**Registro de actividad para la investigación**~~ **hecho (#16):** quién hizo qué y
+      cuándo, en `GET /api/events/:id/activity` y en CSV (`export?type=activity`).
    4. **Recuperar la contraseña del educador por correo** (necesita el dominio verificado en Resend).
    5. **Dejar el proyecto listo para la VM de Azure** si el equipo elige ese plan: build
       `standalone`, `DATABASE_POOL_MAX=10-20`, pasos documentados.
@@ -336,6 +345,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 ### Decisiones abiertas (ver ❓ en `api.md`)
 
 - ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
+- ¿El registro de actividad debe guardar a quién le escribe cada participante en privado? (hoy sí,
+  sin el texto).
 - ¿El educador puede leer el chat de los equipos (moderación)? ¿La rúbrica de mentores (5 criterios
   del 1 al 5, a todos los equipos) está bien?
 - ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
@@ -385,14 +396,14 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15, el
-   código y esta bitácora al día viven en la rama **`feature/emergency-switches`**, en la carpeta aparte
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15 → #16,
+   el código y esta bitácora al día viven en la rama **`feature/activity-log`**, en la carpeta aparte
    **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
    carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
    una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
-2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14 y #15?
+2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14, #15 y #16?
    - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
-     `feature/emergency-switches` y abrir el PR con base `feature/emergency-switches`.
+     `feature/activity-log` y abrir el PR con base `feature/activity-log`.
    - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
    - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
@@ -414,11 +425,12 @@ mensaje por minuto, el líder concluye una fase cada 60-120 s y el educador mira
 
 Corrido desde la casa de Eddy (servidor local en modo producción, base en Supabase us-east-1):
 
-| Corrida                                         | Entradas                                                               | Resultado                                                                         |
-| ----------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Pool de 5, espera de transacción de 2 s (antes) | 97 de 300 fallaron ("Unable to start a transaction in the given time") | 6.6 % de errores                                                                  |
-| Pool de 5, espera de 15 s (`INTERACTIVE_TX`)    | 300 / 300                                                              | Entradas bien; la simulación se satura (11 req/s de capacidad contra ~85 pedidas) |
-| **Pool de 20, espera de 15 s**                  | **300 / 300 en 28 s**                                                  | **0 errores**, 42 req/s, 362 mensajes y 60 fases guardadas                        |
+| Corrida                                         | Entradas                                                               | Resultado                                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Pool de 5, espera de transacción de 2 s (antes) | 97 de 300 fallaron ("Unable to start a transaction in the given time") | 6.6 % de errores                                                                    |
+| Pool de 5, espera de 15 s (`INTERACTIVE_TX`)    | 300 / 300                                                              | Entradas bien; la simulación se satura (11 req/s de capacidad contra ~85 pedidas)   |
+| **Pool de 20, espera de 15 s**                  | **300 / 300 en 28 s**                                                  | **0 errores**, 42 req/s, 362 mensajes y 60 fases guardadas                          |
+| Pool de 20 + registro de actividad (#16), 120 s | 300 / 300 en 34 s                                                      | 0 errores, 38.5 req/s; 704 filas en el registro, una por acción, sin perder ninguna |
 
 Conclusiones:
 
@@ -430,5 +442,7 @@ Conclusiones:
   tardar mucho menos; **falta confirmarlo corriendo el script contra el hosting real**.
 - **El tiempo real importa:** con avisos, el chat y el tablero se refrescan cada 60 s en lugar de
   5-15 s: la carga baja de ~85 a ~15 req/s.
+- **El registro de actividad** agrega una inserción por acción (desde la casa, ~70 ms): la
+  capacidad bajó un poco (42 → 38.5 req/s), sin errores. Junto a la base no debería notarse.
 - **`DATABASE_POOL_MAX`:** en Vercel 3-5 por instancia (el pooler de Supabase acepta ~200 conexiones
   de cliente en los planes chicos y cada instancia abre las suyas); en una VM, 10-20.

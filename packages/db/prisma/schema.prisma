@@ -82,6 +82,7 @@ model Event {
   alerts             Alert[]
   mentors            Mentor[]
   announcements      Announcement[]
+  activity           ActivityLog[]
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
@@ -298,6 +299,36 @@ model Announcement {
   createdAt DateTime @default(now())
 
   @@index([eventId, createdAt])
+}
+
+// Who did an action in the activity record.
+enum ActorType {
+  PARTICIPANT
+  MENTOR
+  STAFF
+}
+
+// Activity record for the research: who did what and when, append-only.
+// Actor and team names are copied so a row stays readable after a rename or
+// a deletion (no foreign keys besides the event). `action` is a string (the
+// list is in apps/web/src/features/activity/server/actions.ts), so a new
+// action needs no migration. It never holds chat text or phase answers,
+// only that they happened.
+model ActivityLog {
+  id        Int       @id @default(autoincrement())
+  eventId   String
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  actorType ActorType
+  actorId   String?
+  actorName String?
+  teamId    String?
+  teamName  String?
+  action    String
+  details   Json?
+  createdAt DateTime  @default(now())
+
+  @@index([eventId, id])
+  @@index([teamId, id])
 }
 
 enum AlertSeverity {

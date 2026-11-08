@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
+import { asMentor, recordActivity } from "@/features/activity/server/record";
 import { toEvaluationDTO } from "@/features/mentor/server/dto";
 import { parseEvaluationBody } from "@/features/mentor/server/rubric";
 import { apiError, readJsonObject } from "@/lib/api/errors";
@@ -28,7 +29,7 @@ export async function PUT(
     // A team of another event answers like a missing one.
     const team = await prisma.team.findFirst({
       where: { id: teamId, eventId: session.event.id },
-      select: { id: true },
+      select: { id: true, name: true },
     });
     if (!team) return apiError("TEAM_NOT_FOUND");
 
@@ -39,7 +40,14 @@ export async function PUT(
       update: data,
     });
     notify({ topic: staffTopic(session.event.id), signal: "overview" });
-    return NextResponse.json({ evaluation: toEvaluationDTO(evaluation) });
+    const dto = toEvaluationDTO(evaluation);
+    await recordActivity({
+      ...asMentor(session.mentor),
+      team,
+      action: "EVALUATION_SAVED",
+      details: { average: dto.average },
+    });
+    return NextResponse.json({ evaluation: dto });
   } catch (error) {
     console.error("Save evaluation failed:", error);
     return apiError("INTERNAL_ERROR");

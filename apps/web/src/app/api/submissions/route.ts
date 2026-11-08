@@ -6,6 +6,7 @@ import {
   canSubmit,
   parseSubmissionBody,
 } from "@/features/submission/server/rules";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
@@ -77,6 +78,11 @@ export async function PUT(request: NextRequest) {
       { topic: teamTopic(player.team.id), signal: "board" },
       { topic: staffTopic(player.event.id), signal: "overview" },
     );
+    await recordActivity({
+      ...asPlayer(player),
+      action: "SUBMISSION_SAVED",
+      details: { type: parsed.data.type, extraLinks: parsed.data.links.length },
+    });
     return NextResponse.json(await loadDelivery(player.team.id));
   } catch (error) {
     console.error("Save submission failed:", error);
