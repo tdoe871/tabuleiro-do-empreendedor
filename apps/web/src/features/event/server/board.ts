@@ -17,6 +17,12 @@ import {
 } from "@/features/submission/server/dto";
 import { canPlay } from "@/features/team/server/team";
 import {
+  toActivityTimerDTO,
+  toChallengeCardDTO,
+  type ActivityTimerDTO,
+  type ChallengeCardDTO,
+} from "./controls";
+import {
   computeKeyStatuses,
   toKeyId,
   type KeyId,
@@ -49,6 +55,8 @@ export type BoardDTO = {
     endsAt: string | null;
     // Whether players can act right now (ACTIVE and time left).
     playable: boolean;
+    // The educator's activity timer, only while they show it to players.
+    activityTimer: ActivityTimerDTO | null;
   };
   team: { id: string; name: string; joinCode: string; score: number };
   me: MemberDTO;
@@ -57,9 +65,8 @@ export type BoardDTO = {
     KeyId,
     { status: KeyStatus; phases: Record<string, PhaseState> }
   >;
-  // The educator's challenge card. Not modeled yet (open decision), so
-  // always null for now; the field is here so the frontend can wire it.
-  cartaAtiva: { key: KeyId; text: string } | null;
+  // The educator's challenge card (one for every team), or null.
+  cartaAtiva: ChallengeCardDTO | null;
   submission: SubmissionDTO | null;
   // The team's uploaded files (ready ones only).
   files: SubmissionFileDTO[];
@@ -141,6 +148,7 @@ export function buildBoard(input: {
       startedAt: event.startedAt?.toISOString() ?? null,
       endsAt: event.endsAt?.toISOString() ?? null,
       playable: canPlay(event, now) === "ok",
+      activityTimer: event.activityVisible ? toActivityTimerDTO(event) : null,
     },
     team: {
       id: team.id,
@@ -151,7 +159,7 @@ export function buildBoard(input: {
     me: toMember(me),
     members: members.filter((member) => member.id !== me.id).map(toMember),
     keys,
-    cartaAtiva: null,
+    cartaAtiva: toChallengeCardDTO(event),
     submission: submission ? toSubmissionDTO(submission) : null,
     files: files.map(toFileDTO),
   };

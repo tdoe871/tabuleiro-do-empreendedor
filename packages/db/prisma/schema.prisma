@@ -61,6 +61,15 @@ model Event {
   maxTeamSize     Int         @default(5)
   startedAt       DateTime?
   endsAt          DateTime?
+  // Short activity timer the educator runs on top of the event clock (for
+  // example 15 min for pitches). Players see it only while it is visible.
+  activityEndsAt  DateTime?
+  activitySeconds Int? // its full length, to draw progress
+  activityVisible Boolean     @default(false)
+  // The educator's challenge card: one at a time, for every team.
+  challengeKey    BoardKey?
+  challengeText   String?
+  challengeSentAt DateTime?
   hostId          String
   host            Staff       @relation(fields: [hostId], references: [id])
   phases          Phase[]

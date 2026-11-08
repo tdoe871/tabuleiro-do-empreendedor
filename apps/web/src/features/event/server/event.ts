@@ -1,5 +1,12 @@
 import type { Event, EventMode, EventStatus } from "@tdoe/db";
 
+import {
+  toActivityTimerDTO,
+  toChallengeCardDTO,
+  type ActivityTimerDTO,
+  type ChallengeCardDTO,
+} from "./controls";
+
 // Server-side rules for events. Pure functions (no database access) so they
 // can be unit-tested; the route handlers in src/app/api/events use them.
 
@@ -35,6 +42,10 @@ export type EventDTO = {
   maxTeamSize: number;
   startedAt: string | null;
   endsAt: string | null;
+  // The educator's controls (see controls.ts).
+  activityTimer: ActivityTimerDTO | null;
+  activityVisible: boolean;
+  challengeCard: ChallengeCardDTO | null;
 };
 
 export function toEventDTO(event: Event): EventDTO {
@@ -52,6 +63,9 @@ export function toEventDTO(event: Event): EventDTO {
     maxTeamSize: event.maxTeamSize,
     startedAt: event.startedAt?.toISOString() ?? null,
     endsAt: event.endsAt?.toISOString() ?? null,
+    activityTimer: toActivityTimerDTO(event),
+    activityVisible: event.activityVisible,
+    challengeCard: toChallengeCardDTO(event),
   };
 }
 

@@ -339,7 +339,9 @@ que no haya que convertir nada.
   la URL: el dashboard ya no necesita `?nickname=`. `me` es el jugador; `members` son los demás.
 - `event.playable`: `true` si ahora mismo se puede contestar (sesión activa y con tiempo). Sirve para
   deshabilitar los botones en pausa.
-- `cartaAtiva` llega siempre `null` hasta que se defina la carta de reto.
+- `cartaAtiva`: la carta de reto del educador (`{ key, text, sentAt }`) o `null`.
+- `event.activityTimer`: el timer de actividad del educador mientras lo muestra (`{ endsAt, seconds,
+visible }`) o `null`.
 - Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar al login).
 
 ### Cómo avanza el tablero (lo calcula el backend)
@@ -580,7 +582,8 @@ agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `
   concluidas sumando todos los equipos.
 - `submission` es `null` hasta que el equipo entrega. El archivo subido no viene aquí; su descarga
   con URL firmada llega con el bloque de entregas.
-- `alerts`: solo las no resueltas. Qué las genera sigue pendiente (ver Alertas ❓).
+- `alerts`: alertas de mediación calculadas más las filas abiertas de `Alert` (ver "Alertas de
+  mediación").
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador).
 
 - El mural (`SocializacaoPanel`) usa `"pendente"` para las llaves bloqueadas. Propongo que la API
@@ -679,37 +682,88 @@ Los mentores pueden **descargar los archivos** de los equipos de su evento
 (`GET /api/submissions/files/:id`). Con cualquier sesión que no tenga permiso, la descarga responde
 `FILE_NOT_FOUND`; sin sesión, `UNAUTHORIZED`.
 
-### Timer del educador ❓
+### Timer de actividad — Staff 🆕
 
-`EducadorPanel` tiene un timer con presets, iniciar/parar y "mostrar a los estudiantes", aparte del
-timer global del evento (24 h). Antes de definir el endpoint hay que aclarar qué es:
+**Implementado** (opción A): una cuenta regresiva corta para una actividad (presets de 5/15/20/30
+min en el panel), aparte del reloj de 24 h del evento.
 
-- **Opción A:** cuenta regresiva corta para una actividad (por ejemplo, 15 min de pitch). Se guarda
-  en el evento (`activityEndsAt`, `activityVisible`) y los jugadores la ven en `GET /api/board`.
-- **Opción B:** es el mismo timer global y los presets solo eligen la duración del evento.
+| Endpoint                                | Body                                 | Qué hace                                                                  |
+| --------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------- |
+| `PUT /api/events/:id/activity-timer`    | `{ "minutes": 15, "visible": true }` | Inicia o reinicia (1-180 min). `visible` conserva su valor si no se manda |
+| `PATCH /api/events/:id/activity-timer`  | `{ "visible": false }`               | "Mostrar a los estudiantes": sí / no                                      |
+| `DELETE /api/events/:id/activity-timer` | —                                    | Lo detiene (`204`)                                                        |
 
-### Carta de reto ❓
+```json
+// PUT / PATCH → 200
+{
+  "serverNow": "...",
+  "activityTimer": { "endsAt": "...", "seconds": 900, "visible": true }
+}
+```
 
-El educador lanza una carta de reto para una llave y la quita.
+- El educador lo ve siempre en `EventDTO.activityTimer` (y `EventDTO.activityVisible`). Los
+  jugadores lo reciben en `GET /api/board` → `event.activityTimer` **solo mientras está visible**.
+  Tiempo restante = `endsAt - serverNow`.
+- Cada cambio manda el aviso `event` (jugadores) y `overview` (educador).
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`minutes` / `visible` →
+  `INVALID`), `EVENT_FINISHED` (no se inicia con el evento terminado).
+
+### Carta de reto — Staff 🆕
+
+**Implementado.** Una carta activa a la vez, para todos los equipos.
 
 ```json
 // PUT /api/events/:id/challenge-card
-{ "key": "problema", "text": "..." }
+{ "key": "parcerias", "text": "¿Quién más está resolviendo este problema?" }
+// 200
+{ "challengeCard": { "key": "parcerias", "text": "...", "sentAt": "..." } }
 // DELETE /api/events/:id/challenge-card → 204
 ```
 
-Los jugadores la reciben en `GET /api/board` como `cartaAtiva`. ❓ ¿Una sola carta activa por
-evento, o una por llave? ¿Se manda a todos los equipos o a uno en particular?
+- Los jugadores la reciben en `GET /api/board` como `cartaAtiva` (`{ key, text, sentAt }` o
+  `null`); el educador, en `EventDTO.challengeCard`. Mandar otra reemplaza la anterior.
+- Texto de 1 a 500 caracteres (el panel lo precarga con `carta.prompts.<llave>` y se puede editar).
+- Avisos `event` y `overview` al mandarla o quitarla.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`key` → `INVALID`, `text` →
+  `REQUIRED` / `TOO_LONG`), `EVENT_FINISHED`.
 
-### Alertas ❓
+### Alertas de mediación — en `GET /api/events/:id/overview` 🆕
 
-`GET /api/events/:id/alerts` y `PATCH /api/alerts/:id/resolve`. ❓ ¿Qué genera una alerta en el
-prototipo ("alertas de mediação")? ¿Equipo sin avanzar X minutos, equipo sin miembros, otra cosa?
+**Implementado.** Se calculan en cada consulta del resumen a partir del avance (no se guardan):
+una alerta desaparece sola cuando se resuelve su causa. "Verificar alertas" = volver a pedir el
+resumen.
 
-### Exportar ❓
+```json
+"alerts": [
+  { "id": "TEAM_STUCK:<teamId>", "type": "TEAM_STUCK", "severity": "WARNING", "team": { "id": "uuid", "name": "..." }, "minutes": 75, "message": "TEAM_STUCK", "createdAt": "..." }
+]
+```
 
-"Reporte" y "exportar propuestas": `GET /api/events/:id/export?type=report|proposals` → CSV.
-Se define cuando el resto esté funcionando.
+| `type`            | Cuándo (defaults en `features/event/server/alerts.ts`)                   | `severity`                                  | `minutes`           |
+| ----------------- | ------------------------------------------------------------------------ | ------------------------------------------- | ------------------- |
+| `NO_SUBMISSION`   | Faltan 2 h o menos y el equipo no ha entregado                           | `WARNING`; `CRITICAL` en los últimos 30 min | Minutos que faltan  |
+| `TEAM_STUCK`      | Sesión activa y 60 min sin concluir una fase (y no terminó las 4 llaves) | `WARNING`                                   | Minutos sin avanzar |
+| `TEAM_INCOMPLETE` | Menos de 2 integrantes                                                   | `INFO`                                      | `null`              |
+| `CUSTOM`          | Filas de la tabla `Alert` (texto libre en `message`)                     | La de la fila                               | `null`              |
+
+- Ordenadas por gravedad. No hay alertas antes de iniciar ni después de terminar.
+- El frontend traduce por `type` y usa `minutes` y `team.name` en el texto. **Cambio:** antes
+  `message` era el texto a mostrar; ahora para las automáticas trae el `type`.
+
+### Exportar — Staff 🆕
+
+**Implementado.** `GET /api/events/:id/export?type=report|proposals` → descarga un CSV (UTF-8 con
+BOM, abre bien en Excel y Google Sheets), una fila por equipo. Encabezados en español.
+
+- `report` ("Reporte"): integrantes y líder, estado de cada llave, fases concluidas, última
+  actividad, entrega (tipo, links, descripción, fecha), archivos y calificaciones de mentores
+  (cantidad, promedio y promedio por criterio).
+- `proposals` ("Exportar propuestas"): la respuesta del equipo a cada una de las 12 fases (con
+  quién y cuándo) y su entrega.
+- Para descargarlo basta un enlace o `window.location` a la URL (la cookie del educador va sola).
+- Las celdas que empiezan con `=`, `+`, `-` o `@` se guardan con un `'` adelante para que Excel no
+  las ejecute como fórmula.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
 
 ---
 
@@ -840,3 +894,5 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
     conversación con `GET /api/messages` + `?after=<cursor>`. Juntar por `id`.
 11. `PlayerBoard` y `EducadorPanel`: usar `useRealtime` (sección 5) para volver a pedir el chat, el
     tablero o el resumen cuando llegue un aviso, en vez de refrescar con un temporizador propio.
+12. `EducadorPanel`: timer, carta, alertas y exportar contra los endpoints de la sección 4 (hoy son
+    estado local o `handlePending`).
