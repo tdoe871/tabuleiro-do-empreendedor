@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { Prisma, prisma } from "@tdoe/db";
+import { Prisma, INTERACTIVE_TX, prisma } from "@tdoe/db";
 
 import {
   MAX_MENTORS_PER_EVENT,
@@ -86,5 +86,5 @@ function enter(mentorCode: string, name: string) {
       data: { eventId: event.id, name },
     });
     return { mentor, event, recovered: false };
-  });
+  }, INTERACTIVE_TX);
 }

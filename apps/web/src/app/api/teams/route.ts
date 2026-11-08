@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { Prisma, prisma } from "@tdoe/db";
+import { Prisma, INTERACTIVE_TX, prisma } from "@tdoe/db";
 
 import {
   canJoinEvent,
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           data: { teamId: team.id, nickname, role: "LEADER" },
         });
         return { event, team, participant };
-      });
+      }, INTERACTIVE_TX);
 
       const response = NextResponse.json(
         {

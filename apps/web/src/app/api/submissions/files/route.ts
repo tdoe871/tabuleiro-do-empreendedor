@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { prisma } from "@tdoe/db";
+import { INTERACTIVE_TX, prisma } from "@tdoe/db";
 
 import { toFileDTO } from "@/features/submission/server/dto";
 import {
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           uploadedById: player.participant.id,
         },
       });
-    });
+    }, INTERACTIVE_TX);
 
     let uploadUrl: string;
     try {

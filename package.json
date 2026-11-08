@@ -16,6 +16,7 @@
     "db:generate": "pnpm --filter @tdoe/db generate",
     "db:migrate": "pnpm --filter @tdoe/db migrate",
     "db:seed": "pnpm --filter @tdoe/db seed",
+    "load-test": "pnpm --filter @tdoe/db exec tsx scripts/load-test.ts",
     "prepare": "husky"
   },
   "devDependencies": {

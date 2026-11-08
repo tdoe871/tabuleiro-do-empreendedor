@@ -32,18 +32,19 @@
 
 ## 2. Dónde estamos ahora (git y PRs)
 
-| PR  | Rama                        | Base              | Estado       | Contenido                                                                                         |
-| --- | --------------------------- | ----------------- | ------------ | ------------------------------------------------------------------------------------------------- |
-| #2  | `feature/backend-base`      | `dev`             | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
-| #3  | `feature/staff-auth`        | `dev`             | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
-| #7  | `feature/players`           | `dev`             | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
-| #8  | `feature/submissions`       | `feature/players` | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
-| #9  | `feature/chat`              | `feature/players` | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
-| #10 | `feature/realtime`          | `feature/chat`    | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
-| #11 | `feature/mentors`           | `feature/players` | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
-| —   | `feature/educator-controls` | `feature/mentors` | Por abrir    | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
-| #6  | `ui/theme-sandbox-test`     | `dev`             | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
-| #5  | `test/initial-tests`        | `qa`              | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
+| PR  | Rama                        | Base                        | Estado       | Contenido                                                                                         |
+| --- | --------------------------- | --------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| #2  | `feature/backend-base`      | `dev`                       | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
+| #3  | `feature/staff-auth`        | `dev`                       | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
+| #7  | `feature/players`           | `dev`                       | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
+| #8  | `feature/submissions`       | `feature/players`           | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
+| #9  | `feature/chat`              | `feature/players`           | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
+| #10 | `feature/realtime`          | `feature/chat`              | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
+| #11 | `feature/mentors`           | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
+| #12 | `feature/educator-controls` | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
+| —   | `feature/load-test`         | `feature/educator-controls` | Por abrir    | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #6  | `ui/theme-sandbox-test`     | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #5  | `test/initial-tests`        | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
 - **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
   alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
@@ -53,7 +54,7 @@
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
-  real. **Orden de merge:** #7, luego #11 (mentores), luego el de controles del educador.
+  real. **Orden de merge:** #7, #11 (mentores), #12 (controles del educador), luego el de carga.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
 
@@ -82,6 +83,7 @@ Un solo archivo: **`apps/web/.env`** (ignorado por git; la plantilla es `apps/we
 | `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                            |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre     |
 | `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                   |
+| `DATABASE_POOL_MAX`                    | Conexiones a la base por instancia       | Opcional (5). Vercel: 3-5. Una VM: 10-20                                                   |
 | `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal)                       |
 | `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                       |
 
@@ -303,8 +305,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Siguientes bloques (avanzar con defaults, sin bloquearse)
 
-1. **Prueba de carga:** script de 60 equipos / 300 participantes. Es lo que confirma si alcanza el
-   plan de hosting (sobre todo las conexiones a la base).
+1. **Correr la prueba de carga contra el hosting real** (Vercel o la VM de Azure) en cuanto exista:
+   `pnpm load-test --base https://<url> --duration 300`. Ver "Prueba de carga" abajo.
 2. **Limpieza antes del evento:** quitar el seed (`QATEST`) y los eventos de prueba del equipo
    (hoy: `Prueba Hackaton` / `FVR7SM` y `Prueba Proyecto` / `WDAFL7`).
 3. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
@@ -365,3 +367,35 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento.
 6. Antes de cada PR: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, prueba en vivo contra
    Supabase (y borrar los datos de prueba) y actualizar `api.md` y este documento.
+
+---
+
+## 10. Prueba de carga (8 nov)
+
+`pnpm load-test` (script en `packages/db/scripts/load-test.ts`) crea un evento propio, mete **60
+equipos y 300 participantes por la API** y simula a todos usando la app a la vez: el chat se
+refresca cada 5 s y el tablero cada 15 s (el peor caso, sin tiempo real), cada quien manda un
+mensaje por minuto, el líder concluye una fase cada 60-120 s y el educador mira el resumen cada
+10 s. Al final borra todo. Opciones: `--base <url>`, `--teams`, `--members`, `--duration`,
+`--messages-every`, `--board-every`, `--keep`.
+
+Corrido desde la casa de Eddy (servidor local en modo producción, base en Supabase us-east-1):
+
+| Corrida                                         | Entradas                                                               | Resultado                                                                         |
+| ----------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Pool de 5, espera de transacción de 2 s (antes) | 97 de 300 fallaron ("Unable to start a transaction in the given time") | 6.6 % de errores                                                                  |
+| Pool de 5, espera de 15 s (`INTERACTIVE_TX`)    | 300 / 300                                                              | Entradas bien; la simulación se satura (11 req/s de capacidad contra ~85 pedidas) |
+| **Pool de 20, espera de 15 s**                  | **300 / 300 en 28 s**                                                  | **0 errores**, 42 req/s, 362 mensajes y 60 fases guardadas                        |
+
+Conclusiones:
+
+- **Se corrigió un error real:** en la ola de entradas del inicio, crear equipo / unirse fallaba
+  porque Prisma solo espera 2 s por una conexión libre. Ahora espera hasta 15 s.
+- **La capacidad crece en proporción al pool** (5 → 20 conexiones: 11 → 42 req/s): el límite de esta
+  prueba es la distancia casa → Virginia (~70 ms por consulta, 6-8 consultas por petición), no la
+  base. Con el servidor junto a la base (Vercel iad1 o Azure East US, ~1-2 ms) cada petición debería
+  tardar mucho menos; **falta confirmarlo corriendo el script contra el hosting real**.
+- **El tiempo real importa:** con avisos, el chat y el tablero se refrescan cada 60 s en lugar de
+  5-15 s: la carga baja de ~85 a ~15 req/s.
+- **`DATABASE_POOL_MAX`:** en Vercel 3-5 por instancia (el pooler de Supabase acepta ~200 conexiones
+  de cliente en los planes chicos y cada instancia abre las suyas); en una VM, 10-20.
