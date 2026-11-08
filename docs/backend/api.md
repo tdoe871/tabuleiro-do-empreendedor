@@ -123,6 +123,8 @@ type EventDTO = {
   maxTeamSize: number; // = integrantes, de 2 a 5
   startedAt: string | null;
   endsAt: string | null;
+  // Además (sección 4): mentorCode, activityTimer, activityVisible, challengeCard y
+  // switches ({ chat, submissions, joins }).
 };
 ```
 
@@ -155,7 +157,8 @@ Crear equipo; quien lo crea queda como `LEADER`.
 
 - **Implementado.** Se puede crear equipo antes de que el educador inicie la sesión, mientras corre
   y en pausa; no cuando ya terminó.
-- Errores: `EVENT_NOT_FOUND`, `EVENT_FINISHED`, `EVENT_FULL` (ya hay `maxTeams` equipos),
+- Errores: `EVENT_NOT_FOUND`, `EVENT_FINISHED`, `JOINS_DISABLED` (el educador cerró las entradas),
+  `EVENT_FULL` (ya hay `maxTeams` equipos),
   `TEAM_NAME_TAKEN` (sin distinguir mayúsculas: "Los Innovadores" = "los innovadores"),
   `RATE_LIMITED`, `VALIDATION_ERROR` con `fields`: `eventCode` → `REQUIRED`; `name` →
   `REQUIRED` | `TOO_LONG` (máx. 40); `nickname` → `REQUIRED` | `TOO_LONG` (máx. 30).
@@ -171,8 +174,14 @@ Lista de equipos para que quien se une elija por nombre real.
 
 ```json
 // 200
-{ "teams": [{ "name": "Los Innovadores", "memberCount": 3, "maxTeamSize": 5 }] }
+{
+  "teams": [{ "name": "Los Innovadores", "memberCount": 3, "maxTeamSize": 5 }],
+  "joinsEnabled": true
+}
 ```
+
+- `joinsEnabled: false` mientras el educador tiene cerradas las entradas (ver "Interruptores de
+  emergencia"): la pantalla puede avisarlo antes de que la persona escriba su nickname.
 
 - **Implementado.** **Nunca devuelve `joinCode`** (cualquiera con el código del evento podría entrar
   a cualquier equipo). Para unirse hace falta el código que comparte el líder.
@@ -200,6 +209,8 @@ Unirse a un equipo.
   (`200` con `recovered: true`). Por eso no existe `NICKNAME_TAKEN`. Solo puede hacerlo quien tenga
   el código del equipo.
 - Errores: `TEAM_NOT_FOUND` (código inválido o regenerado), `TEAM_FULL`, `EVENT_FINISHED`,
+  `JOINS_DISABLED` (entradas cerradas por el educador; **recuperar el lugar con el mismo nickname
+  sigue funcionando**),
   `RATE_LIMITED`, `VALIDATION_ERROR` con `fields`: `teamJoinCode` → `REQUIRED`; `nickname` →
   `REQUIRED` | `TOO_LONG`.
 - El límite de integrantes se valida dentro de una transacción con el equipo bloqueado, así que dos
@@ -240,7 +251,8 @@ type SubmissionFileDTO = {
   archivos pertenecen al equipo, no a un `type`: un equipo puede entregar un link **y** archivos.
 - Cualquier miembro puede entregar, mientras la sesión está `ACTIVE` y con tiempo.
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_ACTIVE` (sin iniciar o en pausa), `DEADLINE_PASSED` (se acabó
-  el tiempo o el evento terminó), `VALIDATION_ERROR` con `fields`: `type` → `INVALID`; `url` →
+  el tiempo o el evento terminó), `SUBMISSIONS_DISABLED` (el educador apagó las entregas; también
+  en los 3 pasos de archivos y al borrar uno), `VALIDATION_ERROR` con `fields`: `type` → `INVALID`; `url` →
   `REQUIRED` | `INVALID_URL`; `links` → `INVALID` (no es lista o son más de 5) | `INVALID_URL`;
   `description` → `TOO_LONG` (máx. 2000); `files` → `REQUIRED` (`FILE_OR_IMAGE` sin archivos).
 
@@ -344,6 +356,8 @@ que no haya que convertir nada.
   (`[{ id, text, createdAt }]`). Ver "Avisos generales" en la sección 4.
 - `event.activityTimer`: el timer de actividad del educador mientras lo muestra (`{ endsAt, seconds,
 visible }`) o `null`.
+- `event.switches`: `{ chat, submissions, joins }`; `false` = el educador lo apagó (ver
+  "Interruptores de emergencia"). Sirve para deshabilitar el chat o el botón de entregar.
 - Errores: `UNAUTHORIZED` (sin sesión de jugador → mandar al login).
 
 ### Cómo avanza el tablero (lo calcula el backend)
@@ -492,7 +506,8 @@ Los avisos de `sistema` (fase concluida, etc.) siguen siendo locales: no pasan p
 - `from` / `to` llegan `null` si ese participante ya no existe.
 - Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`type` → `INVALID`, `text` → `REQUIRED` /
   `TOO_LONG`, `toParticipantId` → `REQUIRED` / `INVALID`, `clientId` → `INVALID`),
-  `EVENT_NOT_ACTIVE`, `EVENT_FINISHED`, `RATE_LIMITED`.
+  `EVENT_NOT_ACTIVE`, `EVENT_FINISHED`, `CHAT_DISABLED` (el educador apagó el chat; leer sigue
+  funcionando), `RATE_LIMITED`.
 
 `GET /api/messages` — los mensajes que el jugador puede ver, **del más viejo al más nuevo**.
 
@@ -763,6 +778,34 @@ pitches empiezan a las 3"). Lo ven todos los jugadores en el tablero y los mento
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`text` → `REQUIRED` /
   `TOO_LONG`), `RATE_LIMITED`; al borrar, `ANNOUNCEMENT_NOT_FOUND`.
 
+### Interruptores de emergencia — Staff 🆕
+
+**Implementado.** El educador apaga una parte de la app de su evento **sin volver a desplegar**
+(abuso en el chat, problemas con Storage, cerrar la puerta a gente nueva). Son banderas en la base
+que cada ruta revisa en cada petición; el cambio vale desde la siguiente petición.
+
+```json
+// PATCH /api/events/:id/switches — cualquiera de los tres; los que no se mandan no cambian
+{ "chat": false }
+// 200
+{ "switches": { "chat": false, "submissions": true, "joins": true } }
+```
+
+| Interruptor   | Apagado bloquea                                                  | Sigue funcionando                                          | Error                  |
+| ------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------- |
+| `chat`        | `POST /api/messages` (mensajes al equipo, privados y toques)     | Leer el chat (`GET /api/messages`)                         | `CHAT_DISABLED`        |
+| `submissions` | `PUT /api/submissions`, subir, confirmar y borrar archivos       | Ver la entrega y descargar archivos                        | `SUBMISSIONS_DISABLED` |
+| `joins`       | Crear equipos (`POST /api/teams`) y unirse como integrante nuevo | Recuperar la sesión con el mismo nickname; entrar mentores | `JOINS_DISABLED`       |
+
+- Todos empiezan encendidos (`true`). Se pueden cambiar en cualquier estado del evento.
+- Dónde se ven: educador en `EventDTO.switches` (`GET /api/events` y el resumen); jugadores en
+  `GET /api/board` → `event.switches`; quien se va a unir, en `GET /api/teams` → `joinsEnabled`.
+- Al cambiar uno, los jugadores reciben el aviso `event` (vuelven a pedir el tablero) y el educador
+  `overview`.
+- No afectan el tablero (contestar fases) ni los avisos generales: para frenar todo está "pausar".
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`switches` → `REQUIRED` si el body
+  no trae ninguno; `<nombre>` → `INVALID` si no es booleano o `UNKNOWN` si no existe).
+
 ### Alertas de mediación — en `GET /api/events/:id/overview` 🆕
 
 **Implementado.** Se calculan en cada consulta del resumen a partir del avance (no se guardan):
@@ -885,6 +928,9 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 | `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                     |
 | `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
 | `EVENT_FINISHED`            | 409  | El evento terminó                                                |
+| `CHAT_DISABLED`             | 409  | El educador apagó el chat (interruptor de emergencia)            |
+| `SUBMISSIONS_DISABLED`      | 409  | El educador apagó las entregas (interruptor de emergencia)       |
+| `JOINS_DISABLED`            | 409  | El educador cerró las entradas (interruptor de emergencia)       |
 | `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
 | `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
 | `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
@@ -937,3 +983,7 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 13. Avisos generales: en `EducadorPanel`, un campo para mandar el aviso y la lista con botón de
     borrar; en `PlayerBoard` (y la pantalla del mentor), mostrar `announcements` y un aviso
     emergente con los nuevos (ver "Avisos generales" en la sección 4).
+14. Interruptores de emergencia: en `EducadorPanel`, tres interruptores (chat, entregas, entradas)
+    contra `PATCH /api/events/:id/switches`; en `PlayerBoard`, deshabilitar el chat o la entrega
+    según `event.switches`, y en `team/create` / `team/join` avisar si `joinsEnabled` es `false`.
+    Traducir `CHAT_DISABLED`, `SUBMISSIONS_DISABLED` y `JOINS_DISABLED`.

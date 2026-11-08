@@ -10,6 +10,7 @@ import {
   matchesSignature,
   type FileExtension,
 } from "@/features/submission/server/rules";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -29,6 +30,8 @@ export async function POST(
 
   const gate = canSubmit(canPlay(player.event, new Date()));
   if (gate !== "ok") return apiError(gate);
+  const open = switchGate(player.event, "submissions");
+  if (open !== "ok") return apiError(open);
 
   const { id } = await params;
   try {

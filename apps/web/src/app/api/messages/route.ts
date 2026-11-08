@@ -14,6 +14,7 @@ import {
   parseMessageQuery,
   visibleMessages,
 } from "@/features/communication/server/rules";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -89,6 +90,8 @@ export async function POST(request: NextRequest) {
 
   const gate = canPlay(player.event, new Date());
   if (gate !== "ok") return apiError(gate);
+  const chat = switchGate(player.event, "chat");
+  if (chat !== "ok") return apiError(chat);
 
   try {
     const existing = await findByClientId(me, input.clientId);

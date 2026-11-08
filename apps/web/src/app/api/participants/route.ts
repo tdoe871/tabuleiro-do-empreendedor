@@ -7,6 +7,7 @@ import {
   normalizeCode,
   sameName,
 } from "@/features/team/server/team";
+import { switchGate } from "@/features/event/server/switches";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
@@ -55,6 +56,10 @@ export async function POST(request: NextRequest) {
         sameName(p.nickname, nickname),
       );
       if (existing) return { team, participant: existing, recovered: true };
+
+      // Closed entries still let people recover their session (above).
+      const joins = switchGate(team.event, "joins");
+      if (joins !== "ok") throw new ApiFailure(joins);
 
       if (team.participants.length >= team.event.maxTeamSize) {
         throw new ApiFailure("TEAM_FULL");

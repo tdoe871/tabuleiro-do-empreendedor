@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
 import { canSubmit } from "@/features/submission/server/rules";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
 import { getMentorFromRequest } from "@/lib/auth/mentor";
@@ -66,6 +67,8 @@ export async function DELETE(request: NextRequest, { params }: Context) {
 
   const gate = canSubmit(canPlay(player.event, new Date()));
   if (gate !== "ok") return apiError(gate);
+  const open = switchGate(player.event, "submissions");
+  if (open !== "ok") return apiError(open);
 
   const { id } = await params;
   try {

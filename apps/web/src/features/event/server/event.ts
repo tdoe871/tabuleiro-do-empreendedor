@@ -6,6 +6,7 @@ import {
   type ActivityTimerDTO,
   type ChallengeCardDTO,
 } from "./controls";
+import { toSwitchesDTO, type SwitchesDTO } from "./switches";
 
 // Server-side rules for events. Pure functions (no database access) so they
 // can be unit-tested; the route handlers in src/app/api/events use them.
@@ -46,6 +47,8 @@ export type EventDTO = {
   activityTimer: ActivityTimerDTO | null;
   activityVisible: boolean;
   challengeCard: ChallengeCardDTO | null;
+  // Emergency switches (see switches.ts): false = turned off.
+  switches: SwitchesDTO;
 };
 
 export function toEventDTO(event: Event): EventDTO {
@@ -66,6 +69,7 @@ export function toEventDTO(event: Event): EventDTO {
     activityTimer: toActivityTimerDTO(event),
     activityVisible: event.activityVisible,
     challengeCard: toChallengeCardDTO(event),
+    switches: toSwitchesDTO(event),
   };
 }
 

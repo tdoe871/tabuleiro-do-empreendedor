@@ -25,27 +25,28 @@
   avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
   equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
   mentores y calificación, controles del educador (timer de actividad, carta de reto, alertas
-  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador.
+  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador e interruptores de emergencia.
 - **Falta:** correr la prueba de carga contra el hosting real y lo que el equipo pida en QA.
 
 ---
 
 ## 2. Dónde estamos ahora (git y PRs)
 
-| PR  | Rama                        | Base                        | Estado       | Contenido                                                                                         |
-| --- | --------------------------- | --------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
-| #2  | `feature/backend-base`      | `dev`                       | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
-| #3  | `feature/staff-auth`        | `dev`                       | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
-| #7  | `feature/players`           | `dev`                       | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
-| #8  | `feature/submissions`       | `feature/players`           | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
-| #9  | `feature/chat`              | `feature/players`           | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
-| #10 | `feature/realtime`          | `feature/chat`              | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
-| #11 | `feature/mentors`           | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
-| #12 | `feature/educator-controls` | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
-| #13 | `feature/load-test`         | `feature/educator-controls` | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
-| #14 | `feature/announcements`     | `feature/load-test`         | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
-| #6  | `ui/theme-sandbox-test`     | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
-| #5  | `test/initial-tests`        | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
+| PR  | Rama                         | Base                        | Estado       | Contenido                                                                                         |
+| --- | ---------------------------- | --------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| #2  | `feature/backend-base`       | `dev`                       | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
+| #3  | `feature/staff-auth`         | `dev`                       | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
+| #7  | `feature/players`            | `dev`                       | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
+| #8  | `feature/submissions`        | `feature/players`           | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
+| #9  | `feature/chat`               | `feature/players`           | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
+| #10 | `feature/realtime`           | `feature/chat`              | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
+| #11 | `feature/mentors`            | `feature/players`           | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
+| #12 | `feature/educator-controls`  | `feature/mentors`           | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
+| #13 | `feature/load-test`          | `feature/educator-controls` | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #14 | `feature/announcements`      | `feature/load-test`         | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
+| #15 | `feature/emergency-switches` | `feature/announcements`     | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
+| #6  | `ui/theme-sandbox-test`      | `dev`                       | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #5  | `test/initial-tests`         | `qa`                        | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
 - **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
   alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
@@ -56,7 +57,7 @@
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
   real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13
-  (carga) → #14 (avisos generales).
+  (carga) → #14 (avisos generales) → #15 (interruptores).
   Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
@@ -141,6 +142,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261108220835_mentors_and_evaluations`           | `Event.mentorCode`, tablas `Mentor` y `Evaluation` (calificación en JSON) con RLS                                                                         |
 | `20261108221623_activity_timer_and_challenge_card` | `Event`: timer de actividad (`activityEndsAt`, `activitySeconds`, `activityVisible`) y carta de reto (`challengeKey`, `challengeText`, `challengeSentAt`) |
 | `20261108230000_announcements`                     | Tabla `Announcement` (avisos generales del educador: `eventId`, `text`, `createdAt`) con RLS                                                              |
+| `20261108233000_emergency_switches`                | `Event`: interruptores de emergencia `chatEnabled`, `submissionsEnabled`, `joinsEnabled` (todos `true` por defecto)                                       |
 
 ### Reglas de la base
 
@@ -201,6 +203,7 @@ apps/web/src/
     progress.ts                 estado de cada llave a partir de las fases concluidas
     controls.ts                 timer de actividad y carta de reto (validación y DTOs)
     announcements.ts            avisos generales: validar, DTO, cuántos se muestran, límite por minuto
+    switches.ts                 interruptores de emergencia: validar, DTO y switchGate() que revisa cada ruta
     alerts.ts                   alertas de mediación calculadas (equipo detenido, sin entrega, incompleto)
     owned-event.ts              cargar el evento del educador y avisar cambios
     board.ts                    arma GET /api/board, orden de fases, POINTS_PER_PHASE
@@ -215,7 +218,7 @@ apps/web/src/
   features/communication/server/
     rules.ts                    chat: validar mensajes y query, quién ve qué, límites
     dto.ts                      formato de respuesta de los mensajes
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements, switches
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -259,10 +262,11 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Educador    | `PUT/PATCH/DELETE /api/events/:id/activity-timer`, `PUT/DELETE /api/events/:id/challenge-card` | Educador             |
 | Educador    | `GET /api/events/:id/export?type=report\|proposals` (CSV)                                      | Educador             |
 | Educador    | `GET/POST /api/events/:id/announcements`, `DELETE .../announcements/:announcementId`           | Educador             |
+| Educador    | `PATCH /api/events/:id/switches` (apagar chat, entregas o entradas)                            | Educador             |
 | —           | `GET /api/health`                                                                              | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **101 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **105 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -306,6 +310,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Alertas                        | Detenido 60 min; sin entrega a 2 h del final (crítica a 30 min); menos de 2 integrantes | `features/event/server/alerts.ts`              |
 | Avisos generales               | 1000 caracteres; en cualquier estado; se muestran los últimos 20; 10 por minuto         | `features/event/server/announcements.ts`       |
 | Avisos generales: leídos       | El backend no lleva quién leyó qué (el navegador recuerda el último que mostró)         | —                                              |
+| Interruptores                  | Por evento, los maneja su educador; leer y descargar siguen funcionando                 | `features/event/server/switches.ts`            |
+| Entradas cerradas              | Bloquea equipos e integrantes nuevos; recuperar sesión y entrar mentores, sí            | `app/api/participants/route.ts`                |
 
 ---
 
@@ -320,8 +326,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 3. **Siguientes tareas de backend propuestas (8 nov), en este orden:**
    1. ~~**Avisos generales**~~ **hecho (#14):** el educador manda un mensaje a todo el evento;
       jugadores y mentores lo ven, aviso de tiempo real `announcements`.
-   2. **Interruptores de emergencia:** apagar chat, entregas o entradas sin volver a desplegar
-      (banderas en la base, revisadas por cada ruta).
+   2. ~~**Interruptores de emergencia**~~ **hecho (#15):** apagar chat, entregas o entradas sin
+      volver a desplegar (banderas en `Event`, revisadas por cada ruta).
    3. **Registro de actividad para la investigación:** quién hizo qué y cuándo, exportable a CSV.
    4. **Recuperar la contraseña del educador por correo** (necesita el dominio verificado en Resend).
    5. **Dejar el proyecto listo para la VM de Azure** si el equipo elige ese plan: build
@@ -379,14 +385,14 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14, el código y
-   esta bitácora al día viven en la rama **`feature/announcements`**, en la carpeta aparte
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15, el
+   código y esta bitácora al día viven en la rama **`feature/emergency-switches`**, en la carpeta aparte
    **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
    carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
    una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
-2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12 y #13?
+2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14 y #15?
    - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
-     `feature/announcements` y abrir el PR con base `feature/announcements`.
+     `feature/emergency-switches` y abrir el PR con base `feature/emergency-switches`.
    - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
    - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
