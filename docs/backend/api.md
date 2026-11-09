@@ -98,6 +98,48 @@ Registro de educador (pestaña de registro del login).
   (`email` o `senha` vacíos).
 - Sin sesión de staff, cualquier página de `/[locale]/mestre/*` redirige al login (`/[locale]`).
 
+### Recuperar la contraseña — Público 🆕
+
+**Implementado.** "¿Olvidaste tu contraseña?" para educadores, en 3 pasos:
+
+```json
+// 1. POST /api/auth/password/forgot — en el login
+{ "email": "ana@ejemplo.com", "locale": "es" }
+// 202 (siempre, exista o no la cuenta)
+{ "ok": true }
+
+// 2. POST /api/auth/password/check — al abrir la página del enlace
+{ "token": "<lo que viene después de #token=>" }
+// 200
+{ "valid": true, "expiresAt": "..." }
+
+// 3. POST /api/auth/password/reset — al mandar la contraseña nueva
+{ "token": "...", "senha": "********" }
+// 200 + cookie tdoe_staff (igual que el login)
+{ "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
+```
+
+- **Paso 1** responde `202` aunque el correo no tenga cuenta, y el trabajo se hace después de
+  responder: ni la respuesta ni el tiempo revelan qué correos están registrados. El correo sale en
+  el idioma de `locale` (`pt-BR`, `es`, `en`, `fr`; si falta o no existe, `pt-BR`). La pantalla
+  siempre muestra "si el correo está registrado, te llegó un enlace".
+- **El enlace** es `<NEXT_PUBLIC_APP_URL>/<locale>/reset-password#token=<token>`. El token va
+  **después de `#`**: el navegador no lo manda al servidor, así no queda en logs. La página lo lee
+  con `window.location.hash` (componente de cliente) y llama al paso 2 para saber si todavía sirve.
+- El enlace **vale 60 minutos y se usa una vez**. Pedir otro deja sin efecto el anterior. Máximo 3
+  enlaces por cuenta por hora (los demás pedidos responden `202` pero no mandan nada).
+- **Paso 3** cambia la contraseña (mismas reglas que el registro), **cierra todas las demás
+  sesiones** de ese educador (las que tenía abiertas responden `401`) y deja iniciada la sesión en
+  este navegador: después se puede mandar directo al panel.
+- Errores: paso 1 `VALIDATION_ERROR` (`email` → `REQUIRED` / `INVALID`), `RATE_LIMITED` (5 por IP
+  cada 15 min); pasos 2 y 3 `RESET_TOKEN_INVALID` (no existe, ya se usó o se pidió uno más nuevo),
+  `RESET_TOKEN_EXPIRED`, `RATE_LIMITED`; paso 3 además `VALIDATION_ERROR` (`senha` → `REQUIRED` /
+  `TOO_SHORT` / `TOO_LONG`).
+- **Para que lleguen los correos** hacen falta en el servidor `RESEND_API_KEY`, `MAIL_FROM` (en un
+  dominio verificado en Resend) y `NEXT_PUBLIC_APP_URL` con la URL real. Sin ellos el paso 1 sigue
+  respondiendo `202` pero no manda nada (queda el error en los logs); en local el correo se imprime
+  en la terminal.
+
 ### `POST /api/events` — Staff
 
 El educador crea una sesión (`CreateSessionModal`).
@@ -986,36 +1028,38 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 
 ## 6. Códigos de error
 
-| Código                      | HTTP | Cuándo                                                           |
-| --------------------------- | ---- | ---------------------------------------------------------------- |
-| `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo            |
-| `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                     |
-| `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                 |
-| `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
-| `INVALID_CREDENTIALS`       | 401  | Login fallido                                                    |
-| `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
-| `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
-| `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
-| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                             |
-| `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                       |
-| `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
-| `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
-| `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
-| `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                     |
-| `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
-| `EVENT_FINISHED`            | 409  | El evento terminó                                                |
-| `CHAT_DISABLED`             | 409  | El educador apagó el chat (interruptor de emergencia)            |
-| `SUBMISSIONS_DISABLED`      | 409  | El educador apagó las entregas (interruptor de emergencia)       |
-| `JOINS_DISABLED`            | 409  | El educador cerró las entradas (interruptor de emergencia)       |
-| `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
-| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
-| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
-| `TOO_MANY_MENTORS`          | 409  | El evento llegó al máximo de mentores                            |
-| `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                  |
-| `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
-| `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
-| `RATE_LIMITED`              | 429  | Demasiados intentos                                              |
-| `INTERNAL_ERROR`            | 500  | Error del servidor (el detalle solo va a los logs)               |
+| Código                      | HTTP | Cuándo                                                            |
+| --------------------------- | ---- | ----------------------------------------------------------------- |
+| `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo             |
+| `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                      |
+| `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                  |
+| `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                       |
+| `INVALID_CREDENTIALS`       | 401  | Login fallido                                                     |
+| `RESET_TOKEN_INVALID`       | 400  | Enlace para recuperar la contraseña inválido, usado o reemplazado |
+| `RESET_TOKEN_EXPIRED`       | 400  | Enlace para recuperar la contraseña vencido (más de 60 min)       |
+| `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff)  |
+| `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                            |
+| `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                            |
+| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                              |
+| `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                        |
+| `EMAIL_TAKEN`               | 409  | Correo ya registrado                                              |
+| `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                      |
+| `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                   |
+| `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                      |
+| `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                              |
+| `EVENT_FINISHED`            | 409  | El evento terminó                                                 |
+| `CHAT_DISABLED`             | 409  | El educador apagó el chat (interruptor de emergencia)             |
+| `SUBMISSIONS_DISABLED`      | 409  | El educador apagó las entregas (interruptor de emergencia)        |
+| `JOINS_DISABLED`            | 409  | El educador cerró las entradas (interruptor de emergencia)        |
+| `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                    |
+| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                    |
+| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                          |
+| `TOO_MANY_MENTORS`          | 409  | El evento llegó al máximo de mentores                             |
+| `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                   |
+| `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                       |
+| `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                          |
+| `RATE_LIMITED`              | 429  | Demasiados intentos                                               |
+| `INTERNAL_ERROR`            | 500  | Error del servidor (el detalle solo va a los logs)                |
 
 `501 not_implemented` desaparece endpoint por endpoint a medida que se implementan.
 
@@ -1066,3 +1110,8 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 15. Registro de actividad (opcional, para el educador o el equipo de investigación): una lista con
     `GET /api/events/:id/activity` (traducir `action`) y un botón "Exportar actividad" que abra
     `GET /api/events/:id/export?type=activity`.
+16. Recuperar la contraseña: en el login, un enlace "¿Olvidaste tu contraseña?" que llame a
+    `POST /api/auth/password/forgot` con el `locale` actual; y una página nueva
+    `/[locale]/reset-password` que lea el token de `window.location.hash`, lo revise con
+    `/check` y mande la contraseña nueva a `/reset` (ver "Recuperar la contraseña" en la
+    sección 2). Traducir `RESET_TOKEN_INVALID` y `RESET_TOKEN_EXPIRED`.

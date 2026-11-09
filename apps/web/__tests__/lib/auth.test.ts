@@ -43,6 +43,7 @@ describe("staff session", () => {
     const token = await createStaffSession("staff-1");
     await expect(verifyStaffSession(token)).resolves.toEqual({
       staffId: "staff-1",
+      issuedAt: expect.any(Number),
     });
   });
 

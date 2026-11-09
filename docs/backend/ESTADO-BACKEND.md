@@ -25,7 +25,7 @@
   avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
   equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
   mentores y calificación, controles del educador (timer de actividad, carta de reto, alertas
-  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador, interruptores de emergencia y registro de actividad.
+  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador, interruptores de emergencia, registro de actividad y recuperar la contraseña del educador.
 - **Falta:** correr la prueba de carga contra el hosting real y lo que el equipo pida en QA.
 
 ---
@@ -46,6 +46,7 @@
 | #14 | `feature/announcements`      | `feature/load-test`          | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
 | #15 | `feature/emergency-switches` | `feature/announcements`      | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
 | #16 | `feature/activity-log`       | `feature/emergency-switches` | **Abierto**  | Registro de actividad para la investigación, con CSV (montado sobre #15)                          |
+| #17 | `feature/password-reset`     | `feature/activity-log`       | **Abierto**  | Recuperar la contraseña del educador por correo (montado sobre #16)                               |
 | #6  | `ui/theme-sandbox-test`      | `dev`                        | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`         | `qa`                         | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
@@ -58,7 +59,7 @@
   `docs/architecture/backend/` (contexto inicial).
 - **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
   real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13
-  (carga) → #14 (avisos generales) → #15 (interruptores) → #16 (registro de actividad).
+  (carga) → #14 (avisos generales) → #15 (interruptores) → #16 (registro de actividad) → #17 (recuperar contraseña).
   Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
@@ -79,18 +80,18 @@
 Un solo archivo: **`apps/web/.env`** (ignorado por git; la plantilla es `apps/web/.env.example`).
 `packages/db/prisma.config.ts` lo carga solo cuando existe.
 
-| Variable                               | Para qué                                 | Notas                                                                                      |
-| -------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`                         | La app (Prisma con `@prisma/adapter-pg`) | Pooler de transacción, puerto **6543**                                                     |
-| `DIRECT_URL`                           | Solo migraciones (CLI de Prisma)         | Pooler de sesión, puerto **5432** (las migraciones necesitan locks que el 6543 no soporta) |
-| `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                       |
-| `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local                                                           |
-| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                            |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre     |
-| `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                   |
-| `DATABASE_POOL_MAX`                    | Conexiones a la base por instancia       | Opcional (5). Vercel: 3-5. Una VM: 10-20                                                   |
-| `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal)                       |
-| `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                       |
+| Variable                               | Para qué                                 | Notas                                                                                                                        |
+| -------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                         | La app (Prisma con `@prisma/adapter-pg`) | Pooler de transacción, puerto **6543**                                                                                       |
+| `DIRECT_URL`                           | Solo migraciones (CLI de Prisma)         | Pooler de sesión, puerto **5432** (las migraciones necesitan locks que el 6543 no soporta)                                   |
+| `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                                                         |
+| `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local. **En producción, la URL real**: arma el enlace de recuperar contraseña                     |
+| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                                                              |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre                                       |
+| `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                                                     |
+| `DATABASE_POOL_MAX`                    | Conexiones a la base por instancia       | Opcional (5). Vercel: 3-5. Una VM: 10-20                                                                                     |
+| `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal). En producción, necesarias para recuperar la contraseña |
+| `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                                                         |
 
 - Eddy ya pasó su `.env` al equipo.
 - **Brandon:** en GitHub (secrets del CI) y en Vercel, los nombres tienen que ser **exactamente** los
@@ -145,6 +146,7 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 | `20261108230000_announcements`                     | Tabla `Announcement` (avisos generales del educador: `eventId`, `text`, `createdAt`) con RLS                                                              |
 | `20261108233000_emergency_switches`                | `Event`: interruptores de emergencia `chatEnabled`, `submissionsEnabled`, `joinsEnabled` (todos `true` por defecto)                                       |
 | `20261109000000_activity_log`                      | Enum `ActorType` y tabla `ActivityLog` (registro de actividad: actor, equipo, acción, detalle; sin llaves foráneas salvo el evento) con RLS               |
+| `20261109010000_password_reset`                    | `Staff.passwordChangedAt` (cierra las sesiones anteriores) y tabla `PasswordReset` (solo el hash del token, vence, un uso) con RLS                        |
 
 ### Reglas de la base
 
@@ -192,7 +194,9 @@ apps/web/src/
   lib/auth/account.ts           reglas de correo, nombre y contraseña
   lib/auth/rate-limit.ts        límite de intentos por IP (en memoria)
   lib/codes.ts                  códigos de 6 caracteres sin I/O/0/1 (eventos y equipos)
-  lib/email/send.ts             sendEmail() con Resend (todavía ningún flujo lo usa)
+  lib/auth/password-reset.ts    recuperar contraseña: token y su hash, vencimiento, enlace, sesiones anteriores al cambio
+  lib/email/send.ts             sendEmail() con Resend (lo usa recuperar contraseña)
+  lib/email/password-reset-email.ts  el correo de recuperar contraseña en los 4 idiomas
   lib/storage/submissions.ts    Storage por REST: bucket, URL de subida, lectura de bytes, URL de descarga, borrar
   lib/csv.ts                    CSV con BOM y celdas protegidas contra fórmulas
   lib/realtime/
@@ -249,6 +253,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Bloque      | Endpoint                                                                                       | Quién                |
 | ----------- | ---------------------------------------------------------------------------------------------- | -------------------- |
 | Educador    | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`                     | Público              |
+| Educador    | `POST /api/auth/password/forgot`, `.../check`, `.../reset` (recuperar la contraseña)           | Público              |
 | Educador    | `POST /api/events`, `GET /api/events`                                                          | Educador             |
 | Educador    | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                            | Educador             |
 | Educador    | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)                  | Educador             |
@@ -272,7 +277,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | —           | `GET /api/health`                                                                              | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **109 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **115 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -319,6 +324,7 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Interruptores                  | Por evento, los maneja su educador; leer y descargar siguen funcionando                      | `features/event/server/switches.ts`            |
 | Entradas cerradas              | Bloquea equipos e integrantes nuevos; recuperar sesión y entrar mentores, sí                 | `app/api/participants/route.ts`                |
 | Registro de actividad          | Toda acción que cambia algo; sin texto del chat ni respuestas; se escribe antes de responder | `features/activity/server/actions.ts`          |
+| Recuperar contraseña           | Enlace de 60 min, un uso, 3 por cuenta por hora; al cambiarla se cierran las demás sesiones  | `lib/auth/password-reset.ts`                   |
 | Registro: mensajes privados    | Guarda a quién se le escribió (no el texto) ❓                                               | `app/api/messages/route.ts`                    |
 
 ---
@@ -338,7 +344,8 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
       volver a desplegar (banderas en `Event`, revisadas por cada ruta).
    3. ~~**Registro de actividad para la investigación**~~ **hecho (#16):** quién hizo qué y
       cuándo, en `GET /api/events/:id/activity` y en CSV (`export?type=activity`).
-   4. **Recuperar la contraseña del educador por correo** (necesita el dominio verificado en Resend).
+   4. ~~**Recuperar la contraseña del educador por correo**~~ **hecho (#17).** Para que lleguen los
+      correos falta el dominio verificado en Resend y las variables en el hosting (ver abajo).
    5. **Dejar el proyecto listo para la VM de Azure** si el equipo elige ese plan: build
       `standalone`, `DATABASE_POOL_MAX=10-20`, pasos documentados.
 
@@ -360,7 +367,9 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
   Brandon (VM, HTTPS, reinicio automático, monitoreo) y bajar el límite de archivos (Free: 1 GB). Si
   se quisiera tiempo real ahí, el lugar es un proveedor `socketio` en `lib/realtime/server.ts` y
   `useRealtime.ts` (servidor propio de Next.js con socket.io en el mismo proceso, ~medio día).
-- Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera).
+- Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera). **Sin
+  él, recuperar la contraseña no manda correos** (responde bien, pero solo deja el error en los
+  logs).
 
 ### Para el resto del equipo
 
@@ -372,7 +381,9 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
   como educador y crear o unirse a un equipo (por ejemplo en `QATEST`).
 - **Brandon:** variables en GitHub y Vercel con los nombres de `.env.example`
   (`SUPABASE_SECRET_KEY` es indispensable para archivos y para mandar avisos;
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` para que el navegador escuche).
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` para que el navegador escuche). Para recuperar la
+  contraseña: `NEXT_PUBLIC_APP_URL` con la URL real, `RESEND_API_KEY` y `MAIL_FROM` en un dominio
+  verificado en Resend.
 - **Leo:** `apps/web/jest.config.mjs` transforma `jose` (paquete solo ESM); sin eso, cualquier
   prueba que importe la sesión falla.
 
@@ -396,14 +407,14 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ## 9. Cómo retomar (checklist)
 
-1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15 → #16,
-   el código y esta bitácora al día viven en la rama **`feature/activity-log`**, en la carpeta aparte
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15 → #16
+   → #17, el código y esta bitácora al día viven en la rama **`feature/password-reset`**, en la carpeta aparte
    **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
    carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
    una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
-2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14, #15 y #16?
+2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14, #15, #16 y #17?
    - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
-     `feature/activity-log` y abrir el PR con base `feature/activity-log`.
+     `feature/password-reset` y abrir el PR con base `feature/password-reset`.
    - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
    - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
