@@ -172,7 +172,7 @@ export function SubmissionModal({
                 <button
                   key={ty}
                   type="button"
-                  className="option-card"
+                  className="option-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-200 hover:border-white/20"
                   aria-pressed={selected}
                   onClick={() => {
                     setType(ty);
@@ -248,7 +248,7 @@ export function SubmissionModal({
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
             disabled={!canSubmit}
           >
             {submitting ? (

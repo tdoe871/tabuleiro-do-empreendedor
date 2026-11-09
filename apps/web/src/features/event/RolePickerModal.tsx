@@ -32,6 +32,7 @@ export function RolePickerModal({
             <button
               key={id}
               onClick={() => onSelect(id)}
+              className="transition-all duration-200 hover:-translate-y-0.5 backdrop-blur-2xl"
               style={{
                 display: "flex",
                 gap: 12,

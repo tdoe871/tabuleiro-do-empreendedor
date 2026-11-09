@@ -261,10 +261,10 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   }
 
   return (
-    <div id="tela-jogadores">
-      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
+    <div id="tela-jogadores" className="min-h-screen bg-[#08090D] text-white">
+      <div className="topbar bg-[#14161C]/80 backdrop-blur-2xl border-b border-white/10">
         <div className="tb-logo">
-          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+          <div className="tb-gem bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:shadow-glow-amber">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>
@@ -295,7 +295,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
       </div>
 
-      <div className="score-strip bg-white/[0.03] backdrop-blur-md border-b border-white/10">
+      <div className="score-strip bg-[#14161C]/80 backdrop-blur-2xl border-b border-white/10">
         <div>
           <div className="score-label">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
@@ -305,19 +305,14 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
         <div style={{ flex: 1 }} />
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost btn-sm bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-xl"
           onClick={() => setShowSubmission(true)}
         >
           {submission ? tSubmission("editar") : tSubmission("abrir")}
         </button>
         {allDone && (
           <button
-            className="btn btn-sm"
-            style={{
-              background: "rgba(255,215,0,.15)",
-              color: "var(--gold)",
-              border: "1px solid rgba(255,215,0,.35)",
-            }}
+            className="btn btn-sm bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] rounded-xl"
             onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
@@ -327,7 +322,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
       <div className="jog-layout">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+          <div className="cenario-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
             <div className="cen-icon">⌖</div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>
@@ -361,7 +356,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 return (
                   <div
                     key={name}
-                    className={`membro-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${i === 0 ? "ativo" : ""}`}
+                    className={`membro-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${i === 0 ? "ativo" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {i !== 0 && (
@@ -414,7 +409,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             </div>
           </div>
 
-          <div className="card card-pad bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/20">
+          <div className="card card-pad bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:border-white/20">
             <div className="comm-tabs">
               <div
                 className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
@@ -615,17 +610,17 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               return (
                 <div
                   key={id}
-                  className={`chave-card bg-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
+                  className={`chave-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
                   style={{
                     background: concluida
                       ? `var(${KEY_COLOR_VAR[id]}-bg)`
                       : ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                        : "rgba(255,255,255,.04)",
+                        : undefined,
                     borderColor:
                       concluida || ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bd)`
-                        : "rgba(255,255,255,.1)",
+                        : undefined,
                   }}
                 >
                   <div className="cc-head">
@@ -738,7 +733,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   </div>
                   {!concluida && !ativa && !bloqueadaPorProblema && (
                     <button
-                      className="btn btn-primary w100 btn-sm"
+                      className="btn btn-primary w100 btn-sm bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
                       style={{ marginTop: 8 }}
                       onClick={() => ativarChave(id)}
                     >
@@ -800,7 +795,10 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               >
                 {t("fase.cancelar")}
               </button>
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="submit"
+                className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+              >
                 {t("fase.concluir")}
               </button>
             </div>
@@ -824,7 +822,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               </div>
             )}
             <button
-              className="btn btn-primary"
+              className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
               style={{ width: "100%" }}
               onClick={() => setCongrats(null)}
             >

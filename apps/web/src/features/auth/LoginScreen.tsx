@@ -105,8 +105,8 @@ export function LoginScreen() {
 
   return (
     <>
-      <div id="tela-login">
-        <div className="login-hero bg-transparent">
+      <div id="tela-login" className="min-h-screen bg-[#08090D] text-white">
+        <div className="login-hero bg-[#08090D]/50 border-r border-white/10">
           <div className="glow-prob" />
           <div className="glow-parc" />
           <div className="glow-opor" />
@@ -115,7 +115,7 @@ export function LoginScreen() {
           </div>
           <div className="login-hero-content anim-in">
             <div className="logo-row">
-              <div className="logo-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+              <div className="logo-gem bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:shadow-glow-amber">
                 <GemLogo />
               </div>
               <div>
@@ -136,7 +136,7 @@ export function LoginScreen() {
                   return (
                     <div
                       key={id}
-                      className="badge backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime"
+                      className="badge backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime rounded-xl"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -155,22 +155,22 @@ export function LoginScreen() {
           <div className="hero-bar" />
         </div>
 
-        <div className="login-panel bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
-          <div className="login-tabs bg-white/5 backdrop-blur-md border border-white/10">
+        <div className="login-panel bg-[#14161C]/80 backdrop-blur-2xl border-l border-white/10">
+          <div className="login-tabs bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-1.5">
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
+              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
+              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
+              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
@@ -200,7 +200,10 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+              >
                 {t("form.enter")}
               </button>
             </form>
@@ -273,7 +276,10 @@ export function LoginScreen() {
                   />
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+              >
                 {t("form.criarConta")}
               </button>
             </form>
@@ -306,11 +312,14 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+              >
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
+                <div className="code-blk bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
                   <div className="code-gem">
                     <GemLogo size={20} />
                   </div>
