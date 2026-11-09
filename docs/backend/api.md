@@ -1,10 +1,12 @@
 # Contrato de la API — Tabuleiro do Empreendedor
 
-> **Estado: BORRADOR para revisar con JP (frontend).** Nada de esto está implementado todavía,
-> salvo `GET /api/health`. Lo marcado con ❓ es una decisión abierta; lo marcado con 🆕 es un
-> endpoint que el frontend todavía no llama. Si algo no te cuadra, coméntalo en el PR.
+> **Estado (9 nov): todo lo de este contrato está implementado y probado contra Supabase**, en los
+> PRs #7 y #11 a #17 (todavía sin merge a `dev`). Lo marcado con ❓ es una decisión abierta; lo
+> marcado con 🆕 es un endpoint que el frontend todavía no llama. La lista de cambios para el
+> frontend está en la [sección 8](#8-resumen-de-cambios-para-el-frontend). Si algo no te cuadra,
+> coméntalo en el PR.
 >
-> Responsable: Eddy (backend). Base: rama `dev` + PR #2 (esquema con 4 llaves × 3 fases).
+> Responsable: Eddy (backend). Estado general del proyecto: `docs/backend/ESTADO-BACKEND.md`.
 >
 > **Glosario.** El tablero tiene 4 **llaves** (etapas): Problema, Solución, Alianzas y
 > Oportunidades. Cada llave tiene 3 **fases** (preguntas que contesta el equipo). En el código y en
@@ -317,7 +319,7 @@ Ya implementado. Sin datos sensibles.
 
 ## 3. Endpoints nuevos para el jugador 🆕
 
-**Implementados** (salvo los de entregas). Defaults que se tomaron mientras no haya otra decisión;
+**Implementados.** Defaults que se tomaron mientras no haya otra decisión;
 cualquiera se puede cambiar después sin rehacer nada:
 
 - Cualquier miembro del equipo puede contestar fases; una fase concluida ya no se edita.
@@ -616,7 +618,7 @@ Botón iniciar / pausar / retomar, y "terminar sesión".
 ### `GET /api/events/:id/overview` — Staff
 
 Métricas, equipos y alertas para `EducadorPanel` y `SocializacaoPanel`, en una sola consulta
-agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `teams` llega vacío.
+agregada (sin N+1). **Implementado.**
 
 ```json
 {
@@ -639,8 +641,9 @@ agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `
 
 - `metrics.activeTeams`: equipos con al menos un integrante. `keysCompleted`: total de llaves
   concluidas sumando todos los equipos.
-- `submission` es `null` hasta que el equipo entrega. El archivo subido no viene aquí; su descarga
-  con URL firmada llega con el bloque de entregas.
+- `submission` es `null` hasta que el equipo entrega. Cada equipo trae también `files` (sus archivos,
+  con `downloadUrl`; el educador los puede descargar) y `evaluation` (`{ count, average }` de los
+  mentores).
 - `alerts`: alertas de mediación calculadas más las filas abiertas de `Alert` (ver "Alertas de
   mediación").
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador).
@@ -1065,14 +1068,20 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 
 ---
 
-## 7. Pendiente de decidir con el equipo (no está en este contrato)
+## 7. Pendiente de decidir con el equipo
+
+Cada punto tiene un default implementado; cambiarlo no obliga a rehacer nada.
 
 - **Chat:** ¿el educador (o un mentor) puede leer los mensajes del equipo, para moderar? Hoy no.
-- **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
-  tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
+- **Registro de actividad:** ¿se guarda a quién le escribe cada participante en privado? Hoy sí
+  (sin el texto).
 - **Mentores:** ¿la rúbrica de 5 criterios del 1 al 5 está bien? ¿Cada mentor califica a todos o a
   equipos asignados? (hoy: a todos).
-- **Registro del líder** (decisión 6.2.1).
+- **Registro del líder** (decisión 6.2.1): ¿el líder necesita cuenta con correo y contraseña? Hoy
+  entra con código y nickname, como todos.
+- **Modo personalizado y puntos:** ¿qué cambia además de guardar el escenario? ¿Cuántos puntos da
+  cada fase? (hoy 0).
+- **Mural:** ¿`proposta` es la descripción de la entrega o algo aparte?
 
 ---
 

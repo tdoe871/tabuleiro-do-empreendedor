@@ -2,7 +2,7 @@
 
 > Bitácora del backend y la base de datos (responsable: Eddy). Dice **qué está hecho, dónde está,
 > cómo se trabaja y qué sigue**, para que cualquiera (o Claude en una sesión nueva) retome sin
-> perder el hilo. Última actualización: **8 nov 2026 (noche)**.
+> perder el hilo. Última actualización: **9 nov 2026 (madrugada)**.
 >
 > Documentos relacionados:
 >
@@ -18,15 +18,22 @@
 ## 1. Resumen en 30 segundos
 
 - Plataforma del LATAM Social Business Hackathon (Monterrey, **12-13 nov 2026**, 24 h, ~300
-  participantes, ~60 equipos de 2 a 5). **Lunes 9: todo terminado.** Martes 10 y miércoles 11: QA.
+  participantes, ~60 equipos de 2 a 5). Plan: **lunes 9 todo terminado**, martes 10 y miércoles 11
+  QA, jueves 12 el evento.
 - Un solo deploy de Next.js 16 (API en route handlers) + Prisma 7 sobre Postgres de Supabase.
-- **Hechos y probados contra Supabase real:** base de datos, login del educador, sesiones del
-  educador (crear / listar / iniciar / pausar / terminar / resumen), equipos y jugadores, tablero con
-  avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
-  equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo),
-  mentores y calificación, controles del educador (timer de actividad, carta de reto, alertas
-  automáticas, exportar a CSV), prueba de carga local, avisos generales del educador, interruptores de emergencia, registro de actividad y recuperar la contraseña del educador.
-- **Falta:** correr la prueba de carga contra el hosting real y lo que el equipo pida en QA.
+- **El backend del alcance acordado está terminado y probado contra Supabase real:** cuentas del
+  educador (con recuperar contraseña), sesiones del evento, equipos y jugadores, tablero con avance
+  automático, entregas con links y archivos, chat del equipo, tiempo real, mentores y calificación,
+  controles del educador (timer, carta de reto, alertas, exportar), avisos generales, interruptores
+  de emergencia, registro de actividad y prueba de carga local (300 personas, 0 errores).
+- **Pero el proyecto todavía no está listo para el evento.** Lo que falta (detalle en la sección 8):
+  1. **Merge de los PRs del backend** (#7 → #11 → … → #17): ninguno está en `dev` todavía.
+  2. **Conectar el frontend** (JP): en `dev` solo están conectados login, sesiones del educador,
+     crear/unirse a equipo y guardar la entrega; falta el tablero, el chat, el tiempo real, los
+     archivos, los mentores y los controles nuevos.
+  3. **Hosting** (Brandon): elegir Vercel o Azure, desplegar y poner las variables.
+  4. **Antes del evento:** prueba de carga contra el hosting real, prueba en el wifi del lugar,
+     limpiar la base y auditoría de seguridad.
 
 ---
 
@@ -47,11 +54,13 @@
 | #15 | `feature/emergency-switches` | `feature/announcements`      | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
 | #16 | `feature/activity-log`       | `feature/emergency-switches` | **Abierto**  | Registro de actividad para la investigación, con CSV (montado sobre #15)                          |
 | #17 | `feature/password-reset`     | `feature/activity-log`       | **Abierto**  | Recuperar la contraseña del educador por correo (montado sobre #16)                               |
-| #6  | `ui/theme-sandbox-test`      | `dev`                        | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #6  | `ui/theme-sandbox-test`      | `dev`                        | Merged (JP)  | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`         | `qa`                         | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
-- **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
-  alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
+- **Ningún PR del backend desde el #7 está en `dev`.** El #7 trae jugadores, entregas, chat y tiempo
+  real; lo tiene que aprobar alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs
+  (ni Claude por él).** Al 8 nov no tenía conflictos con `dev`; el #6 de JP entró a `dev` después,
+  así que conviene revisarlo otra vez al hacer el merge.
 - Ramas locales de Eddy: `local/prueba` (= `feature/players` + `dev`, **solo para probar en local,
   no se sube**) y las ramas de bloque (en la carpeta aparte `../tabuleiro-chat`, un
   `git worktree`, con un enlace a `apps/web/.env`).
@@ -87,8 +96,8 @@ Un solo archivo: **`apps/web/.env`** (ignorado por git; la plantilla es `apps/we
 | `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                                                         |
 | `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local. **En producción, la URL real**: arma el enlace de recuperar contraseña                     |
 | `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                                                              |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre                                       |
-| `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                                                     |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | La recibe el navegador para escuchar el tiempo real. Antes se llamaba `..._ANON_KEY`; se unificó el nombre                   |
+| `SUPABASE_SECRET_KEY`                  | Storage y tiempo real desde el servidor  | **Solo servidor**, se salta RLS. Necesaria para archivos y para mandar avisos en vivo                                        |
 | `DATABASE_POOL_MAX`                    | Conexiones a la base por instancia       | Opcional (5). Vercel: 3-5. Una VM: 10-20                                                                                     |
 | `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal). En producción, necesarias para recuperar la contraseña |
 | `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                                                         |
@@ -166,17 +175,22 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
   5. **Si la migración borra algo** (columnas, tablas), Claude no puede aplicarla: la corre Eddy con
      `! source ~/.nvm/nvm.sh && nvm use 22 && pnpm --filter @tdoe/db exec prisma migrate deploy`.
 
-### Datos actuales
+### Datos actuales (revisado el 9 nov)
 
-- Solo el seed: Staff `seed@tabuleiro.local` (**no puede iniciar sesión**: su hash es `"!"`) y el
-  evento **`QATEST`** con sus 12 fases. **Hay que quitarlos antes del 12 de noviembre.**
-- Todas las pruebas en vivo crean sus propios datos y los borran al terminar.
+- 13 migraciones aplicadas; la base está al día con la rama `feature/password-reset`.
+- 3 eventos: el seed **`QATEST`** (Staff `seed@tabuleiro.local`, que **no puede iniciar sesión**: su
+  hash es `"!"`) y dos de prueba del equipo, `WDAFL7` ("Prueba Proyecto") y `FVR7SM` ("Prueba
+  Hackaton"). 3 cuentas de educador y 5 equipos en total. **Hay que quitar todo esto antes del 12 de
+  noviembre.**
+- Registro de actividad y enlaces de recuperar contraseña: vacíos.
+- Todas las pruebas en vivo de Claude crean sus propios datos (cuentas `@tabuleiro.test`) y los
+  borran al terminar, con un script de Prisma (no con SQL).
 
 ### Storage
 
 - Bucket **`submissions`**: privado, límite de 20 MB y solo tipos permitidos (PDF, Word, PowerPoint,
   imágenes). Lo crea el código la primera vez que se usa (`ensureBucket` en
-  `apps/web/src/lib/storage/submissions.ts`). Hoy está vacío.
+  `apps/web/src/lib/storage/submissions.ts`). Hoy está vacío (0 archivos).
 
 ---
 
@@ -185,10 +199,11 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 ```
 apps/web/src/
   app/api/...                   route handlers (uno por endpoint, ver sección 6)
-  proxy.ts                      protege /[locale]/mestre/* (educador) y /[locale]/jogador/* (jugador)
+  proxy.ts                      protege /[locale]/mestre/* (educador), /[locale]/jogador/* (jugador) y /[locale]/mentor/*
   lib/api/errors.ts             apiError(code), ApiFailure (para abortar transacciones), readJsonObject
-  lib/auth/session.ts           JWT con jose: sesión de educador (tdoe_staff, 12 h) y de jugador (tdoe_player, 36 h)
-  lib/auth/staff.ts             getStaffFromRequest / getStaffFromToken (revisa que la cuenta exista)
+  lib/auth/session.ts           JWT con jose: sesión de educador (tdoe_staff, 12 h), jugador (tdoe_player, 36 h) y mentor (tdoe_mentor, 36 h)
+  lib/auth/staff.ts             getStaffFromRequest / getStaffFromToken (la cuenta existe y la sesión es posterior al último cambio de contraseña)
+  lib/auth/mentor.ts            getMentorFromRequest, setMentorSessionCookie
   lib/auth/player.ts            getPlayerFromRequest (participante + equipo + evento), setPlayerSessionCookie
   lib/auth/password.ts          hash de contraseñas con scrypt de Node (igual que Maestro-virtual)
   lib/auth/account.ts           reglas de correo, nombre y contraseña
@@ -303,10 +318,9 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 | Editar una fase concluida      | No se puede                                                                                  | `features/event/server/board.ts`               |
 | Puntos por fase                | 0                                                                                            | `POINTS_PER_PHASE` en `board.ts`               |
 | Rol del juego de rol           | Se puede repetir en el equipo                                                                | `app/api/participants/me/rpg-role/route.ts`    |
-| Carta de reto                  | `cartaAtiva` siempre `null`                                                                  | `board.ts`                                     |
 | Duración del evento            | 24 h, timer global                                                                           | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
 | Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra                          | `features/submission/server/rules.ts`          |
-| Registro de educadores         | Abierto a cualquiera                                                                         | `app/api/auth/register/route.ts`               |
+| Registro de educadores         | Abierto a cualquiera (revisar en la auditoría)                                               | `app/api/auth/register/route.ts`               |
 | Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino                          | `features/communication/server/rules.ts`       |
 | Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                                  | `app/api/messages/route.ts`                    |
 | Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona                       | `rules.ts` y `route.ts` del chat               |
@@ -329,79 +343,135 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ---
 
-## 8. Qué sigue
+## 8. Dónde estamos y qué falta (9 nov)
 
-### Siguientes bloques (avanzar con defaults, sin bloquearse)
+### 8.1 Estado por parte
 
-1. **Correr la prueba de carga contra el hosting real** (Vercel o la VM de Azure) en cuanto exista:
-   `pnpm load-test --base https://<url> --duration 300`. Ver "Prueba de carga" abajo.
-2. **Limpieza antes del evento:** quitar el seed (`QATEST`) y los eventos de prueba del equipo
-   (hoy: `Prueba Hackaton` / `FVR7SM` y `Prueba Proyecto` / `WDAFL7`).
-3. **Siguientes tareas de backend propuestas (8 nov), en este orden:**
-   1. ~~**Avisos generales**~~ **hecho (#14):** el educador manda un mensaje a todo el evento;
-      jugadores y mentores lo ven, aviso de tiempo real `announcements`.
-   2. ~~**Interruptores de emergencia**~~ **hecho (#15):** apagar chat, entregas o entradas sin
-      volver a desplegar (banderas en `Event`, revisadas por cada ruta).
-   3. ~~**Registro de actividad para la investigación**~~ **hecho (#16):** quién hizo qué y
-      cuándo, en `GET /api/events/:id/activity` y en CSV (`export?type=activity`).
-   4. ~~**Recuperar la contraseña del educador por correo**~~ **hecho (#17).** Para que lleguen los
-      correos falta el dominio verificado en Resend y las variables en el hosting (ver abajo).
-   5. **Dejar el proyecto listo para la VM de Azure** si el equipo elige ese plan: build
-      `standalone`, `DATABASE_POOL_MAX=10-20`, pasos documentados.
+| Parte                      | Estado                                                                   | Quién        |
+| -------------------------- | ------------------------------------------------------------------------ | ------------ |
+| Backend (alcance acordado) | **Hecho y probado** contra Supabase, en PRs abiertos                     | Eddy         |
+| Base de datos              | **Al día** (13 migraciones aplicadas)                                    | Eddy         |
+| Merge del backend a `dev`  | **Pendiente**: #7 → #11 → #12 → #13 → #14 → #15 → #16 → #17              | El equipo    |
+| Frontend conectado         | **Parcial** (ver 8.3)                                                    | JP           |
+| Hosting                    | **Sin decidir ni desplegar**                                             | Brandon / PM |
+| Correos (recuperar clave)  | Código listo; **falta dominio verificado en Resend** y variables         | Brandon      |
+| Prueba de carga real       | Script listo; **falta correrlo contra el hosting**                       | Eddy         |
+| Limpieza de la base        | **Pendiente** (seed y eventos de prueba)                                 | Eddy         |
+| Auditoría de seguridad     | **Pendiente** (al final, con la lista de 8.6)                            | Eddy         |
+| Pruebas (QA)               | Leo tiene pruebas iniciales en `qa` (#5); el QA del 10-11 necesita `dev` | Leo          |
 
-### Decisiones abiertas (ver ❓ en `api.md`)
+### 8.2 Lo más urgente: el merge
+
+Mientras los PRs no entren a `dev`, JP no puede conectar sus pantallas contra el código real y el QA
+del martes no tiene qué probar. Orden: **#7 primero** (los demás se van pasando solos a la base
+correcta). Lo revisa y hace merge alguien del equipo, no Eddy.
+
+### 8.3 Frontend (JP)
+
+En `dev` (#6) ya llaman a la API: login y registro, crear y listar sesiones, iniciar / pausar /
+terminar, el resumen del educador, crear equipo, unirse a equipo y guardar la entrega
+(`PUT /api/submissions`).
+
+Falta (los números son los puntos de la sección 8 de `api.md`):
+
+- `PlayerBoard` completo desde `GET /api/board` y concluir fases (4, 5).
+- Archivos de la entrega en 3 pasos (9).
+- Chat con `POST/GET /api/messages` (10) y tiempo real con `useRealtime` (11).
+- Panel del educador: timer, carta de reto, alertas y exportar (12).
+- Pantalla del mentor (`/[locale]/mentor`) y código de mentores (sección 4 de `api.md`).
+- Avisos generales (13), interruptores de emergencia (14), registro de actividad (15, opcional) y
+  recuperar contraseña (16).
+- Traducir los códigos de error (7) y mandar al login con `401` (8).
+- Revisar los puntos 1-3 (código del evento, `joinCode`, nickname en el link de invitación).
+
+### 8.4 Hosting (Brandon y el PM)
+
+- **Decidir:** Vercel Pro + Supabase Pro (recomendado, ≈45 USD al mes más 10-30 USD de consumo el
+  día del evento; revisar el tope de gasto de Supabase y poner alerta en Vercel) o el **plan B** en
+  una VM de Azure for Students (`next start`, Supabase Free, `REALTIME_PROVIDER=none`). Con
+  Hobby/Free de Vercel **no alcanza** (1 M de llamadas al mes; 200 conexiones de tiempo real).
+- **Variables** (nombres exactos de `.env.example`): `DATABASE_URL`, `AUTH_SECRET`,
+  `NEXT_PUBLIC_APP_URL` (la URL real), `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`; `DATABASE_POOL_MAX` (3-5 en Vercel,
+  10-20 en una VM); `RESEND_API_KEY` y `MAIL_FROM` para los correos. Hoy GitHub (CI) solo tiene
+  `AUTH_SECRET`.
+- **Dominio para los correos:** Resend solo manda a cualquiera desde un dominio verificado. Sin él,
+  recuperar la contraseña responde bien pero no manda nada.
+- **Si eligen Azure,** a Eddy le toca: build `standalone`, `DATABASE_POOL_MAX=10-20` y los pasos
+  escritos (VM, HTTPS, reinicio automático). Medio día de Brandon para montarla.
+
+### 8.5 Pendiente del backend (Eddy)
+
+1. **Preparar la VM de Azure**, solo si se elige ese plan.
+2. **Correr `pnpm load-test --base https://<url> --duration 300`** contra el hosting real en cuanto
+   exista (ver sección 10).
+3. **Limpiar la base antes del 12:** `QATEST` y `seed@tabuleiro.local`, `WDAFL7`, `FVR7SM` y sus
+   equipos. Con un script de Prisma, después del QA.
+4. **Auditoría de seguridad** (8.6).
+5. Lo que salga del QA y de las decisiones abiertas (8.7).
+
+### 8.6 Para la auditoría de seguridad
+
+Pendientes conocidos (Claude lleva la lista completa en su memoria):
+
+- Cambiar la contraseña de la base (se vio en una sesión el 4 nov) y revisar que el `.env`
+  compartido con el equipo no termine en ningún lado público.
+- Registro de educadores abierto a cualquiera (¿lista de correos permitidos?).
+- Aviso del advisor de Supabase sobre `public.rls_auto_enable()`.
+- Límites de intentos en memoria (por instancia; débiles en Vercel).
+- Archivos validados solo por sus primeros bytes (sin antivirus; `.docx`/`.pptx` = cualquier ZIP).
+- Recuperar la sesión del jugador con código del equipo + nickname (cualquiera con el código).
+- Tiempo real por canales públicos de Supabase (nombres firmados y avisos sin datos).
+- Chat sin moderación; avisos generales con texto libre (el frontend los muestra como texto plano).
+- Interruptores solo por evento (no hay administrador de la plataforma).
+- Registro de actividad: guarda nicknames y a quién se escribe en privado; consentimiento y
+  anonimizar antes de compartir el CSV fuera de los organizadores.
+- Recuperar contraseña: no hay "cerrar sesión en todos lados" ni cambiar la contraseña con sesión.
+
+### 8.7 Decisiones abiertas (hay defaults; alguien debería confirmarlas)
 
 - ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
 - ¿El registro de actividad debe guardar a quién le escribe cada participante en privado? (hoy sí,
   sin el texto).
-- ¿El educador puede leer el chat de los equipos (moderación)? ¿La rúbrica de mentores (5 criterios
-  del 1 al 5, a todos los equipos) está bien?
-- ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
-- Presupuesto de hosting. **Recomendación:** Vercel Pro + Supabase Pro antes del martes 10 (≈45 USD
-  al mes más quizá 10-30 USD de consumo el día del evento). Revisar el tope de gasto de Supabase
-  (activado por defecto en Pro) y poner alerta de gasto en Vercel. Con Hobby/Free **no alcanza**
-  (1 M de llamadas al mes en Vercel; 200 conexiones de tiempo real en Supabase).
-- **Plan B sin dinero:** la app en una máquina virtual (crédito de Azure for Students) con
-  `next start`, la base y Storage en Supabase Free y `REALTIME_PROVIDER=none` (solo refresco; en un
-  servidor propio no se paga por llamada). El código no depende de Vercel. Faltaría: medio día de
-  Brandon (VM, HTTPS, reinicio automático, monitoreo) y bajar el límite de archivos (Free: 1 GB). Si
-  se quisiera tiempo real ahí, el lugar es un proveedor `socketio` en `lib/realtime/server.ts` y
-  `useRealtime.ts` (servidor propio de Next.js con socket.io en el mismo proceso, ~medio día).
-- Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera). **Sin
-  él, recuperar la contraseña no manda correos** (responde bien, pero solo deja el error en los
-  logs).
+- ¿El educador puede leer el chat de los equipos (moderación)? (hoy no).
+- ¿La rúbrica de mentores está bien? (5 criterios del 1 al 5, cada mentor califica a todos).
+- ¿Qué cambia en el modo "personalizado" además del texto del escenario? ¿Cómo se dan los puntos?
+  (hoy 0 por fase).
+- ¿El campo `proposta` del mural es la descripción de la entrega o algo aparte?
+- Hosting y dominio para los correos (8.4).
+
+### 8.8 Antes del evento (checklist)
+
+- [ ] Merge de #7 → #17 a `dev` y QA del 10-11 sobre `dev`.
+- [ ] Frontend conectado (8.3).
+- [ ] Hosting desplegado con todas las variables (8.4).
+- [ ] `pnpm load-test --base <url>` contra el hosting real.
+- [ ] **Probar desde el wifi del lugar** (5 min): subir un PDF en la entrega y ver que el chat llegue
+      en vivo. La red de la escuela bloquea la base (puertos 5432/6543), pero eso no afecta a la app
+      hospedada: el navegador solo habla con la app por HTTPS. Lo único que el navegador hace directo
+      con `*.supabase.co` (también HTTPS 443) es **subir archivos** (fallaría si bloquean ese
+      dominio) y **escuchar avisos en vivo** (si falla, la pantalla refresca sola cada 5 s).
+- [ ] Probar recuperar contraseña con el dominio real de Resend.
+- [ ] Limpiar la base (8.5).
+- [ ] Auditoría de seguridad (8.6).
+
+### Historial de bloques de backend propuestos el 8 nov
+
+1. ~~Avisos generales~~ **hecho (#14).**
+2. ~~Interruptores de emergencia~~ **hecho (#15).**
+3. ~~Registro de actividad para la investigación~~ **hecho (#16).**
+4. ~~Recuperar la contraseña del educador por correo~~ **hecho (#17).**
+5. Preparar la VM de Azure: **solo si se elige ese plan** (8.4).
 
 ### Para el resto del equipo
 
-- **JP:** conectar pantallas según la sección 8 de `api.md` (crear evento con el código del backend,
-  crear/unirse a equipo, campo de nickname en el link de invitación, tablero desde `GET /api/board`,
-  estado `bloqueada` y quitar el botón de activar llave, modal de entrega en 3 pasos, traducir
-  códigos de error, mandar al login con `401`), conectar el chat y usar `useRealtime` (puntos 10 y
-  11 de esa sección). Para ver los paneles en local hay que registrarse
-  como educador y crear o unirse a un equipo (por ejemplo en `QATEST`).
-- **Brandon:** variables en GitHub y Vercel con los nombres de `.env.example`
-  (`SUPABASE_SECRET_KEY` es indispensable para archivos y para mandar avisos;
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` para que el navegador escuche). Para recuperar la
-  contraseña: `NEXT_PUBLIC_APP_URL` con la URL real, `RESEND_API_KEY` y `MAIL_FROM` en un dominio
-  verificado en Resend.
+- **JP:** sección 8.3. Para ver los paneles en local hay que registrarse como educador y crear o
+  unirse a un equipo (por ejemplo en `QATEST`). `api.md` es el contrato; la sección 8 de `api.md`
+  es la lista de cambios para el frontend.
+- **Brandon:** sección 8.4.
 - **Leo:** `apps/web/jest.config.mjs` transforma `jose` (paquete solo ESM); sin eso, cualquier
-  prueba que importe la sesión falla.
-
-### Antes del evento
-
-- **Probar desde el wifi del lugar del evento** (5 min): subir un PDF en la entrega y ver que el chat
-  llegue en vivo. La red de la escuela bloquea la base (puertos 5432/6543), pero eso no afecta a la
-  app hospedada: el navegador solo habla con la app por HTTPS. Lo único que el navegador hace directo
-  con `*.supabase.co` (también por HTTPS 443) es **subir archivos** (fallaría si bloquean ese dominio)
-  y **escuchar avisos en vivo** (si falla, la pantalla refresca sola cada 5 s).
-- Correr `pnpm load-test --base <url>` contra el hosting real.
-- Auditoría completa de seguridad (pedida por Eddy para el final). La lista de pendientes la lleva
-  Claude en su memoria; incluye: cambiar la contraseña de la base, `.env` compartido completo,
-  registro abierto de educadores, aviso del advisor sobre `rls_auto_enable()`, límite de intentos
-  en memoria, archivos validados solo por sus primeros bytes, recuperar sesión con el código del
-  equipo.
-- Quitar el seed (`QATEST` y `seed@tabuleiro.local`).
-- Pruebas de carga.
+  prueba que importe la sesión falla. Hay 115 pruebas unitarias del backend en
+  `apps/web/__tests__/`; las tablas de pruebas en vivo están en la descripción de cada PR.
 
 ---
 
@@ -419,7 +489,9 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
    - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
 4. `pnpm --filter @tdoe/db exec prisma migrate status`: debe decir "Database schema is up to date".
-5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento ("Qué sigue").
+5. Leer la sección 8 de este documento ("Dónde estamos y qué falta") y `docs/backend/api.md`
+   (contrato). Para saber qué conectó JP: buscar llamadas a `/api/` en `apps/web/src` de `dev`
+   (fuera de `app/api` y de `*/server/*`) y comparar con la sección 8.3.
 6. Antes de cada PR: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, prueba en vivo contra
    Supabase (y borrar los datos de prueba) y actualizar `api.md` y este documento.
 
