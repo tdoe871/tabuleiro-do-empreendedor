@@ -1,112 +1,121 @@
-# Extracción y Arquitectura del Tema Dark Glass (Figma → Tailwind)
+# Extracción y Arquitectura de Temas (Figma → `window.antigravityTheme` & Tailwind)
 
-Documentación técnica sobre el proceso de extracción, traducción y homologación del sistema de diseño desde **Figma** hacia el monorepo de **Tabuleiro do Empreendedor**, aplicando el paradigma **Dark Glassmorphism Futurista**.
-
----
-
-## 1. Contexto y Origen del Diseño
-
-A partir del prototipo interactivo en Figma (`node-id=2004-8927`), se realizó un análisis estructural de componentes, jerarquía de pantallas y patrones de experiencia de usuario (UX) para eventos de emprendimiento y hackathons en tiempo real.
-
-En lugar de copiar valores CSS estáticos de Figma, se adoptó una metodología de **Reskin Estructural**:
-
-1. **Extracción Anatómica:** Se conservó la disposición del layout de Figma (barra lateral con equipo, cabecera de saludo con timer/XP y la cuadrícula de 4 cuadrantes).
-2. **Aplicación del Sistema de Tokens:** Se sustituyeron los estilos crudos por el lenguaje de diseño propio del proyecto (**Dark Glassmorphism** con acentos neón y elevaciones con `backdrop-blur`).
-3. **Desacoplamiento Funcional:** Se preservó al 100% la lógica de React (estados, temporizadores, canales de comunicación en tiempo real y llamadas a API).
+Documentación técnica sobre el proceso de extracción, traducción y homologación del sistema de diseño desde **Figma** hacia el monorepo de **Tabuleiro do Empreendedor**, incluyendo el contrato global de tematización dinámica `window.antigravityTheme` y la dirección visual **Modern Interactive Turquoise (`v2`)**.
 
 ---
 
-## 2. Tokens de Diseño Extraídos
+## 1. Contrato Global `window.antigravityTheme`
 
-### 2.1 Superficies y Efecto Glass (Vidrio Esmerilado)
+En [`AntigravityThemeBridge.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/components/providers/AntigravityThemeBridge.tsx), la aplicación expone un puente global en `window.antigravityTheme` que permite inspeccionar, inyectar y restablecer tokens visuales en tiempo de ejecución sin mutar nodos del DOM ni la lógica de negocio de React:
 
-El sistema sustituye las superficies planas opacas (`bg-gray-800` / `#1c1e26`) por capas traslúcidas que dejan filtrar la luz ambiental de fondo:
+- **`window.antigravityTheme.schema.tokens`**: Lista oficial de los 31 tokens soportados por el contrato.
+- **`window.antigravityTheme.getTheme()`**: Devuelve el mapa actual de tokens activos.
+- **`window.antigravityTheme.applyTheme(tokens)`**: Valida las claves contra `schema.tokens`, ignora claves no registradas y sincroniza las variables CSS (`--ag-*` y variables base `--bg`, `--bg2`, `--card`, `--t1`, `--border`, `--prob`, `--sol`, `--parc`, `--opor`, `--gold`).
+- **`window.antigravityTheme.resetTheme()`**: Restaura el diseño original oscuro (`ORIGINAL_DARK_THEME`).
+- **Evento de ciclo de vida**: Emite `antigravity:theme-ready` al inicializarse y `antigravity:theme-changed` tras cada actualización.
 
-| Propiedad               | Valor Tailwind / CSS          | Propósito                                          |
-| :---------------------- | :---------------------------- | :------------------------------------------------- |
-| **Canvas Principal**    | `bg-[#08090D]`                | Fondo oscuro absoluto para contraste con neón      |
-| **Superficie Glass**    | `bg-[#14161C]/80`             | Contenedores principales, tarjetas y sidebars      |
-| **Desenfoque de Fondo** | `backdrop-blur-2xl`           | Efecto vidrio esmerilado de alta dispersión        |
-| **Borde Perimetral**    | `border border-white/10`      | Definición de límites y reflejo de luz             |
-| **Radio de Borde**      | `rounded-2xl` / `rounded-3xl` | Esquinas redondeadas modernas para cards y modales |
+---
 
-### 2.2 Cuadrantes Temáticos ("As 4 Chaves do Tabuleiro")
+## 2. Dirección Visual: Modern & Interactive Turquoise (`TURQUOISE_MODERN_THEME`)
 
-El diseño de Figma organiza la progresión del hackathon en 4 grandes pilares. Cada uno recibió un token de color neón con resplandor (_glow shadow_) en estados activos y hover:
+### 2.1 Superficies, Texto y Bordes (Glassmorphism Turquesa)
 
+| Token (`schema.tokens`)   | Valor                      | Variable CSS                     | Propósito                                                      |
+| :------------------------ | :------------------------- | :------------------------------- | :------------------------------------------------------------- |
+| `colorBackground`         | `#04151f`                  | `--ag-color-background` / `--bg` | Fondo abisal turquesa nocturno con halos radiales interactivos |
+| `colorSidebar`            | `rgba(6, 26, 38, 0.90)`    | `--ag-color-sidebar` / `--bg2`   | Barras laterales, cabeceras y modales con cristal esmerilado   |
+| `colorSurface`            | `rgba(10, 38, 54, 0.78)`   | `--ag-color-surface` / `--card`  | Tarjetas principales translúcidas (`backdrop-blur-2xl`)        |
+| `colorSurfaceSolid`       | `#0c2d40`                  | `--ag-color-surface-solid`       | Superficies secundarias y contenedores sólidos                 |
+| `colorSurfaceInteractive` | `#113c54`                  | `--ag-color-surface-interactive` | Pasos en progreso y elementos interactivos                     |
+| `colorSurfaceHover`       | `rgba(0, 245, 212, 0.12)`  | `--ag-color-surface-hover`       | Resplandor turquesa reactivo en hover                          |
+| `colorSurfaceSelected`    | `rgba(0, 245, 212, 0.18)`  | `--ag-color-surface-selected`    | Pestañas activas y pasos seleccionados                         |
+| `colorSurfaceFeatured`    | `rgba(14, 48, 66, 0.88)`   | `--ag-color-surface-featured`    | Bloques destacados (equipo, temporizador)                      |
+| `colorText`               | `#ecfeff`                  | `--ag-color-text` / `--t1`       | Texto principal blanco-hielo turquesa de máximo contraste      |
+| `colorTextMuted`          | `#88d4e3`                  | `--ag-color-text-muted` / `--t3` | Subtítulos, metadatos y etiquetas secundarias en aqua suave    |
+| `colorBorder`             | `rgba(45, 212, 191, 0.24)` | `--ag-color-border` / `--border` | Bordes luminosos de cristal turquesa                           |
+
+### 2.2 Acentos Semánticos, Las 4 Chaves y Avatares
+
+| Token (`schema.tokens`) | Valor     | Equivalencia en Dominio                                     |
+| :---------------------- | :-------- | :---------------------------------------------------------- |
+| `colorAccent`           | `#00f5d4` | Turquesa Eléctrico — Botones primarios y **Solução**        |
+| `colorOnAccent`         | `#031924` | Texto teal oscuro sobre botones turquesa de alto contraste  |
+| `colorSuccess`          | `#2dd4bf` | Turquesa Esmeralda — Estados completados y **Problema**     |
+| `colorInfo`             | `#00bbf9` | Cyan Laguna — Estados informativos y **Oportunidades**      |
+| `colorSecondary`        | `#38bdf8` | Aqua Celeste — **Alianças / Parcerias**                     |
+| `colorWarning`          | `#fbbf24` | Ámbar Dorado — Advertencias, temporizador y gemas           |
+| `colorDisabled`         | `#476c7e` | Elementos bloqueados o deshabilitados                       |
+| `colorAvatarStrategist` | `#00f5d4` | Rol RPG Estratega / Líder Comunitario (`lider_comunitario`) |
+| `colorAvatarResearcher` | `#00bbf9` | Rol RPG Investigador (`pesquisador`)                        |
+| `colorAvatarBuilder`    | `#2dd4bf` | Rol RPG Constructor (`jovem_empreendedor`)                  |
+| `colorAvatarConnector`  | `#38bdf8` | Rol RPG Conector (`agente_saude`)                           |
+| `radiusControl`         | `12px`    | Botones, inputs y selectores                                |
+| `radiusCard`            | `20px`    | Tarjetas de llaves, métricas y modales                      |
+| `radiusPill`            | `999px`   | Badges, etiquetas de fase y barras de progreso              |
+
+---
+
+## 3. Script de Inyección Directa (`applyReskin`)
+
+```javascript
+const applyReskin = () => {
+  const bridge = window.antigravityTheme;
+
+  if (!bridge) {
+    window.addEventListener("antigravity:theme-ready", applyReskin, {
+      once: true,
+    });
+    return;
+  }
+
+  bridge.applyTheme({
+    colorBackground: "#04151f",
+    colorSidebar: "rgba(6, 26, 38, 0.90)",
+    colorSurface: "rgba(10, 38, 54, 0.78)",
+    colorSurfaceSolid: "#0c2d40",
+    colorSurfaceInteractive: "#113c54",
+    colorSurfaceHover: "rgba(0, 245, 212, 0.12)",
+    colorSurfaceSelected: "rgba(0, 245, 212, 0.18)",
+    colorSurfaceFeatured: "rgba(14, 48, 66, 0.88)",
+
+    colorText: "#ecfeff",
+    colorTextMuted: "#88d4e3",
+    colorBorder: "rgba(45, 212, 191, 0.24)",
+
+    colorAccent: "#00f5d4",
+    colorOnAccent: "#031924",
+    colorSuccess: "#2dd4bf",
+    colorInfo: "#00bbf9",
+    colorSecondary: "#38bdf8",
+    colorWarning: "#fbbf24",
+    colorDisabled: "#476c7e",
+
+    colorGradientStart: "rgba(4, 38, 54, 0.95)",
+    colorGradientMiddle: "rgba(6, 28, 40, 0.94)",
+    colorGradientEnd: "rgba(4, 21, 31, 1)",
+    colorFocusRing: "rgba(0, 245, 212, 0.32)",
+    colorSelectionGlow: "rgba(0, 245, 212, 0.28)",
+    colorShadow: "rgba(2, 12, 18, 0.65)",
+
+    colorAvatarStrategist: "#00f5d4",
+    colorAvatarResearcher: "#00bbf9",
+    colorAvatarBuilder: "#2dd4bf",
+    colorAvatarConnector: "#38bdf8",
+
+    radiusControl: "12px",
+    radiusCard: "20px",
+    radiusPill: "999px",
+  });
+};
+
+applyReskin();
 ```
-┌─────────────────────────────────┬─────────────────────────────────┐
-│          1. PROBLEMA            │           2. SOLUÇÃO            │
-│       Ámbar (#F9CA4A)           │         Lima (#B7FF5A)          │
-│   hover:shadow-glow-amber       │     hover:shadow-glow-lime      │
-├─────────────────────────────────┼─────────────────────────────────┤
-│          3. ALIANÇAS            │        4. OPORTUNIDADES         │
-│        Morado (#9B8CFF)         │         Cyan (#50DDFF)          │
-│   hover:shadow-glow-purple      │     hover:shadow-glow-cyan      │
-└─────────────────────────────────┴─────────────────────────────────┘
-```
-
-- **Problema (Fase 01 • Explorar):** `#F9CA4A` (`border-[#F9CA4A]/30`, `bg-[#F9CA4A]/10`)
-- **Solução (Fase 02 • Construir):** `#B7FF5A` (`border-[#B7FF5A]/30`, `bg-[#B7FF5A]/10`)
-- **Alianças / Parcerias (Fase 03 • Conectar):** `#9B8CFF` (`border-[#9B8CFF]/30`, `bg-[#9B8CFF]/10`)
-- **Oportunidades (Fase 04 • Escalar):** `#50DDFF` (`border-[#50DDFF]/30`, `bg-[#50DDFF]/10`)
-
-### 2.3 Botones y Estados de Acción
-
-- **Acción Positiva / Iniciar / Avanzar:**
-  ```css
-  bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)]
-  ```
-- **Acción Crítica / Detener / Pausar:**
-  ```css
-  bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] font-bold shadow-[0_0_15px_-5px_rgba(239,68,68,0.2)]
-  ```
 
 ---
 
-## 3. Mapeo de Pantallas y Componentes
+## 4. Pantallas Homologadas
 
-La homologación visual se implementó de forma consistente en las tres rutas clave de la aplicación:
-
-### 3.1 Portal de Acceso y Bienvenida (`/es`)
-
-- **Archivo:** `apps/web/src/features/auth/LoginScreen.tsx`
-- **Implementación:**
-  - Fondo `min-h-screen bg-[#08090D] text-white`.
-  - Panel dividido: Héroe con estrellas de agua y selector de pestañas (`login-tabs`) dentro de cápsula `bg-[#14161C]/80 backdrop-blur-2xl`.
-  - Botones de envío (_Entrar_, _Criar conta_, _Entrar no jogo_) migrados al gradiente neón.
-  - Acordeones de conceptos (`HeroConceitos.tsx`) estilizados con bordes translúcidos y microinteracciones de elevación.
-
-### 3.2 Cuartel de Control del Educador (`/es/mestre/dashboard`)
-
-- **Archivo:** `apps/web/src/features/event/EducadorPanel.tsx`
-- **Implementación:**
-  - Barra superior (_topbar_) y barra lateral de sesiones en Dark Glass.
-  - Tarjetas métricas (Equipos activos, participantes, código de acceso) con bordes iluminados por llave.
-  - Matriz de equipos en tiempo real (`eq-card`) con microindicadores de progreso por colores.
-  - Botones de inicio y detención del temporizador de sesión integrados con las variantes neón y roja traslúcida.
-
-### 3.3 Tablero Interactivo del Participante (`/es/jogador/dashboard`)
-
-- **Archivo:** `apps/web/src/features/event/PlayerBoard.tsx`
-- **Implementación:**
-  - Franja superior de puntaje y XP del equipo con badges de gema dorada (`#F0BC40`).
-  - Tarjetas de los 4 Pilares con estados dinámicos (Bloqueada, En progreso con borde neón, Concluida con check verde).
-  - Panel de chat colaborativo ("Balões") y susurros privados integrados en contenedores Dark Glass.
-  - Modales hijos estandarizados ([`Modal.tsx`](file:///apps/web/src/components/ui/Modal.tsx), [`SubmissionModal.tsx`](file:///apps/web/src/features/event/SubmissionModal.tsx), [`RolePickerModal.tsx`](file:///apps/web/src/features/event/RolePickerModal.tsx)).
-
----
-
-## 4. Guía para Extender Nuevos Diseños
-
-Cuando se importen nuevos wireframes o frames de Figma a este proyecto, seguir estas reglas:
-
-1. **Jerarquía de Fondos:** Nunca usar fondos blancos ni grises opacos `#1F2937`. Usar siempre `--bg: #08090D` para lienzos y `rgba(20, 22, 28, 0.82)` para tarjetas.
-2. **Iconografía (Lucide React):** Para enlaces a repositorios de código, usar el icono **`GitBranch`** en lugar de `Github`, ya que `lucide-react` no incluye marcas comerciales en su export raíz.
-3. **Contraste de Tipografía:**
-   - Títulos, números y contadores: `text-white font-extrabold font-[family-name:var(--font-manrope)]`.
-   - Textos secundarios o labels: `text-white/60` o `text-white/40`.
-4. **Verificación de Tipos:** Ejecutar siempre tras un reskin:
-   ```bash
-   pnpm --filter web typecheck
-   ```
+1. **Sandbox de Diseño (`/es/sandbox-neon`)**: [`page.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/app/%5Blocale%5D/sandbox-neon/page.tsx)
+2. **Portal de Acceso (`/es`)**: [`LoginScreen.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/auth/LoginScreen.tsx) y [`HeroConceitos.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/auth/HeroConceitos.tsx)
+3. **Panel del Educador (`/es/mestre/dashboard`)**: [`EducadorPanel.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/event/EducadorPanel.tsx)
+4. **Tablero del Jugador (`/es/jogador/dashboard`)**: [`PlayerBoard.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/event/PlayerBoard.tsx), [`SubmissionModal.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/event/SubmissionModal.tsx) y [`RolePickerModal.tsx`](file:///c:/Users/tproh/OneDrive/Documentos/My%20GitHub%20Projects/tabuleiro-do-empreendedor/apps/web/src/features/event/RolePickerModal.tsx)

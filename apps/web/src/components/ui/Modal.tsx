@@ -29,7 +29,7 @@ export function Modal({
       <div
         role="dialog"
         aria-modal="true"
-        className="modal bg-[#14161C]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)]"
+        className="modal bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] shadow-[0_24px_60px_-12px_rgba(2,12,18,0.75)]"
         style={{ maxWidth }}
       >
         {children}

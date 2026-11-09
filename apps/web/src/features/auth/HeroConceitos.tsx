@@ -21,7 +21,7 @@ export function HeroConceitos() {
           fontWeight: 700,
           letterSpacing: ".08em",
           textTransform: "uppercase",
-          color: "rgba(255,255,255,.25)",
+          color: "var(--t3)",
           marginBottom: 4,
         }}
       >
@@ -34,7 +34,7 @@ export function HeroConceitos() {
         return (
           <div
             key={id}
-            className={`hc-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime ${open ? "open" : ""}`}
+            className={`hc-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(0,245,212,0.25)] ${open ? "open" : ""}`}
             style={{
               background: `var(${KEY_COLOR_VAR[id]}-bg)`,
               borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,

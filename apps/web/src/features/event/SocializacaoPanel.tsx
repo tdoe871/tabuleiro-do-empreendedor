@@ -19,11 +19,11 @@ interface SimTeam {
 }
 
 const AVATAR_GRADIENTS = [
-  "linear-gradient(135deg,#1A9055,#0F5E38)",
-  "linear-gradient(135deg,#1A4E9E,#0F3370)",
-  "linear-gradient(135deg,#6A28A0,#441870)",
-  "linear-gradient(135deg,#E8A830,#C4891A)",
-  "linear-gradient(135deg,#0A8C7A,#065C50)",
+  "linear-gradient(135deg,#00F5D4,#00A896)",
+  "linear-gradient(135deg,#00BBF9,#0284C7)",
+  "linear-gradient(135deg,#2DD4BF,#0D9488)",
+  "linear-gradient(135deg,#38BDF8,#0369A1)",
+  "linear-gradient(135deg,#FBBF24,#D97706)",
 ];
 
 function buildSimTeams(count: number): SimTeam[] {
@@ -70,8 +70,11 @@ export function SocializacaoPanel({
   );
 
   return (
-    <div id="tela-socializacao">
-      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
+    <div
+      id="tela-socializacao"
+      className="min-h-screen bg-[var(--ag-color-background,#04151f)] text-[var(--ag-color-text,#ecfeff)]"
+    >
+      <div className="topbar bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-b border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
         <div className="tb-logo">
           <span style={{ fontSize: 16, fontWeight: 800 }}>{t("titulo")}</span>
         </div>
@@ -102,7 +105,7 @@ export function SocializacaoPanel({
         </div>
 
         <div className="soc-summary">
-          <div className="sum-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime">
+          <div className="sum-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#2DD4BF]/50 hover:shadow-[0_12px_32px_-8px_rgba(45,212,191,0.28)]">
             <div className="sum-icon" style={{ background: "var(--prob-bg)" }}>
               👥
             </div>
@@ -113,7 +116,7 @@ export function SocializacaoPanel({
               <div className="sum-lbl">{t("resumo.equipes")}</div>
             </div>
           </div>
-          <div className="sum-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+          <div className="sum-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]">
             <div className="sum-icon" style={{ background: "var(--sol-bg)" }}>
               ✓
             </div>
@@ -124,7 +127,7 @@ export function SocializacaoPanel({
               <div className="sum-lbl">{t("resumo.chavesConcluidas")}</div>
             </div>
           </div>
-          <div className="sum-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-purple/40 hover:shadow-glow-purple">
+          <div className="sum-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]/50 hover:shadow-[0_12px_32px_-8px_rgba(56,189,248,0.28)]">
             <div className="sum-icon" style={{ background: "var(--parc-bg)" }}>
               📋
             </div>
@@ -138,7 +141,7 @@ export function SocializacaoPanel({
               <div className="sum-lbl">{t("resumo.contexto")}</div>
             </div>
           </div>
-          <div className="sum-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-amber/40 hover:shadow-glow-amber">
+          <div className="sum-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#FBBF24]/50 hover:shadow-[0_12px_32px_-8px_rgba(251,191,36,0.28)]">
             <div className="sum-icon" style={{ background: "var(--gold-bg)" }}>
               ★
             </div>
@@ -159,7 +162,7 @@ export function SocializacaoPanel({
             const probStatus = team.chaves.problema;
             return (
               <div
-                className="pitch-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-neon-purple/40 hover:shadow-glow-purple"
+                className="pitch-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_14px_34px_-8px_rgba(0,245,212,0.3)]"
                 key={team.nome}
               >
                 <div className="pitch-card-top">

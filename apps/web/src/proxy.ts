@@ -2,8 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
-import { STAFF_SESSION_COOKIE } from "@/lib/auth/session";
-import { getStaffFromToken } from "@/lib/auth/staff";
+import { STAFF_SESSION_COOKIE, verifyStaffSession } from "@/lib/auth/session";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -33,10 +32,10 @@ export default async function proxy(request: NextRequest) {
   const staffMatch = decodePathname(request.nextUrl.pathname).match(STAFF_PATH);
 
   if (staffMatch) {
-    const staff = await getStaffFromToken(
+    const session = await verifyStaffSession(
       request.cookies.get(STAFF_SESSION_COOKIE)?.value,
     );
-    if (!staff) {
+    if (!session) {
       // The login screen is the locale's home page.
       const locale = loginLocale(staffMatch[1] ?? "");
       const loginUrl = new URL(`/${locale}`, request.url);

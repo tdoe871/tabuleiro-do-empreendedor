@@ -13,10 +13,15 @@ export async function getStaffFromToken(
   const session = await verifyStaffSession(token);
   if (!session) return null;
 
-  return prisma.staff.findUnique({
-    where: { id: session.staffId },
-    select: { id: true, name: true, email: true },
-  });
+  try {
+    return await prisma.staff.findUnique({
+      where: { id: session.staffId },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (error) {
+    console.error("Failed to query staff from token:", error);
+    return null;
+  }
 }
 
 // For route handlers: the staff behind the request's session cookie, or null.

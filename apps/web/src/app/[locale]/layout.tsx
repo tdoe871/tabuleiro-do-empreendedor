@@ -3,6 +3,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { AntigravityThemeBridge } from "@/components/providers/AntigravityThemeBridge";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -23,6 +24,7 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider>
+          <AntigravityThemeBridge />
           <ToastProvider>{children}</ToastProvider>
         </NextIntlClientProvider>
       </body>

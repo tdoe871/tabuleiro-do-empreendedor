@@ -10,10 +10,10 @@ export const RPG_ROLE_IDS = [
 export type RpgRoleId = (typeof RPG_ROLE_IDS)[number];
 
 export const RPG_ROLE_COLOR: Record<RpgRoleId, string> = {
-  agente_saude: "#22C97A",
-  lider_comunitario: "#0FD4B0",
-  jovem_empreendedor: "#2E80F0",
-  pesquisador: "#A040E0",
+  agente_saude: "#38bdf8",
+  lider_comunitario: "#00f5d4",
+  jovem_empreendedor: "#2dd4bf",
+  pesquisador: "#00bbf9",
 };
 
 export const RPG_ROLE_ICON: Record<RpgRoleId, string> = {

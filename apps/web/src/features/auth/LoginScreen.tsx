@@ -52,18 +52,27 @@ export function LoginScreen() {
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
-    const res = await postJson("/api/auth/login", {
-      email: loginEmail,
-      senha: loginSenha,
-    });
-    if (res.ok) {
-      router.push("/mestre/dashboard");
-      return;
+    try {
+      const res = await postJson("/api/auth/login", {
+        email: loginEmail,
+        senha: loginSenha,
+      });
+      if (res.ok) {
+        router.push("/mestre/dashboard");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      console.error("Login error response:", res.status, body);
+      toast(
+        "err",
+        authErrorMessage(body?.error, t("toasts.invalidCredentials")),
+      );
+    } catch (err) {
+      console.error("Login unexpected error:", err);
+      toast("err", tCommon("errors.INTERNAL_ERROR"));
     }
-    const body = (await res.json().catch(() => null)) as {
-      error?: string;
-    } | null;
-    toast("err", authErrorMessage(body?.error, t("toasts.invalidCredentials")));
   }
 
   async function handleCadastro(e: FormEvent) {
@@ -72,20 +81,26 @@ export function LoginScreen() {
       toast("err", t("toasts.passwordMismatch"));
       return;
     }
-    const res = await postJson("/api/auth/register", {
-      nome: cadNome,
-      sobrenome: cadSobrenome,
-      email: cadEmail,
-      senha: cadSenha,
-    });
-    if (res.ok) {
-      router.push("/mestre/dashboard");
-      return;
+    try {
+      const res = await postJson("/api/auth/register", {
+        nome: cadNome,
+        sobrenome: cadSobrenome,
+        email: cadEmail,
+        senha: cadSenha,
+      });
+      if (res.ok) {
+        router.push("/mestre/dashboard");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      console.error("Register error response:", res.status, body);
+      toast("err", authErrorMessage(body?.error, t("toasts.registerError")));
+    } catch (err) {
+      console.error("Register unexpected error:", err);
+      toast("err", tCommon("errors.INTERNAL_ERROR"));
     }
-    const body = (await res.json().catch(() => null)) as {
-      error?: string;
-    } | null;
-    toast("err", authErrorMessage(body?.error, t("toasts.registerError")));
   }
 
   function handleCodigo(e: FormEvent) {
@@ -105,8 +120,11 @@ export function LoginScreen() {
 
   return (
     <>
-      <div id="tela-login" className="min-h-screen bg-[#08090D] text-white">
-        <div className="login-hero bg-[#08090D]/50 border-r border-white/10">
+      <div
+        id="tela-login"
+        className="min-h-screen bg-[var(--ag-color-background,#04151f)] text-[var(--ag-color-text,#ecfeff)]"
+      >
+        <div className="login-hero bg-[var(--ag-color-background,#04151f)] border-r border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
           <div className="glow-prob" />
           <div className="glow-parc" />
           <div className="glow-opor" />
@@ -115,7 +133,7 @@ export function LoginScreen() {
           </div>
           <div className="login-hero-content anim-in">
             <div className="logo-row">
-              <div className="logo-gem bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:shadow-glow-amber">
+              <div className="logo-gem bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:scale-105 hover:border-[#00F5D4]/60 shadow-[0_0_24px_-4px_rgba(0,245,212,0.3)]">
                 <GemLogo />
               </div>
               <div>
@@ -136,7 +154,7 @@ export function LoginScreen() {
                   return (
                     <div
                       key={id}
-                      className="badge backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime rounded-xl"
+                      className="badge transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_18px_-3px_rgba(0,245,212,0.35)] rounded-[999px] cursor-default"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -155,22 +173,22 @@ export function LoginScreen() {
           <div className="hero-bar" />
         </div>
 
-        <div className="login-panel bg-[#14161C]/80 backdrop-blur-2xl border-l border-white/10">
-          <div className="login-tabs bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-1.5">
+        <div className="login-panel bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-l border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
+          <div className="login-tabs bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px] p-1.5">
             <div
-              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
+              className={`login-tab rounded-[10px] transition-all duration-200 hover:text-[var(--ag-color-text,#ecfeff)] ${tab === "login" ? "on" : ""}`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
+              className={`login-tab rounded-[10px] transition-all duration-200 hover:text-[var(--ag-color-text,#ecfeff)] ${tab === "cadastro" ? "on" : ""}`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab rounded-xl transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
+              className={`login-tab rounded-[10px] transition-all duration-200 hover:text-[var(--ag-color-text,#ecfeff)] ${tab === "codigo" ? "on" : ""}`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
@@ -202,7 +220,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_32px_0px_rgba(0,245,212,0.75)] hover:scale-[1.01] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
               >
                 {t("form.enter")}
               </button>
@@ -278,7 +296,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_32px_0px_rgba(0,245,212,0.75)] hover:scale-[1.01] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
               >
                 {t("form.criarConta")}
               </button>
@@ -314,12 +332,12 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+                className="btn btn-primary w100 bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_32px_0px_rgba(0,245,212,0.75)] hover:scale-[1.01] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
               >
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
+                <div className="code-blk bg-[var(--ag-color-surface-featured,rgba(14,48,66,0.88))] backdrop-blur-xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00F5D4]/50">
                   <div className="code-gem">
                     <GemLogo size={20} />
                   </div>

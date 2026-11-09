@@ -10,7 +10,6 @@ import {
   Crown,
   Sparkles,
   Flame,
-  Bell,
   CheckCircle2,
   Lock,
   ArrowRight,
@@ -20,11 +19,8 @@ import {
   FileText,
   Compass,
   Trophy,
-  Users,
   LayoutDashboard,
   MessageSquare,
-  ShieldAlert,
-  ChevronRight,
   X,
 } from "lucide-react";
 
@@ -64,11 +60,11 @@ const CHAVES_DATA: ChaveCardData[] = [
     description:
       "Identifique problemas reais, entreviste usuários e formule uma tese de valor clara e validada.",
     progress: 100,
-    color: "#F9CA4A",
-    accentHex: "text-[#F9CA4A]",
-    borderHover: "hover:border-[#F9CA4A]/70",
-    shadowGlow: "hover:shadow-[0_0_35px_-5px_rgba(249,202,74,0.30)]",
-    badgeBg: "bg-[#F9CA4A]/10 text-[#F9CA4A] border-[#F9CA4A]/30",
+    color: "#2DD4BF",
+    accentHex: "text-[#2DD4BF]",
+    borderHover: "hover:border-[#2DD4BF]/80",
+    shadowGlow: "hover:shadow-[0_16px_42px_-8px_rgba(45,212,191,0.38)]",
+    badgeBg: "bg-[#2DD4BF]/15 text-[#2DD4BF] border-[#2DD4BF]/40",
     icon: Search,
     steps: [
       {
@@ -102,11 +98,11 @@ const CHAVES_DATA: ChaveCardData[] = [
     description:
       "Construa o protótipo da solução, estabeleça o core loop e valide usabilidade com feedback real.",
     progress: 68,
-    color: "#B7FF5A",
-    accentHex: "text-[#B7FF5A]",
-    borderHover: "hover:border-[#B7FF5A]/70",
-    shadowGlow: "hover:shadow-[0_0_35px_-5px_rgba(183,255,90,0.32)]",
-    badgeBg: "bg-[#B7FF5A]/10 text-[#B7FF5A] border-[#B7FF5A]/30",
+    color: "#00F5D4",
+    accentHex: "text-[#00F5D4]",
+    borderHover: "hover:border-[#00F5D4]/80",
+    shadowGlow: "hover:shadow-[0_16px_42px_-8px_rgba(0,245,212,0.42)]",
+    badgeBg: "bg-[#00F5D4]/15 text-[#00F5D4] border-[#00F5D4]/40",
     icon: Lightbulb,
     steps: [
       {
@@ -140,11 +136,11 @@ const CHAVES_DATA: ChaveCardData[] = [
     description:
       "Conecte mentores, estabeleça parceiros de distribuição e distribua papéis estratégicos.",
     progress: 25,
-    color: "#9B8CFF",
-    accentHex: "text-[#9B8CFF]",
-    borderHover: "hover:border-[#9B8CFF]/70",
-    shadowGlow: "hover:shadow-[0_0_35px_-5px_rgba(155,140,255,0.32)]",
-    badgeBg: "bg-[#9B8CFF]/10 text-[#9B8CFF] border-[#9B8CFF]/30",
+    color: "#38BDF8",
+    accentHex: "text-[#38BDF8]",
+    borderHover: "hover:border-[#38BDF8]/80",
+    shadowGlow: "hover:shadow-[0_16px_42px_-8px_rgba(56,189,248,0.38)]",
+    badgeBg: "bg-[#38BDF8]/15 text-[#38BDF8] border-[#38BDF8]/40",
     icon: Handshake,
     steps: [
       {
@@ -178,11 +174,11 @@ const CHAVES_DATA: ChaveCardData[] = [
     description:
       "Projete monetização sustentável, viabilidade de escala e prepare a apresentação definitiva.",
     progress: 0,
-    color: "#50DDFF",
-    accentHex: "text-[#50DDFF]",
-    borderHover: "hover:border-[#50DDFF]/70",
-    shadowGlow: "hover:shadow-[0_0_35px_-5px_rgba(80,221,255,0.30)]",
-    badgeBg: "bg-[#50DDFF]/10 text-[#50DDFF] border-[#50DDFF]/30",
+    color: "#00BBF9",
+    accentHex: "text-[#00BBF9]",
+    borderHover: "hover:border-[#00BBF9]/80",
+    shadowGlow: "hover:shadow-[0_16px_42px_-8px_rgba(0,187,249,0.38)]",
+    badgeBg: "bg-[#00BBF9]/15 text-[#00BBF9] border-[#00BBF9]/40",
     icon: Rocket,
     steps: [
       {
@@ -210,6 +206,29 @@ const CHAVES_DATA: ChaveCardData[] = [
   },
 ];
 
+const TEAM_ROLES = [
+  {
+    name: "Strategist",
+    icon: "🧭",
+    colorVar: "var(--ag-color-avatar-strategist, #00f5d4)",
+  },
+  {
+    name: "Researcher",
+    icon: "🔬",
+    colorVar: "var(--ag-color-avatar-researcher, #00bbf9)",
+  },
+  {
+    name: "Builder",
+    icon: "🛠️",
+    colorVar: "var(--ag-color-avatar-builder, #2dd4bf)",
+  },
+  {
+    name: "Connector",
+    icon: "🤝",
+    colorVar: "var(--ag-color-avatar-connector, #38bdf8)",
+  },
+];
+
 export default function PlayerBoard() {
   const [activeTab, setActiveTab] = useState<
     "tabuleiro" | "jornada" | "ranking" | "chat"
@@ -227,27 +246,58 @@ export default function PlayerBoard() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#08090D] text-white font-sans antialiased selection:bg-[#B7FF5A] selection:text-black">
-      {/* GLOWS AMBIENTALES DE FONDO */}
-      <div className="fixed top-[-100px] left-[-80px] w-[500px] h-[500px] bg-[#F9CA4A]/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-[-100px] right-[-100px] w-[600px] h-[600px] bg-[#9B8CFF]/10 rounded-full blur-[160px] pointer-events-none" />
-      <div className="fixed top-1/2 left-1/3 w-[450px] h-[450px] bg-[#B7FF5A]/05 rounded-full blur-[180px] pointer-events-none" />
+    <div
+      className="flex min-h-screen font-sans antialiased selection:bg-[#00F5D4] selection:text-[#031924]"
+      style={{
+        backgroundColor: "var(--ag-color-background, #04151f)",
+        color: "var(--ag-color-text, #ecfeff)",
+      }}
+    >
+      {/* GLOWS AMBIENTALES TURQUESA INTERACTIVOS */}
+      <div className="fixed top-[-120px] left-[-80px] w-[520px] h-[520px] bg-[#00F5D4]/15 rounded-full blur-[150px] pointer-events-none" />
+      <div className="fixed bottom-[-120px] right-[-100px] w-[580px] h-[580px] bg-[#00BBF9]/15 rounded-full blur-[160px] pointer-events-none" />
+      <div className="fixed top-1/3 left-1/3 w-[440px] h-[440px] bg-[#2DD4BF]/10 rounded-full blur-[180px] pointer-events-none" />
 
       {/* ─────────────────────────────────────────────────────────────
           1. BARRA LATERAL (SIDEBAR)
       ────────────────────────────────────────────────────────────── */}
-      <aside className="w-64 border-r border-white/10 bg-[#0D0E14]/80 backdrop-blur-2xl flex flex-col justify-between shrink-0 z-20">
+      <aside
+        className="w-64 border-r backdrop-blur-2xl flex flex-col justify-between shrink-0 z-20"
+        style={{
+          backgroundColor: "var(--ag-color-sidebar, rgba(6, 26, 38, 0.90))",
+          borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+        }}
+      >
         <div>
           {/* Logo Brand */}
-          <div className="p-6 border-b border-white/10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F0BC40]/15 border border-[#F0BC40]/40 flex items-center justify-center shadow-[0_0_20px_-3px_rgba(240,188,64,0.4)]">
-              <Sparkles className="w-5 h-5 text-[#F0BC40]" />
+          <div
+            className="p-6 border-b flex items-center gap-3"
+            style={{
+              borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+            }}
+          >
+            <div
+              className="w-10 h-10 flex items-center justify-center border shadow-[0_0_24px_-4px_rgba(0,245,212,0.45)] transition-transform duration-300 hover:scale-105"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor: "rgba(0, 245, 212, 0.14)",
+                borderColor: "rgba(0, 245, 212, 0.45)",
+                color: "var(--ag-color-accent, #00f5d4)",
+              }}
+            >
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <span className="block text-xs font-extrabold tracking-widest text-[#F0BC40] uppercase">
+              <span
+                className="block text-xs font-extrabold tracking-widest uppercase"
+                style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+              >
                 Tabuleiro
               </span>
-              <span className="block text-sm font-bold tracking-tight text-white/90">
+              <span
+                className="block text-sm font-bold tracking-tight"
+                style={{ color: "var(--ag-color-text, #ecfeff)" }}
+              >
                 DO EMPREENDEDOR
               </span>
             </div>
@@ -257,103 +307,226 @@ export default function PlayerBoard() {
           <nav className="p-4 space-y-1.5">
             <button
               onClick={() => setActiveTab("tabuleiro")}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "tabuleiro"
-                  ? "bg-white/10 text-white shadow-inner border border-white/10"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+              className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-semibold transition-all duration-200 border hover:translate-x-1 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  activeTab === "tabuleiro"
+                    ? "var(--ag-color-surface-selected, rgba(0, 245, 212, 0.18))"
+                    : "transparent",
+                borderColor:
+                  activeTab === "tabuleiro"
+                    ? "rgba(0, 245, 212, 0.45)"
+                    : "transparent",
+                color:
+                  activeTab === "tabuleiro"
+                    ? "var(--ag-color-text, #ecfeff)"
+                    : "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <div className="flex items-center gap-3">
                 <LayoutDashboard
-                  className={`w-4 h-4 ${activeTab === "tabuleiro" ? "text-[#B7FF5A]" : ""}`}
+                  className="w-4 h-4"
+                  style={{
+                    color:
+                      activeTab === "tabuleiro"
+                        ? "var(--ag-color-accent, #00f5d4)"
+                        : undefined,
+                  }}
                 />
                 <span>Meu Tabuleiro</span>
               </div>
               {activeTab === "tabuleiro" && (
-                <div className="w-1.5 h-1.5 rounded-full bg-[#B7FF5A]" />
+                <div
+                  className="w-2 h-2 rounded-full shadow-[0_0_10px_#00F5D4]"
+                  style={{
+                    backgroundColor: "var(--ag-color-accent, #00f5d4)",
+                  }}
+                />
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("jornada")}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "jornada"
-                  ? "bg-white/10 text-white shadow-inner border border-white/10"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+              className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-semibold transition-all duration-200 border hover:translate-x-1 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  activeTab === "jornada"
+                    ? "var(--ag-color-surface-selected, rgba(0, 245, 212, 0.18))"
+                    : "transparent",
+                borderColor:
+                  activeTab === "jornada"
+                    ? "rgba(0, 245, 212, 0.45)"
+                    : "transparent",
+                color:
+                  activeTab === "jornada"
+                    ? "var(--ag-color-text, #ecfeff)"
+                    : "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <div className="flex items-center gap-3">
                 <Compass className="w-4 h-4" />
                 <span>Jornada & Fases</span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/80">
+              <span
+                className="text-[10px] font-bold px-2 py-0.5"
+                style={{
+                  borderRadius: "var(--ag-radius-pill, 999px)",
+                  backgroundColor: "rgba(0, 245, 212, 0.15)",
+                  color: "var(--ag-color-accent, #00f5d4)",
+                }}
+              >
                 12
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab("ranking")}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "ranking"
-                  ? "bg-white/10 text-white shadow-inner border border-white/10"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+              className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-semibold transition-all duration-200 border hover:translate-x-1 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  activeTab === "ranking"
+                    ? "var(--ag-color-surface-selected, rgba(0, 245, 212, 0.18))"
+                    : "transparent",
+                borderColor:
+                  activeTab === "ranking"
+                    ? "rgba(0, 245, 212, 0.45)"
+                    : "transparent",
+                color:
+                  activeTab === "ranking"
+                    ? "var(--ag-color-text, #ecfeff)"
+                    : "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <div className="flex items-center gap-3">
-                <Trophy className="w-4 h-4 text-[#F9CA4A]" />
+                <Trophy
+                  className="w-4 h-4"
+                  style={{ color: "var(--ag-color-warning, #fbbf24)" }}
+                />
                 <span>Ranking Geral</span>
               </div>
-              <span className="text-xs font-bold text-[#F9CA4A]">#3</span>
+              <span
+                className="text-xs font-bold"
+                style={{ color: "var(--ag-color-warning, #fbbf24)" }}
+              >
+                #3
+              </span>
             </button>
 
             <button
               onClick={() => setActiveTab("chat")}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "chat"
-                  ? "bg-white/10 text-white shadow-inner border border-white/10"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+              className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-semibold transition-all duration-200 border hover:translate-x-1 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  activeTab === "chat"
+                    ? "var(--ag-color-surface-selected, rgba(0, 245, 212, 0.18))"
+                    : "transparent",
+                borderColor:
+                  activeTab === "chat"
+                    ? "rgba(0, 245, 212, 0.45)"
+                    : "transparent",
+                color:
+                  activeTab === "chat"
+                    ? "var(--ag-color-text, #ecfeff)"
+                    : "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <div className="flex items-center gap-3">
                 <MessageSquare className="w-4 h-4" />
                 <span>Canal do Time</span>
               </div>
-              <span className="w-2 h-2 rounded-full bg-[#50DDFF]" />
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: "var(--ag-color-accent, #00f5d4)" }}
+              />
             </button>
           </nav>
         </div>
 
         {/* Tarjeta inferior del Equipo */}
-        <div className="p-4 m-3 rounded-2xl bg-[#14161C]/90 border border-white/10 backdrop-blur-md">
+        <div
+          className="p-4 m-3 border backdrop-blur-xl transition-all duration-300 hover:border-[#00F5D4]/50"
+          style={{
+            borderRadius: "var(--ag-radius-card, 20px)",
+            backgroundColor:
+              "var(--ag-color-surface-featured, rgba(14, 48, 66, 0.88))",
+            borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+          }}
+        >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold tracking-wider uppercase text-white/40">
+            <span
+              className="text-[10px] font-bold tracking-wider uppercase"
+              style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+            >
               Sua Equipe
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#B7FF5A]/20 text-[#B7FF5A] border border-[#B7FF5A]/30">
+            <span
+              className="text-[10px] font-bold px-2.5 py-0.5 border"
+              style={{
+                borderRadius: "var(--ag-radius-pill, 999px)",
+                backgroundColor: "rgba(0, 245, 212, 0.16)",
+                color: "var(--ag-color-accent, #00f5d4)",
+                borderColor: "rgba(0, 245, 212, 0.4)",
+              }}
+            >
               Líder
             </span>
           </div>
 
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1A9055] to-[#0FD4B0] flex items-center justify-center font-bold text-base shadow-md">
+            <div
+              className="w-10 h-10 flex items-center justify-center font-extrabold text-base shadow-[0_0_18px_rgba(0,245,212,0.35)]"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                background:
+                  "linear-gradient(135deg, var(--ag-color-accent, #00f5d4), var(--ag-color-info, #00bbf9))",
+                color: "var(--ag-color-on-accent, #031924)",
+              }}
+            >
               TR
             </div>
             <div>
-              <h4 className="text-sm font-bold leading-tight">Team Raiz</h4>
-              <p className="text-[11px] text-white/50">4 Empreendedores</p>
+              <h4
+                className="text-sm font-bold leading-tight"
+                style={{ color: "var(--ag-color-text, #ecfeff)" }}
+              >
+                Team Raiz
+              </h4>
+              <p
+                className="text-[11px]"
+                style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+              >
+                4 Empreendedores
+              </p>
             </div>
           </div>
 
-          {/* Micro Stack de Roles */}
-          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-white/05 text-[10px] text-white/70">
-            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
-              <span>🩺</span>
-              <span className="truncate">Saúde</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
-              <span>🚀</span>
-              <span className="truncate">Inovação</span>
-            </div>
+          {/* Micro Stack de Roles con Avatares Turquesa */}
+          <div
+            className="grid grid-cols-2 gap-1.5 pt-2 border-t text-[10px]"
+            style={{
+              borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+            }}
+          >
+            {TEAM_ROLES.map((r) => (
+              <div
+                key={r.name}
+                className="flex items-center gap-1.5 px-2 py-1 font-semibold transition-transform hover:scale-105"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor: "var(--ag-color-surface-solid, #0c2d40)",
+                  color: r.colorVar,
+                  border:
+                    "1px solid var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                }}
+              >
+                <span>{r.icon}</span>
+                <span className="truncate">{r.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </aside>
@@ -361,17 +534,29 @@ export default function PlayerBoard() {
       {/* ─────────────────────────────────────────────────────────────
           2. ÁREA PRINCIPAL + HEADER
       ────────────────────────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto z-10">
         {/* HEADER SUPERIOR */}
-        <header className="h-24 px-8 border-b border-white/10 bg-[#08090D]/80 backdrop-blur-xl flex items-center justify-between sticky top-0 z-10">
+        <header
+          className="h-24 px-8 border-b backdrop-blur-2xl flex items-center justify-between sticky top-0 z-10"
+          style={{
+            backgroundColor: "var(--ag-color-sidebar, rgba(6, 26, 38, 0.88))",
+            borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+          }}
+        >
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white">
+              <h1
+                className="text-2xl font-extrabold tracking-tight"
+                style={{ color: "var(--ag-color-text, #ecfeff)" }}
+              >
                 Good morning, Team Raiz
               </h1>
-              <span className="inline-block animate-pulse text-lg">🌱</span>
+              <span className="inline-block animate-pulse text-lg">🌊</span>
             </div>
-            <p className="text-xs text-white/50 mt-0.5">
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+            >
               Temporada 02 • Hackathon de Empreendedorismo de Impacto
             </p>
           </div>
@@ -379,26 +564,60 @@ export default function PlayerBoard() {
           {/* Badges de Estado y Acciones Rápidas */}
           <div className="flex items-center gap-4">
             {/* Timer Global */}
-            <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[#14161C]/90 border border-white/10 shadow-sm">
-              <Clock className="w-4 h-4 text-[#F9CA4A] animate-spin-slow" />
+            <div
+              className="flex items-center gap-2.5 px-4 py-2 border backdrop-blur-xl transition-transform hover:-translate-y-0.5"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  "var(--ag-color-surface-featured, rgba(14, 48, 66, 0.88))",
+                borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+              }}
+            >
+              <Clock
+                className="w-4 h-4"
+                style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+              />
               <div>
-                <span className="block text-[9px] font-bold text-white/40 uppercase tracking-wider">
+                <span
+                  className="block text-[9px] font-bold uppercase tracking-wider"
+                  style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                >
                   Tempo Restante
                 </span>
-                <span className="block text-sm font-mono font-bold text-white">
+                <span
+                  className="block text-sm font-mono font-bold"
+                  style={{ color: "var(--ag-color-text, #ecfeff)" }}
+                >
                   03:42:18
                 </span>
               </div>
             </div>
 
             {/* XP & Nivel */}
-            <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[#14161C]/90 border border-white/10 shadow-sm">
-              <Crown className="w-4 h-4 text-[#B7FF5A]" />
+            <div
+              className="flex items-center gap-2.5 px-4 py-2 border backdrop-blur-xl transition-transform hover:-translate-y-0.5"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                backgroundColor:
+                  "var(--ag-color-surface-featured, rgba(14, 48, 66, 0.88))",
+                borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+              }}
+            >
+              <Crown
+                className="w-4 h-4"
+                style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+              />
               <div>
-                <span className="block text-[9px] font-bold text-white/40 uppercase tracking-wider">
+                <span
+                  className="block text-[9px] font-bold uppercase tracking-wider"
+                  style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                >
                   Nível 07
                 </span>
-                <span className="block text-sm font-bold text-[#B7FF5A]">
+                <span
+                  className="block text-sm font-bold"
+                  style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+                >
                   2,840 XP
                 </span>
               </div>
@@ -407,7 +626,15 @@ export default function PlayerBoard() {
             {/* Botón de Entrega de Proyecto */}
             <button
               onClick={() => setIsSubmissionOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-bold text-xs uppercase tracking-wider hover:opacity-95 transition-all shadow-[0_0_25px_-5px_rgba(183,255,90,0.4)] cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 font-extrabold text-xs uppercase tracking-wider hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                background:
+                  "linear-gradient(135deg, var(--ag-color-accent, #00f5d4), var(--ag-color-info, #00bbf9))",
+                color: "var(--ag-color-on-accent, #031924)",
+                boxShadow:
+                  "0 0 28px -4px var(--ag-color-selection-glow, rgba(0,245,212,0.55))",
+              }}
             >
               <Upload className="w-4 h-4" />
               <span>
@@ -418,20 +645,44 @@ export default function PlayerBoard() {
         </header>
 
         {/* ─────────────────────────────────────────────────────────────
-            3. GRID PRINCIPAL (4 TARJETAS GLASSMORPHISM RESKIN)
+            3. GRID PRINCIPAL (4 TARJETAS TURQUOISE GLASS INTERACTIVAS)
         ────────────────────────────────────────────────────────────── */}
         <div className="p-8 space-y-6">
           {/* Banner de Estado Resumen */}
-          <div className="p-5 rounded-2xl bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 flex items-center justify-between">
+          <div
+            className="p-5 border backdrop-blur-2xl flex items-center justify-between transition-all duration-300 hover:border-[#00F5D4]/50"
+            style={{
+              borderRadius: "var(--ag-radius-card, 20px)",
+              backgroundColor:
+                "var(--ag-color-surface, rgba(10, 38, 54, 0.78))",
+              borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+              boxShadow:
+                "0 12px 32px -10px var(--ag-color-shadow, rgba(0,245,212,0.20))",
+            }}
+          >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#B7FF5A]">
+              <div
+                className="w-12 h-12 border flex items-center justify-center shadow-[0_0_20px_-4px_rgba(0,245,212,0.4)]"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor: "rgba(0, 245, 212, 0.14)",
+                  borderColor: "rgba(0, 245, 212, 0.4)",
+                  color: "var(--ag-color-accent, #00f5d4)",
+                }}
+              >
                 <Flame className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3
+                  className="text-base font-bold"
+                  style={{ color: "var(--ag-color-text, #ecfeff)" }}
+                >
                   Progresso da Jornada do Tabuleiro
                 </h3>
-                <p className="text-xs text-white/50">
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                >
                   Você concluiu 1 das 4 Chaves mestras. Fase ativa no momento:
                   Solução.
                 </p>
@@ -439,15 +690,36 @@ export default function PlayerBoard() {
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <span className="block text-xs font-bold text-white/40 uppercase">
+                <span
+                  className="block text-xs font-bold uppercase"
+                  style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                >
                   Avanço Global
                 </span>
-                <span className="text-lg font-mono font-bold text-[#B7FF5A]">
+                <span
+                  className="text-lg font-mono font-bold"
+                  style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+                >
                   48%
                 </span>
               </div>
-              <div className="w-32 h-2.5 rounded-full bg-white/5 overflow-hidden border border-white/10 p-0.5">
-                <div className="h-full rounded-full bg-gradient-to-r from-[#F9CA4A] via-[#B7FF5A] to-[#9B8CFF] w-[48%]" />
+              <div
+                className="w-32 h-2.5 overflow-hidden border p-0.5"
+                style={{
+                  borderRadius: "var(--ag-radius-pill, 999px)",
+                  backgroundColor: "var(--ag-color-surface-solid, #0c2d40)",
+                  borderColor:
+                    "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                }}
+              >
+                <div
+                  className="h-full w-[48%] shadow-[0_0_12px_#00F5D4]"
+                  style={{
+                    borderRadius: "var(--ag-radius-pill, 999px)",
+                    background:
+                      "linear-gradient(90deg, #2DD4BF, #00F5D4, #00BBF9)",
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -462,19 +734,29 @@ export default function PlayerBoard() {
                 <div
                   key={chave.key}
                   onClick={() => setSelectedChave(chave)}
-                  className={`group relative rounded-3xl p-7 bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 transition-all duration-300 cursor-pointer flex flex-col justify-between ${chave.borderHover} ${chave.shadowGlow} hover:-translate-y-1`}
+                  className={`group relative overflow-hidden p-7 border backdrop-blur-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between ${chave.borderHover} ${chave.shadowGlow} hover:-translate-y-1.5`}
+                  style={{
+                    borderRadius: "var(--ag-radius-card, 20px)",
+                    backgroundColor:
+                      "var(--ag-color-surface, rgba(10, 38, 54, 0.78))",
+                    borderColor:
+                      "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  }}
                 >
-                  {/* Luz ambiental interna al pasar el cursor */}
+                  {/* Luz ambiental turquesa al pasar el cursor */}
                   <div
-                    className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-[80px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ backgroundColor: `${chave.color}20` }}
+                    className="absolute -top-14 -right-14 w-44 h-44 rounded-full blur-[70px] pointer-events-none opacity-20 group-hover:opacity-60 transition-opacity duration-300"
+                    style={{ backgroundColor: chave.color }}
                   />
 
                   {/* Cabecera de la Tarjeta */}
-                  <div>
+                  <div className="relative z-10">
                     <div className="flex items-center justify-between mb-4">
                       <span
-                        className={`text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${chave.badgeBg}`}
+                        className={`text-[11px] font-bold px-3 py-1 uppercase tracking-wider border ${chave.badgeBg}`}
+                        style={{
+                          borderRadius: "var(--ag-radius-pill, 999px)",
+                        }}
                       >
                         {chave.tag}
                       </span>
@@ -488,10 +770,12 @@ export default function PlayerBoard() {
 
                     <div className="flex items-start gap-4 mb-3">
                       <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border transition-all duration-300"
+                        className="w-12 h-12 flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110"
                         style={{
-                          backgroundColor: `${chave.color}15`,
-                          borderColor: `${chave.color}40`,
+                          borderRadius: "var(--ag-radius-control, 12px)",
+                          backgroundColor: `${chave.color}1F`,
+                          borderColor: `${chave.color}55`,
+                          boxShadow: `0 0 20px -4px ${chave.color}55`,
                         }}
                       >
                         <Icon
@@ -500,16 +784,27 @@ export default function PlayerBoard() {
                         />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold tracking-tight text-white group-hover:text-white transition-colors">
+                        <h2
+                          className="text-xl font-bold tracking-tight"
+                          style={{ color: "var(--ag-color-text, #ecfeff)" }}
+                        >
                           {chave.title}
                         </h2>
-                        <h3 className="text-xs font-medium text-white/50">
+                        <h3
+                          className="text-xs font-semibold"
+                          style={{
+                            color: "var(--ag-color-text-muted, #88d4e3)",
+                          }}
+                        >
                           {chave.subtitle}
                         </h3>
                       </div>
                     </div>
 
-                    <p className="text-xs text-white/60 leading-relaxed mb-6">
+                    <p
+                      className="text-xs leading-relaxed mb-6"
+                      style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                    >
                       {chave.description}
                     </p>
 
@@ -518,11 +813,27 @@ export default function PlayerBoard() {
                       {chave.steps.map((step, idx) => (
                         <div
                           key={step.id}
-                          className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/05 text-xs"
+                          className="flex items-center justify-between p-2.5 border text-xs transition-all duration-200 group-hover:border-[#2DD4BF]/35"
+                          style={{
+                            borderRadius: "var(--ag-radius-control, 12px)",
+                            backgroundColor:
+                              step.status === "completed"
+                                ? "var(--ag-color-surface-selected, rgba(0, 245, 212, 0.18))"
+                                : step.status === "in-progress"
+                                  ? "var(--ag-color-surface-interactive, #113c54)"
+                                  : "var(--ag-color-surface-solid, #0c2d40)",
+                            borderColor:
+                              "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                          }}
                         >
                           <div className="flex items-center gap-2.5">
                             {step.status === "completed" ? (
-                              <CheckCircle2 className="w-4 h-4 text-[#22C97A]" />
+                              <CheckCircle2
+                                className="w-4 h-4"
+                                style={{
+                                  color: "var(--ag-color-accent, #00f5d4)",
+                                }}
+                              />
                             ) : step.status === "in-progress" ? (
                               <div
                                 className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
@@ -532,19 +843,31 @@ export default function PlayerBoard() {
                                 }}
                               />
                             ) : (
-                              <Lock className="w-4 h-4 text-white/20" />
+                              <Lock
+                                className="w-4 h-4"
+                                style={{
+                                  color: "var(--ag-color-disabled, #476c7e)",
+                                }}
+                              />
                             )}
                             <span
-                              className={
-                                step.status === "locked"
-                                  ? "text-white/40"
-                                  : "text-white/90 font-medium"
-                              }
+                              className="font-semibold"
+                              style={{
+                                color:
+                                  step.status === "locked"
+                                    ? "var(--ag-color-disabled, #476c7e)"
+                                    : "var(--ag-color-text, #ecfeff)",
+                              }}
                             >
                               {idx + 1}. {step.title}
                             </span>
                           </div>
-                          <span className="text-[10px] font-mono text-white/40">
+                          <span
+                            className="text-[10px] font-mono font-semibold"
+                            style={{
+                              color: "var(--ag-color-text-muted, #88d4e3)",
+                            }}
+                          >
                             +{step.xp} XP
                           </span>
                         </div>
@@ -553,20 +876,36 @@ export default function PlayerBoard() {
                   </div>
 
                   {/* Barra de Progreso y Call to Action */}
-                  <div className="pt-4 border-t border-white/05 flex items-center justify-between">
-                    <div className="w-1/2 h-1.5 rounded-full bg-white/5 overflow-hidden border border-white/10">
+                  <div
+                    className="relative z-10 pt-4 border-t flex items-center justify-between"
+                    style={{
+                      borderColor:
+                        "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                    }}
+                  >
+                    <div
+                      className="w-1/2 h-2 overflow-hidden border"
+                      style={{
+                        borderRadius: "var(--ag-radius-pill, 999px)",
+                        backgroundColor:
+                          "var(--ag-color-surface-solid, #0c2d40)",
+                        borderColor:
+                          "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                      }}
+                    >
                       <div
-                        className="h-full rounded-full transition-all duration-500"
+                        className="h-full transition-all duration-500"
                         style={{
                           width: `${chave.progress}%`,
                           backgroundColor: chave.color,
                           boxShadow: `0 0 12px ${chave.color}`,
+                          borderRadius: "var(--ag-radius-pill, 999px)",
                         }}
                       />
                     </div>
 
                     <div
-                      className="flex items-center gap-1 text-xs font-bold group-hover:translate-x-1 transition-transform"
+                      className="flex items-center gap-1 text-xs font-bold group-hover:translate-x-1.5 transition-transform"
                       style={{ color: chave.color }}
                     >
                       <span>
@@ -586,30 +925,56 @@ export default function PlayerBoard() {
           4. MODAL: DETALLES DE FASE / CARTA DESAFIO
       ────────────────────────────────────────────────────────────── */}
       {selectedChave && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-xl rounded-3xl bg-[#14161C] border border-white/10 p-7 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
+          style={{ backgroundColor: "rgba(2, 12, 18, 0.78)" }}
+        >
+          <div
+            className="w-full max-w-xl border p-7 relative animate-in fade-in zoom-in-95 duration-200 backdrop-blur-2xl"
+            style={{
+              borderRadius: "var(--ag-radius-card, 20px)",
+              backgroundColor: "var(--ag-color-sidebar, rgba(6, 26, 38, 0.96))",
+              borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.35))",
+              boxShadow:
+                "0 24px 60px -12px var(--ag-color-shadow, rgba(0,245,212,0.28))",
+            }}
+          >
             <button
               onClick={() => setSelectedChave(null)}
-              className="absolute top-6 right-6 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all"
+              className="absolute top-6 right-6 p-2 transition-all hover:scale-110 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                color: "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-2">
               <span
-                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${selectedChave.badgeBg}`}
+                className={`text-[10px] font-bold px-2.5 py-0.5 border ${selectedChave.badgeBg}`}
+                style={{ borderRadius: "var(--ag-radius-pill, 999px)" }}
               >
                 {selectedChave.tag}
               </span>
-              <span className="text-xs font-mono text-white/40">
+              <span
+                className="text-xs font-mono font-semibold"
+                style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+              >
                 {selectedChave.progress}% Concluído
               </span>
             </div>
 
-            <h2 className="text-2xl font-extrabold text-white mb-1">
+            <h2
+              className="text-2xl font-extrabold mb-1"
+              style={{ color: "var(--ag-color-text, #ecfeff)" }}
+            >
               {selectedChave.title}
             </h2>
-            <p className="text-xs text-white/50 mb-6">
+            <p
+              className="text-xs mb-6"
+              style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+            >
               {selectedChave.subtitle}
             </p>
 
@@ -617,27 +982,54 @@ export default function PlayerBoard() {
               {selectedChave.steps.map((st, i) => (
                 <div
                   key={st.id}
-                  className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/05 flex items-start gap-3"
+                  className="p-3.5 border flex items-start gap-3 transition-colors"
+                  style={{
+                    borderRadius: "var(--ag-radius-control, 12px)",
+                    backgroundColor: "var(--ag-color-surface-solid, #0c2d40)",
+                    borderColor:
+                      "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  }}
                 >
                   <div className="mt-0.5">
                     {st.status === "completed" ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#22C97A]" />
+                      <CheckCircle2
+                        className="w-4 h-4"
+                        style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+                      />
                     ) : st.status === "in-progress" ? (
-                      <div className="w-4 h-4 rounded-full border-2 border-[#B7FF5A] border-t-transparent animate-spin" />
+                      <div
+                        className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
+                        style={{
+                          borderColor: "var(--ag-color-accent, #00f5d4)",
+                          borderTopColor: "transparent",
+                        }}
+                      />
                     ) : (
-                      <Lock className="w-4 h-4 text-white/20" />
+                      <Lock
+                        className="w-4 h-4"
+                        style={{ color: "var(--ag-color-disabled, #476c7e)" }}
+                      />
                     )}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-white/90">
+                      <h4
+                        className="text-xs font-bold"
+                        style={{ color: "var(--ag-color-text, #ecfeff)" }}
+                      >
                         {i + 1}. {st.title}
                       </h4>
-                      <span className="text-[10px] font-mono text-white/40">
+                      <span
+                        className="text-[10px] font-mono font-semibold"
+                        style={{ color: "var(--ag-color-accent, #00f5d4)" }}
+                      >
                         +{st.xp} XP
                       </span>
                     </div>
-                    <p className="text-[11px] text-white/50 mt-0.5">
+                    <p
+                      className="text-[11px] mt-0.5"
+                      style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+                    >
                       {st.desc}
                     </p>
                   </div>
@@ -647,7 +1039,14 @@ export default function PlayerBoard() {
 
             <button
               onClick={() => setSelectedChave(null)}
-              className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all"
+              className="w-full py-3 font-extrabold text-xs uppercase tracking-wider transition-all hover:opacity-95 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                background:
+                  "linear-gradient(135deg, var(--ag-color-accent, #00f5d4), var(--ag-color-info, #00bbf9))",
+                color: "var(--ag-color-on-accent, #031924)",
+                boxShadow: "0 0 24px -4px rgba(0, 245, 212, 0.45)",
+              }}
             >
               Continuar Missão
             </button>
@@ -656,27 +1055,57 @@ export default function PlayerBoard() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          5. MODAL: ENTREGA DE PROJETO (SUBMISSION RESKIN)
+          5. MODAL: ENTREGA DE PROJETO (SUBMISSION TURQUOISE RESKIN)
       ────────────────────────────────────────────────────────────── */}
       {isSubmissionOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-lg rounded-3xl bg-[#14161C] border border-white/15 p-8 relative shadow-[0_0_60px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
+          style={{ backgroundColor: "rgba(2, 12, 18, 0.78)" }}
+        >
+          <div
+            className="w-full max-w-lg border p-8 relative animate-in fade-in zoom-in-95 duration-200 backdrop-blur-2xl"
+            style={{
+              borderRadius: "var(--ag-radius-card, 20px)",
+              backgroundColor: "var(--ag-color-sidebar, rgba(6, 26, 38, 0.96))",
+              borderColor: "var(--ag-color-border, rgba(45, 212, 191, 0.35))",
+              boxShadow:
+                "0 24px 60px -12px var(--ag-color-shadow, rgba(0,245,212,0.28))",
+            }}
+          >
             <button
               onClick={() => setIsSubmissionOpen(false)}
-              className="absolute top-6 right-6 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all"
+              className="absolute top-6 right-6 p-2 transition-all hover:scale-110 cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                color: "var(--ag-color-text-muted, #88d4e3)",
+              }}
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#B7FF5A]/10 border border-[#B7FF5A]/30 flex items-center justify-center text-[#B7FF5A]">
+              <div
+                className="w-8 h-8 border flex items-center justify-center"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor: "rgba(0, 245, 212, 0.16)",
+                  borderColor: "rgba(0, 245, 212, 0.4)",
+                  color: "var(--ag-color-accent, #00f5d4)",
+                }}
+              >
                 <Upload className="w-4 h-4" />
               </div>
-              <h2 className="text-xl font-extrabold text-white">
+              <h2
+                className="text-xl font-extrabold"
+                style={{ color: "var(--ag-color-text, #ecfeff)" }}
+              >
                 Entrega do Projeto
               </h2>
             </div>
-            <p className="text-xs text-white/50 mb-6">
+            <p
+              className="text-xs mb-6"
+              style={{ color: "var(--ag-color-text-muted, #88d4e3)" }}
+            >
               Disponibilize o link funcional da sua solução para avaliação da
               banca examinadora.
             </p>
@@ -686,11 +1115,22 @@ export default function PlayerBoard() {
               <button
                 type="button"
                 onClick={() => setSubmissionType("deploy")}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl border text-xs font-semibold transition-all ${
-                  submissionType === "deploy"
-                    ? "bg-[#B7FF5A]/10 border-[#B7FF5A] text-white shadow-[0_0_20px_-5px_rgba(183,255,90,0.3)]"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
-                }`}
+                className="flex flex-col items-center gap-2 p-3 border text-xs font-semibold transition-all cursor-pointer hover:-translate-y-0.5"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor:
+                    submissionType === "deploy"
+                      ? "rgba(0, 245, 212, 0.18)"
+                      : "var(--ag-color-surface-solid, #0c2d40)",
+                  borderColor:
+                    submissionType === "deploy"
+                      ? "var(--ag-color-accent, #00f5d4)"
+                      : "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  color:
+                    submissionType === "deploy"
+                      ? "var(--ag-color-accent, #00f5d4)"
+                      : "var(--ag-color-text-muted, #88d4e3)",
+                }}
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>Deploy Web</span>
@@ -699,11 +1139,22 @@ export default function PlayerBoard() {
               <button
                 type="button"
                 onClick={() => setSubmissionType("repo")}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl border text-xs font-semibold transition-all ${
-                  submissionType === "repo"
-                    ? "bg-[#9B8CFF]/10 border-[#9B8CFF] text-white shadow-[0_0_20px_-5px_rgba(155,140,255,0.3)]"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
-                }`}
+                className="flex flex-col items-center gap-2 p-3 border text-xs font-semibold transition-all cursor-pointer hover:-translate-y-0.5"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor:
+                    submissionType === "repo"
+                      ? "rgba(56, 189, 248, 0.18)"
+                      : "var(--ag-color-surface-solid, #0c2d40)",
+                  borderColor:
+                    submissionType === "repo"
+                      ? "var(--ag-color-secondary, #38bdf8)"
+                      : "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  color:
+                    submissionType === "repo"
+                      ? "var(--ag-color-secondary, #38bdf8)"
+                      : "var(--ag-color-text-muted, #88d4e3)",
+                }}
               >
                 <GitBranch className="w-4 h-4" />
                 <span>Repositório</span>
@@ -712,11 +1163,22 @@ export default function PlayerBoard() {
               <button
                 type="button"
                 onClick={() => setSubmissionType("file")}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl border text-xs font-semibold transition-all ${
-                  submissionType === "file"
-                    ? "bg-[#50DDFF]/10 border-[#50DDFF] text-white shadow-[0_0_20px_-5px_rgba(80,221,255,0.3)]"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
-                }`}
+                className="flex flex-col items-center gap-2 p-3 border text-xs font-semibold transition-all cursor-pointer hover:-translate-y-0.5"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor:
+                    submissionType === "file"
+                      ? "rgba(0, 187, 249, 0.18)"
+                      : "var(--ag-color-surface-solid, #0c2d40)",
+                  borderColor:
+                    submissionType === "file"
+                      ? "var(--ag-color-info, #00bbf9)"
+                      : "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  color:
+                    submissionType === "file"
+                      ? "var(--ag-color-info, #00bbf9)"
+                      : "var(--ag-color-text-muted, #88d4e3)",
+                }}
               >
                 <FileText className="w-4 h-4" />
                 <span>PDF / Pitch</span>
@@ -725,7 +1187,10 @@ export default function PlayerBoard() {
 
             {/* Input URL */}
             <div className="space-y-2 mb-6">
-              <label className="block text-xs font-bold text-white/70">
+              <label
+                className="block text-xs font-bold"
+                style={{ color: "var(--ag-color-text, #ecfeff)" }}
+              >
                 {submissionType === "deploy"
                   ? "URL de Produção (Vercel / Netlify)"
                   : submissionType === "repo"
@@ -737,7 +1202,14 @@ export default function PlayerBoard() {
                 value={deployUrl}
                 onChange={(e) => setDeployUrl(e.target.value)}
                 placeholder="https://..."
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#B7FF5A] focus:ring-1 focus:ring-[#B7FF5A] transition-all"
+                className="w-full px-4 py-3 border text-xs font-mono focus:outline-none transition-all"
+                style={{
+                  borderRadius: "var(--ag-radius-control, 12px)",
+                  backgroundColor: "var(--ag-color-surface-solid, #0c2d40)",
+                  borderColor:
+                    "var(--ag-color-border, rgba(45, 212, 191, 0.24))",
+                  color: "var(--ag-color-text, #ecfeff)",
+                }}
               />
             </div>
 
@@ -747,7 +1219,15 @@ export default function PlayerBoard() {
                 setSubmitted(true);
                 setIsSubmissionOpen(false);
               }}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold text-xs uppercase tracking-wider hover:opacity-95 transition-all shadow-[0_0_25px_-5px_rgba(183,255,90,0.4)] cursor-pointer"
+              className="w-full py-3.5 font-extrabold text-xs uppercase tracking-wider hover:opacity-95 transition-all cursor-pointer"
+              style={{
+                borderRadius: "var(--ag-radius-control, 12px)",
+                background:
+                  "linear-gradient(135deg, var(--ag-color-accent, #00f5d4), var(--ag-color-info, #00bbf9))",
+                color: "var(--ag-color-on-accent, #031924)",
+                boxShadow:
+                  "0 0 28px -4px var(--ag-color-selection-glow, rgba(0,245,212,0.5))",
+              }}
             >
               Confirmar Entrega do Team Raiz
             </button>

@@ -11,6 +11,9 @@ export function createRateLimiter({
   const hits = new Map<string, number[]>();
 
   return function isRateLimited(key: string): boolean {
+    if (key === "unknown" && process.env.NODE_ENV !== "production") {
+      return false;
+    }
     const now = Date.now();
     const cutoff = now - windowMs;
     const recent = (hits.get(key) ?? []).filter((time) => time > cutoff);

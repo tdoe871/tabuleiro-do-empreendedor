@@ -40,10 +40,10 @@ const TOTAL_FASES = 3;
 const DEPENDENTES: KeyId[] = ["solucao", "parcerias", "oportunidades"];
 
 const AVATAR_GRADIENTS = [
-  "linear-gradient(135deg,#1A9055,#0F5E38)",
-  "linear-gradient(135deg,#1A4E9E,#0F3370)",
-  "linear-gradient(135deg,#6A28A0,#441870)",
-  "linear-gradient(135deg,#E8A830,#C4891A)",
+  "var(--ag-color-avatar-strategist, #00f5d4)",
+  "var(--ag-color-avatar-researcher, #00bbf9)",
+  "var(--ag-color-avatar-builder, #2dd4bf)",
+  "var(--ag-color-avatar-connector, #38bdf8)",
 ];
 
 function initialKeys(): Record<KeyId, KeyState> {
@@ -261,10 +261,13 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
   }
 
   return (
-    <div id="tela-jogadores" className="min-h-screen bg-[#08090D] text-white">
-      <div className="topbar bg-[#14161C]/80 backdrop-blur-2xl border-b border-white/10">
+    <div
+      id="tela-jogadores"
+      className="min-h-screen bg-[var(--ag-color-background,#04151f)] text-[var(--ag-color-text,#ecfeff)]"
+    >
+      <div className="topbar bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-b border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
         <div className="tb-logo">
-          <div className="tb-gem bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:shadow-glow-amber">
+          <div className="tb-gem bg-[var(--ag-color-surface-featured,rgba(14,48,66,0.88))] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[10px] transition-all duration-300 shadow-[0_0_16px_-3px_rgba(0,245,212,0.4)]">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>
@@ -295,7 +298,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
       </div>
 
-      <div className="score-strip bg-[#14161C]/80 backdrop-blur-2xl border-b border-white/10">
+      <div className="score-strip bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-b border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
         <div>
           <div className="score-label">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
@@ -305,14 +308,14 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
         </div>
         <div style={{ flex: 1 }} />
         <button
-          className="btn btn-ghost btn-sm bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-xl"
+          className="btn btn-ghost btn-sm bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px] hover:border-[#00F5D4]/50 transition-all"
           onClick={() => setShowSubmission(true)}
         >
           {submission ? tSubmission("editar") : tSubmission("abrir")}
         </button>
         {allDone && (
           <button
-            className="btn btn-sm bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] rounded-xl"
+            className="btn btn-sm bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] rounded-[12px] hover:scale-[1.02] transition-all"
             onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
@@ -322,7 +325,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
 
       <div className="jog-layout">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+          <div className="cenario-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:border-[#00F5D4]/50 hover:shadow-[0_10px_28px_-6px_rgba(0,245,212,0.22)]">
             <div className="cen-icon">⌖</div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>
@@ -356,7 +359,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 return (
                   <div
                     key={name}
-                    className={`membro-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${i === 0 ? "ativo" : ""}`}
+                    className={`membro-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_10px_28px_-6px_rgba(0,245,212,0.25)] ${i === 0 ? "ativo" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {i !== 0 && (
@@ -409,7 +412,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
             </div>
           </div>
 
-          <div className="card card-pad bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:border-white/20">
+          <div className="card card-pad bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:border-[#00F5D4]/40">
             <div className="comm-tabs">
               <div
                 className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
@@ -453,9 +456,10 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   <input
                     style={{
                       flex: 1,
-                      background: "rgba(255,255,255,.05)",
+                      background:
+                        "var(--ag-color-sidebar, rgba(6, 26, 38, 0.90))",
                       border: "1.5px solid var(--border)",
-                      borderRadius: 9,
+                      borderRadius: "var(--ag-radius-control, 12px)",
                       padding: "9px 13px",
                       fontSize: 12,
                       color: "var(--t1)",
@@ -503,9 +507,10 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                 </div>
                 <textarea
                   style={{
-                    background: "rgba(255,255,255,.05)",
+                    background:
+                      "var(--ag-color-sidebar, rgba(6, 26, 38, 0.90))",
                     border: "1.5px solid var(--border)",
-                    borderRadius: 10,
+                    borderRadius: "var(--ag-radius-control, 12px)",
                     padding: "10px 13px",
                     fontSize: 12,
                     color: "var(--t1)",
@@ -598,19 +603,10 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   100,
               );
 
-              const hoverGlowClass =
-                id === "problema"
-                  ? "hover:shadow-glow-amber hover:ring-1 hover:ring-neon-amber/40"
-                  : id === "solucao"
-                    ? "hover:shadow-glow-lime hover:ring-1 hover:ring-neon-lime/40"
-                    : id === "parcerias"
-                      ? "hover:shadow-glow-purple hover:ring-1 hover:ring-neon-purple/40"
-                      : "hover:shadow-glow-cyan hover:ring-1 hover:ring-neon-cyan/40";
-
               return (
                 <div
                   key={id}
-                  className={`chave-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
+                  className="chave-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/60 hover:shadow-[0_14px_34px_-8px_rgba(0,245,212,0.3)]"
                   style={{
                     background: concluida
                       ? `var(${KEY_COLOR_VAR[id]}-bg)`
@@ -636,7 +632,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                         color:
                           concluida || ativa || disponivel
                             ? colorVar
-                            : "rgba(255,255,255,.4)",
+                            : "var(--t3)",
                       }}
                     >
                       {keyInfo.name}
@@ -649,7 +645,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                           ? `var(${KEY_COLOR_VAR[id]}-bg)`
                           : ativa
                             ? "var(--gold-bg)"
-                            : "rgba(255,255,255,.05)",
+                            : "var(--ag-color-surface-solid, #0c2d40)",
                         color: concluida
                           ? colorVar
                           : ativa
@@ -677,7 +673,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:translate-x-1 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }
@@ -692,9 +688,9 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                                 ? colorVar
                                 : active
                                   ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                                  : "rgba(255,255,255,.08)",
+                                  : "var(--ag-color-surface-solid, #0c2d40)",
                               color: done
-                                ? "#fff"
+                                ? "#031924"
                                 : active
                                   ? colorVar
                                   : "var(--t3)",
@@ -733,7 +729,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                   </div>
                   {!concluida && !ativa && !bloqueadaPorProblema && (
                     <button
-                      className="btn btn-primary w100 btn-sm bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+                      className="btn btn-primary w100 btn-sm bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.01] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
                       style={{ marginTop: 8 }}
                       onClick={() => ativarChave(id)}
                     >
@@ -748,9 +744,9 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
                         color: "var(--t3)",
                         textAlign: "center",
                         padding: 6,
-                        background: "rgba(255,255,255,.03)",
-                        borderRadius: 6,
-                        border: "1px dashed rgba(255,255,255,.08)",
+                        background: "var(--ag-color-surface-solid, #0c2d40)",
+                        borderRadius: "var(--ag-radius-control, 12px)",
+                        border: "1px dashed var(--border)",
                       }}
                     >
                       {t("chave.bloqueadaPorProblema")}
@@ -797,7 +793,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               </button>
               <button
                 type="submit"
-                className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+                className="btn btn-primary bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
               >
                 {t("fase.concluir")}
               </button>
@@ -822,7 +818,7 @@ export function PlayerBoard({ nickname = "" }: { nickname?: string }) {
               </div>
             )}
             <button
-              className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+              className="btn btn-primary bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
               style={{ width: "100%" }}
               onClick={() => setCongrats(null)}
             >

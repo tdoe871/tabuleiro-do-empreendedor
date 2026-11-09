@@ -172,7 +172,7 @@ export function SubmissionModal({
                 <button
                   key={ty}
                   type="button"
-                  className="option-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-200 hover:border-white/20"
+                  className="option-card bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:border-[#00F5D4]/50 hover:-translate-y-0.5"
                   aria-pressed={selected}
                   onClick={() => {
                     setType(ty);
@@ -248,7 +248,7 @@ export function SubmissionModal({
           </button>
           <button
             type="submit"
-            className="btn btn-primary bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all rounded-xl cursor-pointer"
+            className="btn btn-primary bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98] transition-all rounded-[12px] cursor-pointer"
             disabled={!canSubmit}
           >
             {submitting ? (

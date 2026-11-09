@@ -17,6 +17,18 @@ if (process.env.NODE_ENV !== "production") {
   globalThis.__prisma = prisma;
 }
 
-export * from "@prisma/client";
+export {
+  Prisma,
+  PrismaClient,
+  EventStatus,
+  EventMode,
+  TimerMode,
+  BoardKey,
+  ParticipantRole,
+  SubmissionType,
+  AlertSeverity,
+} from "@prisma/client";
+
+export type * from "@prisma/client";
 
 export * from "./board";

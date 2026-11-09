@@ -95,7 +95,7 @@ const NEXT_STATUS: Partial<
   pausada: { next: "ativa", actionKey: "retomar" },
 };
 
-const AVATAR_COLORS = ["#2E80F0", "#22C97A", "#A040E0", "#0FD4B0", "#F0BC40"];
+const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
 
 // Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
 // roadmap list, not a backend-driven feature. Kept hardcoded like the icons
@@ -319,10 +319,13 @@ export function EducadorPanel() {
   const canResume = selected?.status === "pausada";
 
   return (
-    <div id="tela-educador" className="min-h-screen bg-[#08090D] text-white">
-      <div className="topbar bg-[#14161C]/80 backdrop-blur-2xl border-b border-white/10">
+    <div
+      id="tela-educador"
+      className="min-h-screen bg-[var(--ag-color-background,#04151f)] text-[var(--ag-color-text,#ecfeff)]"
+    >
+      <div className="topbar bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-b border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
         <div className="tb-logo">
-          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+          <div className="tb-gem transition-all duration-300 shadow-[0_0_16px_-3px_rgba(0,245,212,0.4)]">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>TdoE</span>
@@ -367,8 +370,8 @@ export function EducadorPanel() {
           <button
             className="btn btn-sm"
             style={{
-              background: "linear-gradient(135deg,var(--parc),#5B6CF0)",
-              color: "#fff",
+              background: "var(--ag-color-accent, #00f5d4)",
+              color: "var(--ag-color-on-accent, #031924)",
             }}
             onClick={handleSocializar}
           >
@@ -384,7 +387,7 @@ export function EducadorPanel() {
       </div>
 
       <div className="edu-layout">
-        <div className="sidebar bg-[#14161C]/80 backdrop-blur-2xl border-r border-white/10">
+        <div className="sidebar bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-r border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
           <div className="sidebar-sec">{t("sidebar.sessoes")}</div>
           <div>
             {sessions.length === 0 && (
@@ -401,7 +404,7 @@ export function EducadorPanel() {
             {sessions.map((s, i) => (
               <div
                 key={s.id}
-                className={`eq-item transition-all duration-200 hover:bg-white/5 hover:translate-x-0.5 ${s.id === selectedId ? "on" : ""}`}
+                className={`eq-item transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:translate-x-1 ${s.id === selectedId ? "on" : ""}`}
                 onClick={() => selectSession(s.id)}
               >
                 <div
@@ -424,19 +427,19 @@ export function EducadorPanel() {
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.acoes")}</div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={() => setShowCreate(true)}
           >
             ＋ {t("sidebar.novaSessao")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={handleVerificarAlertas}
           >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
@@ -444,19 +447,19 @@ export function EducadorPanel() {
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={() => handlePending(t("sidebar.relatorio"))}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={() => handlePending(t("sidebar.exportarPropostas"))}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className="sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:text-[var(--ag-color-accent,#00f5d4)] hover:translate-x-0.5"
             onClick={() => router.push("/")}
           >
             ← {t("sair")}
@@ -465,7 +468,7 @@ export function EducadorPanel() {
 
         <div className="edu-main">
           <div className="metrics">
-            <div className="metric-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime">
+            <div className="metric-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#2DD4BF]/50 hover:shadow-[0_12px_32px_-8px_rgba(45,212,191,0.28)]">
               <div
                 style={{
                   position: "absolute",
@@ -481,7 +484,7 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.equipesAtivas")}</div>
             </div>
-            <div className="metric-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+            <div className="metric-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]">
               <div
                 style={{
                   position: "absolute",
@@ -497,7 +500,7 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.participantes")}</div>
             </div>
-            <div className="metric-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-purple/40 hover:shadow-glow-purple">
+            <div className="metric-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]/50 hover:shadow-[0_12px_32px_-8px_rgba(56,189,248,0.28)]">
               <div
                 style={{
                   position: "absolute",
@@ -513,7 +516,7 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.chavesConcluidas")}</div>
             </div>
-            <div className="metric-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-amber/40 hover:shadow-glow-amber">
+            <div className="metric-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00BBF9]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,187,249,0.28)]">
               <div
                 style={{
                   position: "absolute",
@@ -546,7 +549,7 @@ export function EducadorPanel() {
                 : 0;
               return (
                 <div
-                  className="prog-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/35 hover:shadow-glow-lime"
+                  className="prog-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_10px_28px_-6px_rgba(0,245,212,0.25)]"
                   key={id}
                 >
                   <div className="pc-head">
@@ -588,7 +591,7 @@ export function EducadorPanel() {
             )}
             {selected && overview && overview.teams.length === 0 && (
               <div
-                className="card card-pad bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl"
+                className="card card-pad bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px]"
                 style={{
                   gridColumn: "1 / -1",
                   textAlign: "center",
@@ -613,7 +616,7 @@ export function EducadorPanel() {
                 const pct = Math.round((completed / KEY_IDS.length) * 100);
                 return (
                   <div
-                    className="eq-card bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20"
+                    className="eq-card bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]"
                     key={team.id}
                   >
                     <div className="eq-card-head">
@@ -642,7 +645,7 @@ export function EducadorPanel() {
                             ? 1
                             : status === "ativa"
                               ? 0.6
-                              : 0.15;
+                              : 0.25;
                         return (
                           <div
                             key={id}
@@ -677,7 +680,7 @@ export function EducadorPanel() {
                       <div
                         className="badge tiny"
                         style={{
-                          background: "rgba(255,255,255,.05)",
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
                           color: "var(--t3)",
                           borderColor: "var(--border)",
                         }}
@@ -687,7 +690,7 @@ export function EducadorPanel() {
                       <div
                         className="badge tiny"
                         style={{
-                          background: "rgba(255,255,255,.05)",
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
                           color: "var(--t3)",
                           borderColor: "var(--border)",
                         }}
@@ -698,9 +701,9 @@ export function EducadorPanel() {
                         <div
                           className="badge tiny"
                           style={{
-                            background: "rgba(34,197,94,.12)",
-                            color: "#22c55e",
-                            borderColor: "rgba(34,197,94,.3)",
+                            background: "var(--prob-bg)",
+                            color: "var(--prob)",
+                            borderColor: "var(--prob-bd)",
                           }}
                         >
                           ✓ {t("equipeCard.entregou")}
@@ -713,7 +716,7 @@ export function EducadorPanel() {
           </div>
         </div>
 
-        <div className="edu-right bg-[#14161C]/80 backdrop-blur-2xl border-l border-white/10">
+        <div className="edu-right bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] backdrop-blur-2xl border-l border-[var(--ag-color-border,rgba(45,212,191,0.24))]">
           <div className="panel-title">{t("right.alertasMediacao")}</div>
           {!overview || overview.alerts.length === 0 ? (
             <div style={{ fontSize: 11, color: "var(--t3)" }}>
@@ -724,22 +727,22 @@ export function EducadorPanel() {
               {overview.alerts.map((alert) => {
                 const color =
                   alert.severity === "CRITICAL"
-                    ? "#ef4444"
+                    ? "var(--ag-color-warning, #fbbf24)"
                     : alert.severity === "WARNING"
                       ? "var(--gold)"
-                      : "var(--parc)";
+                      : "var(--opor)";
                 const bg =
                   alert.severity === "CRITICAL"
-                    ? "rgba(239,68,68,.1)"
+                    ? "var(--gold-bg)"
                     : alert.severity === "WARNING"
                       ? "var(--gold-bg)"
-                      : "var(--parc-bg)";
+                      : "var(--opor-bg)";
                 const bd =
                   alert.severity === "CRITICAL"
-                    ? "1.5px solid rgba(239,68,68,.3)"
+                    ? "1.5px solid var(--gold-bd)"
                     : alert.severity === "WARNING"
                       ? "1.5px solid var(--gold-bd)"
-                      : "1.5px solid var(--parc-bd)";
+                      : "1.5px solid var(--opor-bd)";
                 const icon =
                   alert.severity === "CRITICAL"
                     ? "⚠"
@@ -749,7 +752,7 @@ export function EducadorPanel() {
                 return (
                   <div
                     key={alert.id}
-                    className="alert-card backdrop-blur-xl rounded-2xl"
+                    className="alert-card rounded-[20px]"
                     style={{ background: bg, border: bd }}
                   >
                     <div
@@ -772,25 +775,25 @@ export function EducadorPanel() {
           <div className="panel-title">{t("right.controlesSessao")}</div>
           <div className="ctrl-grid">
             <div
-              className={`ctrl-btn bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] transition-all duration-200 hover:opacity-90 ${!canStart ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] rounded-[12px] transition-all duration-200 hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98] ${!canStart ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canStart && changeStatus("ACTIVE")}
             >
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className={`ctrl-btn bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-200 hover:border-neon-amber/40 hover:text-white hover:shadow-glow-amber ${!canPause ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px] text-[var(--ag-color-text,#ecfeff)] transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:border-[#00F5D4]/50 ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className={`ctrl-btn bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-200 hover:border-neon-cyan/40 hover:text-white hover:shadow-glow-cyan ${!canResume ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px] text-[var(--ag-color-text,#ecfeff)] transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:border-[#00F5D4]/50 ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
             <div
-              className="ctrl-btn bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-200 hover:border-neon-purple/40 hover:text-white hover:shadow-glow-purple"
+              className="ctrl-btn bg-[var(--ag-color-surface-solid,#0c2d40)] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px] text-[var(--ag-color-text,#ecfeff)] transition-all duration-200 hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))] hover:border-[#00F5D4]/50"
               onClick={handleVerificarAlertas}
             >
               🔔 {t("right.alertas")}
@@ -798,7 +801,7 @@ export function EducadorPanel() {
           </div>
           <div className="sidebar-divider" />
           <div className="panel-title">⏱ {t("timer.titulo")}</div>
-          <div className="timer-edu-block bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 my-2">
+          <div className="timer-edu-block bg-[var(--ag-color-surface-featured,rgba(14,48,66,0.88))] backdrop-blur-xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] p-3 my-2">
             <div style={{ fontSize: 10, color: "var(--t3)", marginBottom: 4 }}>
               {t("timer.duracao")}
             </div>
@@ -832,7 +835,7 @@ export function EducadorPanel() {
             </div>
             <div className="timer-ctrl-row">
               <button
-                className="timer-ctrl-btn timer-start bg-gradient-to-r from-[#B7FF5A] to-[#0FD4B0] text-black font-extrabold uppercase border-none shadow-[0_0_20px_-5px_rgba(183,255,90,0.4)] hover:opacity-90 transition-all"
+                className="timer-ctrl-btn timer-start bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] rounded-[12px] hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                 onClick={() => {
                   if (timerSeconds === null && timerMinutes)
                     setTimerSeconds(timerMinutes * 60);
@@ -842,13 +845,13 @@ export function EducadorPanel() {
                 ▶ {t("timer.iniciar")}
               </button>
               <button
-                className="timer-ctrl-btn timer-stop bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] font-bold shadow-[0_0_15px_-5px_rgba(239,68,68,0.2)] hover:bg-[#EF4444]/20 transition-all"
+                className="timer-ctrl-btn timer-stop bg-[#EF4444]/12 border border-[#EF4444]/35 text-[#EF4444] font-bold rounded-[12px] hover:bg-[#EF4444]/20 shadow-[0_0_15px_-5px_rgba(239,68,68,0.25)] transition-all"
                 onClick={() => setTimerRunning(false)}
               >
                 ⏹ {t("timer.parar")}
               </button>
             </div>
-            <div className="timer-toggle-row bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-xl">
+            <div className="timer-toggle-row bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))] border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[12px]">
               <span className="timer-toggle-lbl">
                 {t("timer.mostrarEstudantes")}
               </span>
@@ -871,7 +874,7 @@ export function EducadorPanel() {
               return (
                 <button
                   key={id}
-                  className="carta-launcher-btn bg-[#14161C]/80 backdrop-blur-2xl border border-white/10 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-purple"
+                  className="carta-launcher-btn bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(0,245,212,0.25)]"
                   style={{
                     borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
                     background: `var(${KEY_COLOR_VAR[id]}-bg)`,

@@ -31,7 +31,7 @@ export default function ChooseTeamActionPage() {
         }}
       >
         <div
-          className="card card-pad anim-in bg-white/5 backdrop-blur-md border border-white/10"
+          className="card card-pad anim-in bg-[var(--ag-color-surface,rgba(10,38,54,0.78))] backdrop-blur-2xl border border-[var(--ag-color-border,rgba(45,212,191,0.24))] rounded-[20px] shadow-[0_12px_32px_-8px_rgba(0,245,212,0.2)]"
           style={{
             display: "flex",
             flexDirection: "column",
