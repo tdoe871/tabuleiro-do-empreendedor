@@ -2,7 +2,44 @@
   "common": {
     "appName": "Tabuleiro do Empreendedor",
     "continue": "Continuar",
-    "back": "Voltar"
+    "back": "Voltar",
+    "toasts": {
+      "featurePendente": "{feature}: ainda em construção"
+    },
+    "errors": {
+      "VALIDATION_ERROR": "Verifique os dados enviados.",
+      "INVALID_URL": "O link precisa começar com https://",
+      "FILE_TYPE_NOT_ALLOWED": "Formato de arquivo não permitido.",
+      "FILE_TOO_LARGE": "O arquivo passa do limite permitido.",
+      "UNAUTHORIZED": "Sua sessão expirou. Entre novamente.",
+      "INVALID_CREDENTIALS": "E-mail ou senha incorretos.",
+      "FORBIDDEN": "Você não tem permissão para isso.",
+      "EVENT_NOT_FOUND": "Sessão não encontrada.",
+      "TEAM_NOT_FOUND": "Código de equipe inválido.",
+      "EMAIL_TAKEN": "Esse e-mail já está cadastrado.",
+      "TEAM_NAME_TAKEN": "Já existe uma equipe com esse nome neste evento.",
+      "NICKNAME_TAKEN": "Já existe alguém com esse apelido na equipe.",
+      "TEAM_FULL": "Essa equipe já está completa.",
+      "EVENT_FULL": "Esse evento já atingiu o limite de equipes.",
+      "EVENT_NOT_ACTIVE": "A sessão está pausada ou ainda não começou.",
+      "EVENT_FINISHED": "Essa sessão já terminou.",
+      "DEADLINE_PASSED": "O prazo de entrega já passou.",
+      "KEY_LOCKED": "Essa chave ainda está bloqueada.",
+      "PHASE_LOCKED": "Essa fase ainda está bloqueada.",
+      "INVALID_STATUS_TRANSITION": "Essa ação não é permitida no estado atual da sessão.",
+      "RATE_LIMITED": "Muitas tentativas. Espere um pouco e tente de novo.",
+      "INTERNAL_ERROR": "Algo deu errado do nosso lado. Tente novamente.",
+      "RESET_TOKEN_INVALID": "Esse link não é mais válido. Peça um novo.",
+      "RESET_TOKEN_EXPIRED": "Esse link venceu. Peça um novo.",
+      "FILE_NOT_FOUND": "Arquivo não encontrado.",
+      "ANNOUNCEMENT_NOT_FOUND": "Esse aviso não existe mais.",
+      "FILE_NOT_UPLOADED": "Esse arquivo ainda não foi enviado.",
+      "TOO_MANY_FILES": "Sua equipe já chegou no limite de arquivos.",
+      "TOO_MANY_MENTORS": "Essa sessão já chegou no limite de mentores.",
+      "CHAT_DISABLED": "O educador desligou o chat por agora.",
+      "SUBMISSIONS_DISABLED": "O educador desligou as entregas por agora.",
+      "JOINS_DISABLED": "O educador fechou as entradas novas por agora."
+    }
   },
   "join": {
     "title": "Entrar no evento",
@@ -16,8 +53,17 @@
     "joinTeam": "Entrar em uma equipe existente",
     "createNameLabel": "Nome da equipe",
     "joinCodeLabel": "Código da equipe (ou use o link que o líder te enviou)",
+    "joinNicknameLabel": "Seu nome",
     "youAreLeader": "Você é o líder desta equipe",
-    "shareLink": "Compartilhe este link com sua equipe"
+    "shareLink": "Compartilhe este link com sua equipe",
+    "enterBoardPreview": "Entrar no tabuleiro (prévia) →",
+    "toasts": {
+      "backendPendingCreate": "Criar equipe: backend em construção — prévia local.",
+      "created": "Equipe criada",
+      "createError": "Não foi possível criar a equipe",
+      "backendPendingJoin": "Entrar na equipe: backend em construção — abrindo tabuleiro em modo prévia.",
+      "invalidCode": "Código de equipe inválido"
+    }
   },
   "submission": {
     "title": "Entrega do projeto",
@@ -34,7 +80,22 @@
     "saved": "Entrega salva localmente — falta conectar ao backend.",
     "editar": "✏️ Editar entrega",
     "abrir": "📦 Entregar projeto",
-    "status": "Entrega registrada"
+    "status": "Entrega registrada",
+    "invalidUrl": "O link precisa começar com https://",
+    "fileHint": "Máx. 20MB cada · PDF, Word, PowerPoint, PNG, JPG ou WEBP · até 5 arquivos",
+    "fileTooLarge": "O arquivo passa do limite de 20MB.",
+    "fileInvalidType": "Formato não permitido.",
+    "fileRequired": "Envie pelo menos um arquivo antes de salvar.",
+    "saving": "Salvando…",
+    "cancelar": "Cancelar",
+    "maxArquivos": "Sua equipe já chegou no limite de 5 arquivos.",
+    "uploadFalhou": "Não foi possível enviar o arquivo. Tente de novo.",
+    "arquivoEnviado": "Arquivo enviado",
+    "removerArquivo": "Remover arquivo",
+    "enviando": "Enviando…",
+    "adicionarArquivo": "+ Adicionar arquivo",
+    "linksExtraLabel": "Links extras (opcional)",
+    "adicionarLink": "Adicionar link"
   },
   "keys": {
     "problema": {
@@ -67,7 +128,8 @@
     "tabs": {
       "login": "Entrar",
       "cadastro": "Criar conta",
-      "codigo": "Código"
+      "codigo": "Código",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Bem-vindo de volta",
@@ -89,7 +151,27 @@
       "codigoPlaceholder": "Ex: A7X3K2",
       "entrarJogo": "Entrar no jogo →",
       "codeHint1": "Código fornecido pelo educador",
-      "codeHint2": "Peça o código de 6 letras para começar"
+      "codeHint2": "Peça o código de 6 letras para começar",
+      "esqueceuSenha": "Esqueceu sua senha?",
+      "titleMentor": "Entrar como mentor",
+      "subMentor": "Avalie as equipes — sem cadastro",
+      "codigoMentores": "Código de mentores",
+      "entrarMentor": "Entrar →"
+    },
+    "toasts": {
+      "backendPendingLogin": "Login de educador: backend em construção — abrindo painel em modo de visualização.",
+      "invalidCredentials": "Credenciais inválidas",
+      "passwordMismatch": "As senhas não coincidem",
+      "backendPendingRegister": "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
+      "registerError": "Não foi possível criar a conta",
+      "missingFields": "Preencha seu nome e o código",
+      "mentorError": "Não foi possível entrar. Confira o código de mentores."
+    },
+    "forgot": {
+      "titulo": "Recuperar senha",
+      "sub": "Vamos te mandar um link para criar uma nova senha.",
+      "enviar": "Enviar link",
+      "enviado": "Se esse e-mail estiver cadastrado, um link já foi enviado. Confira sua caixa de entrada."
     }
   },
   "educador": {
@@ -114,9 +196,37 @@
       "acoes": "Ações",
       "novaSessao": "Nova sessão",
       "verificarAlertas": "Verificar alertas",
+      "mentores": "Ver notas dos mentores",
       "exportar": "Exportar",
       "relatorio": "Relatório de interação",
-      "exportarPropostas": "Exportar propostas"
+      "exportarPropostas": "Exportar propostas",
+      "exportarAtividade": "Exportar atividade"
+    },
+    "avisos": {
+      "titulo": "Avisos gerais",
+      "placeholder": "Avisar todo o evento…",
+      "enviar": "Enviar",
+      "vazio": "Você ainda não enviou avisos"
+    },
+    "interruptores": {
+      "titulo": "Interruptores de emergência",
+      "chat": "Chat",
+      "submissions": "Entregas",
+      "joins": "Novas entradas"
+    },
+    "mentores": {
+      "titulo": "Mentores",
+      "codigo": "Código",
+      "semCodigo": "Você ainda não gerou um código de mentores",
+      "gerar": "Gerar código",
+      "regenerar": "Gerar novo código",
+      "mentoresCount": "{count} mentor(es) avaliando",
+      "semNota": "Sem nota"
+    },
+    "alertas": {
+      "NO_SUBMISSION": "{team}: sem entrega e faltam {minutes} min",
+      "TEAM_STUCK": "{team}: sem avançar há {minutes} min",
+      "TEAM_INCOMPLETE": "{team}: falta um integrante"
     },
     "metrics": {
       "equipesAtivas": "Equipes ativas",
@@ -170,10 +280,11 @@
       "contextoLabel": "Contexto de investigação",
       "contextoPlaceholder": "Ex: Vocês são agentes de transformação do bairro Novo Horizonte…",
       "contextoAjuda": "Este texto será exibido para as equipes ao iniciar a sessão.",
-      "numEquipesLabel": "Número de equipes (até 80 — sem limite de 10)",
+      "numEquipesLabel": "Número de equipes",
       "integrantesLabel": "Integrantes por equipe",
       "cancelar": "Cancelar",
-      "criar": "Criar sessão →"
+      "criar": "Criar sessão →",
+      "numEquipesHint": "Até 80 equipes por sessão (sem limite de 10)."
     },
     "toasts": {
       "selecioneSessao": "Selecione uma sessão",
@@ -181,19 +292,63 @@
       "tituloObrigatorio": "Digite um título para a sessão",
       "contextoObrigatorio": "Descreva o contexto de investigação",
       "sessaoCriada": "Sessão criada! Código: {code}",
-      "backendPendente": "Backend em construção — sessão mostrada localmente."
+      "backendPendente": "Backend em construção — sessão mostrada localmente.",
+      "erroCriar": "Não foi possível criar a sessão",
+      "alertasEncontrados": "{count} alerta(s) ativo(s)"
+    },
+    "equipesVazio": "Nenhuma equipe nesta sessão ainda. Compartilhe o código {codigo} com os participantes para que entrem.",
+    "extensoesModal": {
+      "subtitulo": "Funcionalidades planejadas para as próximas versões do TdoE",
+      "emBreve": "Em breve",
+      "fechar": "Fechar",
+      "items": {
+        "desafiosExtras": {
+          "nome": "Desafios extras",
+          "descricao": "Baralho adicional lançado manualmente pelo educador."
+        },
+        "coringas": {
+          "nome": "Coringas",
+          "descricao": "Cartas especiais usadas uma vez por sessão pela equipe."
+        },
+        "cartasPedagogicas": {
+          "nome": "Cartas pedagógicas",
+          "descricao": "Cartões com conceitos e perguntas geradoras para apoio."
+        }
+      }
+    },
+    "equipeCard": {
+      "semChaveAtiva": "Sem chave ativa",
+      "chaves": "chaves",
+      "entregou": "Entregou"
     }
   },
   "jogador": {
     "topbarTitulo": "Tabuleiro",
     "semChaveAtiva": "— sem chave ativa —",
     "sair": "Sair",
+    "carregando": "Carregando sua equipe…",
+    "entregaEditar": "✏️ Editar entrega",
+    "entregaAbrir": "📦 Entregar projeto",
+    "estado": {
+      "draft": "A sessão ainda não começou.",
+      "paused": "A sessão está em pausa.",
+      "finished": "A sessão já terminou."
+    },
+    "avisos": {
+      "titulo": "Avisos",
+      "vazio": "Ainda não há avisos do educador"
+    },
+    "cartaAtiva": {
+      "titulo": "Carta de reto ativa"
+    },
     "score": {
       "label": "Pontos de investigação",
       "unidade": "pts",
       "verResumo": "Ver resumo"
     },
-    "timer": { "label": "Tempo da fase" },
+    "timer": {
+      "label": "Tempo da fase"
+    },
     "cenario": {
       "titulo": "Sessão de investigação",
       "sub": "Você é um agente de transformação."
@@ -213,15 +368,14 @@
       "enviar": "Enviar →",
       "paraQuem": "Para quem?",
       "semMensagens": "Ainda não há mensagens",
-      "historico": "Histórico da sessão · visível ao educador"
+      "historico": "Histórico da sessão · visível ao educador",
+      "participanteSaiu": "Alguém que não está mais na equipe"
     },
     "chave": {
       "concluida": "✓ Feita",
       "ativa": "⏱ Ativa",
-      "disponivel": "▶ Disponível",
-      "padrao": "○ Disponível",
-      "iniciar": "Iniciar {nome}",
-      "bloqueadaPorProblema": "🔒 Complete Problema primeiro",
+      "pendente": "○ Por vir",
+      "bloqueadaPorProblema": "🔒 Complete a chave anterior primeiro",
       "clique": "clique",
       "bloqueada": "🔒"
     },
@@ -243,7 +397,10 @@
     },
     "fases": {
       "problema": [
-        { "nome": "Contexto", "pergunta": "Onde o problema acontece?" },
+        {
+          "nome": "Contexto",
+          "pergunta": "Onde o problema acontece?"
+        },
         {
           "nome": "Características",
           "pergunta": "Como o problema afeta o contexto?"
@@ -254,7 +411,10 @@
         }
       ],
       "solucao": [
-        { "nome": "Características", "pergunta": "Como será a solução?" },
+        {
+          "nome": "Características",
+          "pergunta": "Como será a solução?"
+        },
         {
           "nome": "Custos",
           "pergunta": "Quais são as despesas envolvidas para implementar a solução?"
@@ -296,7 +456,8 @@
     "comm2": {
       "cutucou": "Você cutucou {nome}",
       "paraDestino": "Você → {nome}",
-      "faseConcluidaLog": "✓ Fase {nome} de {chave} concluída"
+      "faseConcluidaLog": "✓ Fase {nome} de {chave} concluída",
+      "cutucarTitle": "Cutucar"
     },
     "rpg": {
       "escolherTitulo": "Escolha seu papel",
@@ -304,6 +465,13 @@
       "perspectiva": "Perspectiva",
       "confirmar": "Assumir este papel",
       "trocarPapel": "Trocar papel"
+    },
+    "encerramento": {
+      "titulo": "Investigação concluída!",
+      "subTpl": "Equipe: {equipe} · {pontos} pts",
+      "semFases": "Nenhuma fase registrada",
+      "revisar": "← Revisar",
+      "entregar": "Entregar projeto →"
     }
   },
   "socializacao": {
@@ -324,6 +492,41 @@
       "maisAvancadaLbl": "Mais avançada"
     },
     "avisoDemo": "Vista prévia — dados de exemplo, falta conectar ao backend real."
+  },
+  "resetPassword": {
+    "titulo": "Nova senha",
+    "verificando": "Verificando o link…",
+    "linkInvalido": "Esse link não é mais válido ou venceu. Peça um novo na tela de login.",
+    "voltarLogin": "Voltar ao login",
+    "sub": "Escolha sua nova senha.",
+    "novaSenha": "Nova senha",
+    "confirmarSenha": "Confirmar senha",
+    "salvar": "Salvar senha",
+    "senhasDiferentes": "As senhas não coincidem",
+    "erro": "Não foi possível trocar a senha",
+    "sucesso": "Senha atualizada"
+  },
+  "mentor": {
+    "titulo": "Painel do mentor",
+    "carregando": "Carregando…",
+    "sair": "Sair",
+    "semEquipes": "Ainda não há equipes neste evento",
+    "criterios": {
+      "problema": "Problema",
+      "solucao": "Solução",
+      "impacto": "Impacto",
+      "viabilidade": "Viabilidade",
+      "apresentacao": "Apresentação"
+    },
+    "avaliar": {
+      "chaves": "chaves",
+      "editar": "✏️ Editar nota",
+      "calificar": "⭐ Avaliar",
+      "comentario": "Comentário (opcional)",
+      "cancelar": "Cancelar",
+      "salvar": "Salvar nota",
+      "salvo": "Nota salva"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

@@ -5,39 +5,40 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
+import { TeamFlowHeader } from "@/components/shared/TeamFlowHeader";
+import { sendJson, readApiError, translateApiError } from "@/lib/api/client";
 
 export default function JoinTeamPage() {
   const t = useTranslations("team");
+  const tCommon = useTranslations("common");
   const toast = useToast();
   const router = useRouter();
   const params = useSearchParams();
-  const nickname = params.get("nickname") ?? "";
+  const nicknameFromLink = params.get("nickname") ?? "";
   const [joinCode, setJoinCode] = useState(params.get("code") ?? "");
+  const [nickname, setNickname] = useState(nicknameFromLink);
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/participants", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ teamJoinCode: joinCode, nickname }),
-    });
-    if (res.status === 501) {
-      toast(
-        "info",
-        "Unirse a equipo: backend en construcción — abriendo tablero en modo preview.",
-      );
-      router.push(
-        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
-      );
-      return;
+    setSubmitting(true);
+    try {
+      const res = await sendJson("/api/participants", "POST", {
+        teamJoinCode: joinCode,
+        nickname,
+      });
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          translateApiError(tCommon, err?.error, t("toasts.invalidCode")),
+        );
+        return;
+      }
+      router.push("/jogador/dashboard");
+    } finally {
+      setSubmitting(false);
     }
-    if (res.ok) {
-      router.push(
-        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
-      );
-      return;
-    }
-    toast("err", "Código de equipo inválido");
   }
 
   return (
@@ -45,34 +46,60 @@ export default function JoinTeamPage() {
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         padding: 24,
       }}
     >
-      <form
-        className="card card-pad"
-        style={{ maxWidth: 420, width: "100%" }}
-        onSubmit={handleSubmit}
+      <TeamFlowHeader />
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <div className="field">
-          <label>{t("joinCodeLabel")}</label>
-          <input
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value)}
-            style={{
-              textTransform: "uppercase",
-              letterSpacing: ".15em",
-              fontWeight: 700,
-            }}
-            required
-            autoFocus
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w100">
-          {t("joinTeam")}
-        </button>
-      </form>
+        <form
+          className="card card-pad anim-in bg-white/5 backdrop-blur-md border border-white/10"
+          style={{ maxWidth: 420, width: "100%" }}
+          onSubmit={handleSubmit}
+        >
+          <div className="field">
+            <label>{t("joinCodeLabel")}</label>
+            <input
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value)}
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: ".15em",
+                fontWeight: 700,
+              }}
+              required
+              autoFocus={!nicknameFromLink}
+            />
+          </div>
+          {!nicknameFromLink && (
+            <div className="field">
+              <label>{t("joinNicknameLabel")}</label>
+              <input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+          )}
+          <button
+            type="submit"
+            className="btn btn-primary w100"
+            disabled={submitting}
+          >
+            {t("joinTeam")}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
