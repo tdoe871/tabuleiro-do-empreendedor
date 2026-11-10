@@ -7,6 +7,9 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jsdom",
   testPathIgnorePatterns: ["<rootDir>/e2e-tests/", "<rootDir>/node_modules/"],
+  // next/jest rewrites "@/" in static imports at compile time, but not inside
+  // jest.mock() or computed require() paths, so map it for the resolver too.
+  moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
 };
 
 // ESM-only packages that Jest has to transform (next/jest skips everything in
