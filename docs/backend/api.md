@@ -1,10 +1,9 @@
 # Contrato de la API — Tabuleiro do Empreendedor
 
-> **Estado (9 nov): todo lo de este contrato está implementado y probado contra Supabase**, en los
-> PRs #7 y #11 a #17 (todavía sin merge a `dev`). Lo marcado con ❓ es una decisión abierta; lo
-> marcado con 🆕 es un endpoint que el frontend todavía no llama. La lista de cambios para el
-> frontend está en la [sección 8](#8-resumen-de-cambios-para-el-frontend). Si algo no te cuadra,
-> coméntalo en el PR.
+> **Estado (10 nov): todo lo de este contrato está implementado, probado contra Supabase y en
+> `dev`** (PRs #7 y #11 a #17). Desde el PR #18 el frontend llama a todos los endpoints. Lo marcado
+> con ❓ es una decisión abierta. La [sección 8](#8-resumen-de-cambios-para-el-frontend) queda como
+> registro de los cambios que pidió el backend. Si algo no te cuadra, coméntalo en el PR.
 >
 > Responsable: Eddy (backend). Estado general del proyecto: `docs/backend/ESTADO-BACKEND.md`.
 >
@@ -100,7 +99,7 @@ Registro de educador (pestaña de registro del login).
   (`email` o `senha` vacíos).
 - Sin sesión de staff, cualquier página de `/[locale]/mestre/*` redirige al login (`/[locale]`).
 
-### Recuperar la contraseña — Público 🆕
+### Recuperar la contraseña — Público
 
 **Implementado.** "¿Olvidaste tu contraseña?" para educadores, en 3 pasos:
 
@@ -141,6 +140,10 @@ Registro de educador (pestaña de registro del login).
   dominio verificado en Resend) y `NEXT_PUBLIC_APP_URL` con la URL real. Sin ellos el paso 1 sigue
   respondiendo `202` pero no manda nada (queda el error en los logs); en local el correo se imprime
   en la terminal.
+- **En producción no hay dominio en Resend (10 nov), así que no llega ningún correo.** Mientras
+  tanto, el educador que olvidó su contraseña le pide una nueva a Eddy, que la cambia con
+  `pnpm staff:password --email <correo>` (ver `ESTADO-BACKEND.md`). El efecto es el mismo que el
+  paso 3: se cierran sus otras sesiones y los enlaces pendientes dejan de servir.
 
 ### `POST /api/events` — Staff
 
@@ -317,7 +320,7 @@ Ya implementado. Sin datos sensibles.
 
 ---
 
-## 3. Endpoints nuevos para el jugador 🆕
+## 3. Endpoints nuevos para el jugador
 
 **Implementados.** Defaults que se tomaron mientras no haya otra decisión;
 cualquiera se puede cambiar después sin rehacer nada:
@@ -582,7 +585,7 @@ Borra las cookies de educador y de jugador. `204`. **Implementado.**
 
 ---
 
-## 4. Endpoints nuevos para el educador 🆕
+## 4. Endpoints nuevos para el educador
 
 ### `GET /api/events` — Staff
 
@@ -653,7 +656,7 @@ agregada (sin N+1). **Implementado.**
   que el mural los pinte como quiera.
 - ❓ El campo `proposta` del mural (la propuesta del equipo): ¿es la descripción de la entrega o algo aparte?
 
-### Mentores y calificación — Staff y Mentor 🆕
+### Mentores y calificación — Staff y Mentor
 
 **Implementado.** Defaults (se cambian sin migración, en `features/mentor/server/rubric.ts`):
 
@@ -746,7 +749,7 @@ Los mentores pueden **descargar los archivos** de los equipos de su evento
 (`GET /api/submissions/files/:id`). Con cualquier sesión que no tenga permiso, la descarga responde
 `FILE_NOT_FOUND`; sin sesión, `UNAUTHORIZED`.
 
-### Timer de actividad — Staff 🆕
+### Timer de actividad — Staff
 
 **Implementado** (opción A): una cuenta regresiva corta para una actividad (presets de 5/15/20/30
 min en el panel), aparte del reloj de 24 h del evento.
@@ -772,7 +775,7 @@ min en el panel), aparte del reloj de 24 h del evento.
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`minutes` / `visible` →
   `INVALID`), `EVENT_FINISHED` (no se inicia con el evento terminado).
 
-### Carta de reto — Staff 🆕
+### Carta de reto — Staff
 
 **Implementado.** Una carta activa a la vez, para todos los equipos.
 
@@ -791,7 +794,7 @@ min en el panel), aparte del reloj de 24 h del evento.
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`key` → `INVALID`, `text` →
   `REQUIRED` / `TOO_LONG`), `EVENT_FINISHED`.
 
-### Avisos generales — Staff 🆕
+### Avisos generales — Staff
 
 **Implementado.** El educador manda un mensaje a todo el evento ("la comida está lista", "los
 pitches empiezan a las 3"). Lo ven todos los jugadores en el tablero y los mentores en su pantalla.
@@ -823,7 +826,7 @@ pitches empiezan a las 3"). Lo ven todos los jugadores en el tablero y los mento
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`text` → `REQUIRED` /
   `TOO_LONG`), `RATE_LIMITED`; al borrar, `ANNOUNCEMENT_NOT_FOUND`.
 
-### Interruptores de emergencia — Staff 🆕
+### Interruptores de emergencia — Staff
 
 **Implementado.** El educador apaga una parte de la app de su evento **sin volver a desplegar**
 (abuso en el chat, problemas con Storage, cerrar la puerta a gente nueva). Son banderas en la base
@@ -851,7 +854,7 @@ que cada ruta revisa en cada petición; el cambio vale desde la siguiente petici
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`switches` → `REQUIRED` si el body
   no trae ninguno; `<nombre>` → `INVALID` si no es booleano o `UNKNOWN` si no existe).
 
-### Alertas de mediación — en `GET /api/events/:id/overview` 🆕
+### Alertas de mediación — en `GET /api/events/:id/overview`
 
 **Implementado.** Se calculan en cada consulta del resumen a partir del avance (no se guardan):
 una alerta desaparece sola cuando se resuelve su causa. "Verificar alertas" = volver a pedir el
@@ -874,7 +877,7 @@ resumen.
 - El frontend traduce por `type` y usa `minutes` y `team.name` en el texto. **Cambio:** antes
   `message` era el texto a mostrar; ahora para las automáticas trae el `type`.
 
-### Exportar — Staff 🆕
+### Exportar — Staff
 
 **Implementado.** `GET /api/events/:id/export?type=report|proposals|activity` → descarga un CSV
 (UTF-8 con BOM, abre bien en Excel y Google Sheets). Encabezados en español.
@@ -890,7 +893,7 @@ resumen.
   las ejecute como fórmula (los números, también los negativos, quedan como números).
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
 
-### Registro de actividad — Staff 🆕
+### Registro de actividad — Staff
 
 **Implementado.** Para la investigación: quién hizo qué y cuándo en el evento. El backend lo
 escribe solo en cada acción; nadie lo edita. **Nunca guarda contenido**: ni el texto del chat ni las

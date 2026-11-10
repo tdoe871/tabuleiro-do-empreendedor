@@ -17,8 +17,8 @@
 // The team leader completes the next phase every 60-120 s. One educator
 // polls the overview every 10 s. Intervals get ±30% jitter.
 //
-// Note: the app limits team creation and joins to 300 per 5 min per IP;
-// more than 300 participants from one machine will hit RATE_LIMITED.
+// Note: the app limits team creation and joins to 500 per 5 min per IP;
+// more than 500 participants from one machine will hit RATE_LIMITED.
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";

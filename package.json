@@ -17,6 +17,7 @@
     "db:migrate": "pnpm --filter @tdoe/db migrate",
     "db:seed": "pnpm --filter @tdoe/db seed",
     "load-test": "pnpm --filter @tdoe/db exec tsx scripts/load-test.ts",
+    "staff:password": "pnpm --filter @tdoe/db exec tsx scripts/staff-password.ts",
     "prepare": "husky"
   },
   "devDependencies": {

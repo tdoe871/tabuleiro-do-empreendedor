@@ -1,5 +1,6 @@
 import {
   randomBytes,
+  randomInt,
   scrypt,
   timingSafeEqual,
   type ScryptOptions,
@@ -49,6 +50,28 @@ export async function hashPassword(password: string): Promise<string> {
     salt.toString("base64"),
     key.toString("base64"),
   ].join("$");
+}
+
+// Letters and digits without look-alikes (I/l/1, O/0), so a password can be
+// read out over the phone or copied from a chat without mistakes.
+export const GENERATED_PASSWORD_ALPHABET =
+  "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+
+// Temporary password for an educator (staff-password script): 4 groups of 4
+// characters, about 92 bits of randomness, 19 characters with the dashes.
+export function generatePassword(): string {
+  const groups: string[] = [];
+  for (let g = 0; g < 4; g++) {
+    let group = "";
+    for (let i = 0; i < 4; i++) {
+      group +=
+        GENERATED_PASSWORD_ALPHABET[
+          randomInt(GENERATED_PASSWORD_ALPHABET.length)
+        ];
+    }
+    groups.push(group);
+  }
+  return groups.join("-");
 }
 
 // Returns false for anything that is not a well-formed hash, including the
