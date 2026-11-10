@@ -6,8 +6,10 @@ import {
   planStatusChange,
   toEventDTO,
 } from "@/features/event/server/event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
+import { eventTopic, notify, staffTopic } from "@/lib/realtime/server";
 
 // PATCH /api/events/:id/status — start, pause, resume or finish a session.
 // Body: { status: "ACTIVE" | "PAUSED" | "FINISHED" }. Rules in
@@ -44,6 +46,15 @@ export async function PATCH(
       data: change.data,
     });
     if (count === 0) return apiError("INVALID_STATUS_TRANSITION");
+    await recordActivity({
+      ...asStaff(staff, id),
+      action: "EVENT_STATUS_CHANGED",
+      details: { from: event.status, to: change.data.status },
+    });
+    notify(
+      { topic: eventTopic(id), signal: "event" },
+      { topic: staffTopic(id), signal: "overview" },
+    );
 
     const updated = await prisma.event.findUniqueOrThrow({ where: { id } });
     return NextResponse.json({ event: toEventDTO(updated) });
