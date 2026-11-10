@@ -28,7 +28,17 @@
       "PHASE_LOCKED": "Essa fase ainda está bloqueada.",
       "INVALID_STATUS_TRANSITION": "Essa ação não é permitida no estado atual da sessão.",
       "RATE_LIMITED": "Muitas tentativas. Espere um pouco e tente de novo.",
-      "INTERNAL_ERROR": "Algo deu errado do nosso lado. Tente novamente."
+      "INTERNAL_ERROR": "Algo deu errado do nosso lado. Tente novamente.",
+      "RESET_TOKEN_INVALID": "Esse link não é mais válido. Peça um novo.",
+      "RESET_TOKEN_EXPIRED": "Esse link venceu. Peça um novo.",
+      "FILE_NOT_FOUND": "Arquivo não encontrado.",
+      "ANNOUNCEMENT_NOT_FOUND": "Esse aviso não existe mais.",
+      "FILE_NOT_UPLOADED": "Esse arquivo ainda não foi enviado.",
+      "TOO_MANY_FILES": "Sua equipe já chegou no limite de arquivos.",
+      "TOO_MANY_MENTORS": "Essa sessão já chegou no limite de mentores.",
+      "CHAT_DISABLED": "O educador desligou o chat por agora.",
+      "SUBMISSIONS_DISABLED": "O educador desligou as entregas por agora.",
+      "JOINS_DISABLED": "O educador fechou as entradas novas por agora."
     }
   },
   "join": {
@@ -70,12 +80,21 @@
     "editar": "✏️ Editar entrega",
     "abrir": "📦 Entregar projeto",
     "status": "Entrega registrada",
-    "invalidUrl": "O link precisa começar com http:// ou https://",
-    "fileHint": "Máx. 10MB · PDF, PNG, JPG ou WEBP",
-    "fileTooLarge": "O arquivo passa do limite de 10MB.",
-    "fileInvalidType": "Formato não permitido. Use PDF, PNG, JPG ou WEBP.",
-    "fileRequired": "Selecione um arquivo antes de salvar.",
-    "saving": "Salvando…"
+    "invalidUrl": "O link precisa começar com https://",
+    "fileHint": "Máx. 20MB cada · PDF, Word, PowerPoint, PNG, JPG ou WEBP · até 5 arquivos",
+    "fileTooLarge": "O arquivo passa do limite de 20MB.",
+    "fileInvalidType": "Formato não permitido.",
+    "fileRequired": "Envie pelo menos um arquivo antes de salvar.",
+    "saving": "Salvando…",
+    "cancelar": "Cancelar",
+    "maxArquivos": "Sua equipe já chegou no limite de 5 arquivos.",
+    "uploadFalhou": "Não foi possível enviar o arquivo. Tente de novo.",
+    "arquivoEnviado": "Arquivo enviado",
+    "removerArquivo": "Remover arquivo",
+    "enviando": "Enviando…",
+    "adicionarArquivo": "+ Adicionar arquivo",
+    "linksExtraLabel": "Links extras (opcional)",
+    "adicionarLink": "Adicionar link"
   },
   "keys": {
     "problema": {
@@ -265,6 +284,21 @@
     "topbarTitulo": "Tabuleiro",
     "semChaveAtiva": "— sem chave ativa —",
     "sair": "Sair",
+    "carregando": "Carregando sua equipe…",
+    "entregaEditar": "✏️ Editar entrega",
+    "entregaAbrir": "📦 Entregar projeto",
+    "estado": {
+      "draft": "A sessão ainda não começou.",
+      "paused": "A sessão está em pausa.",
+      "finished": "A sessão já terminou."
+    },
+    "avisos": {
+      "titulo": "Avisos",
+      "vazio": "Ainda não há avisos do educador"
+    },
+    "cartaAtiva": {
+      "titulo": "Carta de reto ativa"
+    },
     "score": {
       "label": "Pontos de investigação",
       "unidade": "pts",
@@ -292,15 +326,14 @@
       "enviar": "Enviar →",
       "paraQuem": "Para quem?",
       "semMensagens": "Ainda não há mensagens",
-      "historico": "Histórico da sessão · visível ao educador"
+      "historico": "Histórico da sessão · visível ao educador",
+      "participanteSaiu": "Alguém que não está mais na equipe"
     },
     "chave": {
       "concluida": "✓ Feita",
       "ativa": "⏱ Ativa",
-      "disponivel": "▶ Disponível",
-      "padrao": "○ Disponível",
-      "iniciar": "Iniciar {nome}",
-      "bloqueadaPorProblema": "🔒 Complete Problema primeiro",
+      "pendente": "○ Por vir",
+      "bloqueadaPorProblema": "🔒 Complete a chave anterior primeiro",
       "clique": "clique",
       "bloqueada": "🔒"
     },

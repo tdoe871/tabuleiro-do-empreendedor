@@ -28,7 +28,17 @@
       "PHASE_LOCKED": "Cette phase est encore verrouillée.",
       "INVALID_STATUS_TRANSITION": "Cette action n'est pas autorisée dans l'état actuel de la session.",
       "RATE_LIMITED": "Trop de tentatives. Attendez un peu et réessayez.",
-      "INTERNAL_ERROR": "Une erreur est survenue de notre côté. Réessayez."
+      "INTERNAL_ERROR": "Une erreur est survenue de notre côté. Réessayez.",
+      "RESET_TOKEN_INVALID": "Ce lien n'est plus valide. Demandez-en un nouveau.",
+      "RESET_TOKEN_EXPIRED": "Ce lien a expiré. Demandez-en un nouveau.",
+      "FILE_NOT_FOUND": "Fichier introuvable.",
+      "ANNOUNCEMENT_NOT_FOUND": "Cette annonce n'existe plus.",
+      "FILE_NOT_UPLOADED": "Ce fichier n'a pas encore été envoyé.",
+      "TOO_MANY_FILES": "Votre équipe a déjà atteint la limite de fichiers.",
+      "TOO_MANY_MENTORS": "Cette session a déjà atteint la limite de mentors.",
+      "CHAT_DISABLED": "L'éducateur a désactivé le chat pour l'instant.",
+      "SUBMISSIONS_DISABLED": "L'éducateur a désactivé les soumissions pour l'instant.",
+      "JOINS_DISABLED": "L'éducateur a fermé les nouvelles entrées pour l'instant."
     }
   },
   "join": {
@@ -70,12 +80,21 @@
     "editar": "✏️ Modifier la soumission",
     "abrir": "📦 Soumettre le projet",
     "status": "Soumission enregistrée",
-    "invalidUrl": "Le lien doit commencer par http:// ou https://",
-    "fileHint": "Max 10 Mo · PDF, PNG, JPG ou WEBP",
-    "fileTooLarge": "Le fichier dépasse la limite de 10 Mo.",
-    "fileInvalidType": "Format non autorisé. Utilisez PDF, PNG, JPG ou WEBP.",
-    "fileRequired": "Sélectionnez un fichier avant d'enregistrer.",
-    "saving": "Enregistrement…"
+    "invalidUrl": "Le lien doit commencer par https://",
+    "fileHint": "Max 20 Mo chacun · PDF, Word, PowerPoint, PNG, JPG ou WEBP · jusqu'à 5 fichiers",
+    "fileTooLarge": "Le fichier dépasse la limite de 20 Mo.",
+    "fileInvalidType": "Format non autorisé.",
+    "fileRequired": "Envoyez au moins un fichier avant d'enregistrer.",
+    "saving": "Enregistrement…",
+    "cancelar": "Annuler",
+    "maxArquivos": "Votre équipe a déjà atteint la limite de 5 fichiers.",
+    "uploadFalhou": "Impossible d'envoyer le fichier. Réessayez.",
+    "arquivoEnviado": "Fichier envoyé",
+    "removerArquivo": "Retirer le fichier",
+    "enviando": "Envoi…",
+    "adicionarArquivo": "+ Ajouter un fichier",
+    "linksExtraLabel": "Liens supplémentaires (optionnel)",
+    "adicionarLink": "Ajouter un lien"
   },
   "keys": {
     "problema": {
@@ -265,6 +284,21 @@
     "topbarTitulo": "Plateau",
     "semChaveAtiva": "— aucune clé active —",
     "sair": "Se déconnecter",
+    "carregando": "Chargement de votre équipe…",
+    "entregaEditar": "✏️ Modifier la soumission",
+    "entregaAbrir": "📦 Soumettre le projet",
+    "estado": {
+      "draft": "La session n'a pas encore commencé.",
+      "paused": "La session est en pause.",
+      "finished": "La session est déjà terminée."
+    },
+    "avisos": {
+      "titulo": "Annonces",
+      "vazio": "Pas encore d'annonces du formateur"
+    },
+    "cartaAtiva": {
+      "titulo": "Carte-défi active"
+    },
     "score": {
       "label": "Points d'investigation",
       "unidade": "pts",
@@ -292,15 +326,14 @@
       "enviar": "Envoyer →",
       "paraQuem": "Pour qui ?",
       "semMensagens": "Pas encore de messages",
-      "historico": "Historique de la session · visible par le formateur"
+      "historico": "Historique de la session · visible par le formateur",
+      "participanteSaiu": "Quelqu'un qui n'est plus dans l'équipe"
     },
     "chave": {
       "concluida": "✓ Fait",
       "ativa": "⏱ Active",
-      "disponivel": "▶ Disponible",
-      "padrao": "○ Disponible",
-      "iniciar": "Démarrer {nome}",
-      "bloqueadaPorProblema": "🔒 Terminez Problème d'abord",
+      "pendente": "○ À venir",
+      "bloqueadaPorProblema": "🔒 Terminez d'abord la clé précédente",
       "clique": "touchez",
       "bloqueada": "🔒"
     },

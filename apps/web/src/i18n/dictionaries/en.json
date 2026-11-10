@@ -28,7 +28,17 @@
       "PHASE_LOCKED": "That phase is still locked.",
       "INVALID_STATUS_TRANSITION": "That action isn't allowed in the session's current state.",
       "RATE_LIMITED": "Too many attempts. Wait a bit and try again.",
-      "INTERNAL_ERROR": "Something went wrong on our end. Try again."
+      "INTERNAL_ERROR": "Something went wrong on our end. Try again.",
+      "RESET_TOKEN_INVALID": "That link isn't valid anymore. Ask for a new one.",
+      "RESET_TOKEN_EXPIRED": "That link expired. Ask for a new one.",
+      "FILE_NOT_FOUND": "File not found.",
+      "ANNOUNCEMENT_NOT_FOUND": "That announcement no longer exists.",
+      "FILE_NOT_UPLOADED": "That file hasn't been uploaded yet.",
+      "TOO_MANY_FILES": "Your team already reached the file limit.",
+      "TOO_MANY_MENTORS": "This session already reached the mentor limit.",
+      "CHAT_DISABLED": "The educator turned off chat for now.",
+      "SUBMISSIONS_DISABLED": "The educator turned off submissions for now.",
+      "JOINS_DISABLED": "The educator closed new entries for now."
     }
   },
   "join": {
@@ -70,12 +80,21 @@
     "editar": "✏️ Edit submission",
     "abrir": "📦 Submit project",
     "status": "Submission recorded",
-    "invalidUrl": "The link must start with http:// or https://",
-    "fileHint": "Max 10MB · PDF, PNG, JPG or WEBP",
-    "fileTooLarge": "The file is over the 10MB limit.",
-    "fileInvalidType": "Format not allowed. Use PDF, PNG, JPG or WEBP.",
-    "fileRequired": "Select a file before saving.",
-    "saving": "Saving…"
+    "invalidUrl": "The link must start with https://",
+    "fileHint": "Max 20MB each · PDF, Word, PowerPoint, PNG, JPG or WEBP · up to 5 files",
+    "fileTooLarge": "The file is over the 20MB limit.",
+    "fileInvalidType": "Format not allowed.",
+    "fileRequired": "Upload at least one file before saving.",
+    "saving": "Saving…",
+    "cancelar": "Cancel",
+    "maxArquivos": "Your team already reached the limit of 5 files.",
+    "uploadFalhou": "Couldn't upload the file. Try again.",
+    "arquivoEnviado": "File uploaded",
+    "removerArquivo": "Remove file",
+    "enviando": "Uploading…",
+    "adicionarArquivo": "+ Add file",
+    "linksExtraLabel": "Extra links (optional)",
+    "adicionarLink": "Add link"
   },
   "keys": {
     "problema": {
@@ -265,6 +284,21 @@
     "topbarTitulo": "Board",
     "semChaveAtiva": "— no active key —",
     "sair": "Sign out",
+    "carregando": "Loading your team…",
+    "entregaEditar": "✏️ Edit submission",
+    "entregaAbrir": "📦 Submit project",
+    "estado": {
+      "draft": "The session hasn't started yet.",
+      "paused": "The session is paused.",
+      "finished": "The session already ended."
+    },
+    "avisos": {
+      "titulo": "Announcements",
+      "vazio": "No announcements from the educator yet"
+    },
+    "cartaAtiva": {
+      "titulo": "Active challenge card"
+    },
     "score": {
       "label": "Investigation points",
       "unidade": "pts",
@@ -292,15 +326,14 @@
       "enviar": "Send →",
       "paraQuem": "To whom?",
       "semMensagens": "No messages yet",
-      "historico": "Session history · visible to the educator"
+      "historico": "Session history · visible to the educator",
+      "participanteSaiu": "Someone no longer on the team"
     },
     "chave": {
       "concluida": "✓ Done",
       "ativa": "⏱ Active",
-      "disponivel": "▶ Available",
-      "padrao": "○ Available",
-      "iniciar": "Start {nome}",
-      "bloqueadaPorProblema": "🔒 Complete Problem first",
+      "pendente": "○ Coming up",
+      "bloqueadaPorProblema": "🔒 Finish the previous key first",
       "clique": "tap",
       "bloqueada": "🔒"
     },
