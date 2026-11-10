@@ -54,7 +54,7 @@
 | #16 | `feature/activity-log`          | (#7)  | **Merged**       | Registro de actividad para la investigación, con CSV                                              |
 | #17 | `feature/password-reset`        | (#7)  | **Merged**       | Recuperar la contraseña del educador por correo                                                   |
 | #18 | `feat/connect-frontend-...`     | `dev` | Merged (Brandon) | Frontend conectado a todos los bloques; sube el límite de entradas por IP de 300 a 500            |
-| —   | `feature/staff-password-script` | `dev` | **Abierto**      | Script para darle una contraseña nueva a un educador sin correo (`pnpm staff:password`)           |
+| #19 | `feature/staff-password-script` | `dev` | **Abierto**      | Script para darle una contraseña nueva a un educador sin correo (`pnpm staff:password`)           |
 | #6  | `ui/theme-sandbox-test`         | `dev` | Merged (JP)      | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
 | #5  | `test/initial-tests`            | `qa`  | Merged (Leo)     | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
@@ -479,7 +479,7 @@ Pendientes conocidos (Claude lleva la lista completa en su memoria):
 3. ~~Registro de actividad para la investigación~~ **hecho (#16).**
 4. ~~Recuperar la contraseña del educador por correo~~ **hecho (#17).**
 5. ~~Preparar la VM de Azure~~ **no hace falta: se eligió Vercel.**
-6. Contraseña nueva sin correo (`pnpm staff:password`): **PR `feature/staff-password-script`.**
+6. Contraseña nueva sin correo (`pnpm staff:password`): **PR #19.**
 
 ### Para el resto del equipo
 
