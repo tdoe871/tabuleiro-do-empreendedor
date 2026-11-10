@@ -152,6 +152,7 @@
       "entrarJogo": "Entrar no jogo →",
       "codeHint1": "Código fornecido pelo educador",
       "codeHint2": "Peça o código de 6 letras para começar",
+      "esqueceuSenha": "Esqueceu sua senha?",
       "titleMentor": "Entrar como mentor",
       "subMentor": "Avalie as equipes — sem cadastro",
       "codigoMentores": "Código de mentores",
@@ -165,6 +166,12 @@
       "registerError": "Não foi possível criar a conta",
       "missingFields": "Preencha seu nome e o código",
       "mentorError": "Não foi possível entrar. Confira o código de mentores."
+    },
+    "forgot": {
+      "titulo": "Recuperar senha",
+      "sub": "Vamos te mandar um link para criar uma nova senha.",
+      "enviar": "Enviar link",
+      "enviado": "Se esse e-mail estiver cadastrado, um link já foi enviado. Confira sua caixa de entrada."
     }
   },
   "educador": {
@@ -485,6 +492,19 @@
       "maisAvancadaLbl": "Mais avançada"
     },
     "avisoDemo": "Vista prévia — dados de exemplo, falta conectar ao backend real."
+  },
+  "resetPassword": {
+    "titulo": "Nova senha",
+    "verificando": "Verificando o link…",
+    "linkInvalido": "Esse link não é mais válido ou venceu. Peça um novo na tela de login.",
+    "voltarLogin": "Voltar ao login",
+    "sub": "Escolha sua nova senha.",
+    "novaSenha": "Nova senha",
+    "confirmarSenha": "Confirmar senha",
+    "salvar": "Salvar senha",
+    "senhasDiferentes": "As senhas não coincidem",
+    "erro": "Não foi possível trocar a senha",
+    "sucesso": "Senha atualizada"
   },
   "mentor": {
     "titulo": "Painel do mentor",

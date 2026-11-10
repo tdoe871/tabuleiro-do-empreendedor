@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { GemLogo, StarWatermark } from "@/components/ui/GemLogo";
 import { LangSwitcher } from "@/components/shared/LangSwitcher";
+import { Modal } from "@/components/ui/Modal";
 import { HeroConceitos } from "./HeroConceitos";
 import {
   KEY_IDS,
@@ -30,7 +31,11 @@ export function LoginScreen() {
   const tKeys = useTranslations("keys");
   const toast = useToast();
   const router = useRouter();
+  const locale = useLocale();
   const [tab, setTab] = useState<LoginTab>("login");
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginSenha, setLoginSenha] = useState("");
@@ -102,6 +107,16 @@ export function LoginScreen() {
       nickname: jogNome.trim(),
     });
     router.push(`/team?${params.toString()}`);
+  }
+
+  async function handleForgot(e: FormEvent) {
+    e.preventDefault();
+    await postJson("/api/auth/password/forgot", {
+      email: forgotEmail,
+      locale,
+    });
+    // 202 always, whether or not the account exists — never reveal which.
+    setForgotSent(true);
   }
 
   async function handleMentor(e: FormEvent) {
@@ -224,6 +239,26 @@ export function LoginScreen() {
                   onChange={(e) => setLoginSenha(e.target.value)}
                   required
                 />
+              </div>
+              <div style={{ textAlign: "right", marginBottom: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotEmail(loginEmail);
+                    setForgotSent(false);
+                    setShowForgot(true);
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--t3)",
+                    fontSize: 11,
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {t("form.esqueceuSenha")}
+                </button>
               </div>
               <button type="submit" className="btn btn-primary w100">
                 {t("form.enter")}
@@ -409,6 +444,36 @@ export function LoginScreen() {
           </span>
         ))}
       </div>
+
+      {showForgot && (
+        <Modal onClose={() => setShowForgot(false)} maxWidth={400}>
+          <h3>{t("forgot.titulo")}</h3>
+          {forgotSent ? (
+            <p style={{ fontSize: 12, color: "var(--t2)" }}>
+              {t("forgot.enviado")}
+            </p>
+          ) : (
+            <form onSubmit={handleForgot}>
+              <p style={{ fontSize: 12, color: "var(--t3)" }}>
+                {t("forgot.sub")}
+              </p>
+              <div className="field">
+                <label>{t("form.email")}</label>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w100">
+                {t("forgot.enviar")}
+              </button>
+            </form>
+          )}
+        </Modal>
+      )}
     </>
   );
 }

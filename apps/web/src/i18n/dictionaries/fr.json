@@ -152,6 +152,7 @@
       "entrarJogo": "Rejoindre la partie →",
       "codeHint1": "Code fourni par le formateur",
       "codeHint2": "Demandez le code à 6 lettres pour commencer",
+      "esqueceuSenha": "Mot de passe oublié ?",
       "titleMentor": "Connexion mentor",
       "subMentor": "Notez les équipes — sans inscription",
       "codigoMentores": "Code mentor",
@@ -165,6 +166,12 @@
       "registerError": "Impossible de créer le compte",
       "missingFields": "Renseignez votre nom et le code",
       "mentorError": "Connexion impossible. Vérifiez le code mentor."
+    },
+    "forgot": {
+      "titulo": "Réinitialiser le mot de passe",
+      "sub": "Nous allons vous envoyer un lien pour créer un nouveau mot de passe.",
+      "enviar": "Envoyer le lien",
+      "enviado": "Si cet e-mail est enregistré, un lien est en route. Vérifiez votre boîte de réception."
     }
   },
   "educador": {
@@ -485,6 +492,19 @@
       "maisAvancadaLbl": "La plus avancée"
     },
     "avisoDemo": "Aperçu — données d'exemple, il faut encore connecter le vrai backend."
+  },
+  "resetPassword": {
+    "titulo": "Nouveau mot de passe",
+    "verificando": "Vérification du lien…",
+    "linkInvalido": "Ce lien n'est plus valide ou a expiré. Demandez-en un nouveau depuis la page de connexion.",
+    "voltarLogin": "Retour à la connexion",
+    "sub": "Choisissez votre nouveau mot de passe.",
+    "novaSenha": "Nouveau mot de passe",
+    "confirmarSenha": "Confirmer le mot de passe",
+    "salvar": "Enregistrer le mot de passe",
+    "senhasDiferentes": "Les mots de passe ne correspondent pas",
+    "erro": "Impossible de changer le mot de passe",
+    "sucesso": "Mot de passe mis à jour"
   },
   "mentor": {
     "titulo": "Panneau mentor",

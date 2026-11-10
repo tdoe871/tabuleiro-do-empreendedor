@@ -152,6 +152,7 @@
       "entrarJogo": "Join the game →",
       "codeHint1": "Code provided by your educator",
       "codeHint2": "Ask for the 6-letter code to get started",
+      "esqueceuSenha": "Forgot your password?",
       "titleMentor": "Sign in as a mentor",
       "subMentor": "Score teams — no sign-up",
       "codigoMentores": "Mentor code",
@@ -165,6 +166,12 @@
       "registerError": "Couldn't create the account",
       "missingFields": "Fill in your name and the code",
       "mentorError": "Couldn't sign in. Check the mentor code."
+    },
+    "forgot": {
+      "titulo": "Reset password",
+      "sub": "We'll send you a link to set a new password.",
+      "enviar": "Send link",
+      "enviado": "If that email is registered, a link is on its way. Check your inbox."
     }
   },
   "educador": {
@@ -485,6 +492,19 @@
       "maisAvancadaLbl": "Most advanced"
     },
     "avisoDemo": "Preview — sample data, still needs to connect to the real backend."
+  },
+  "resetPassword": {
+    "titulo": "New password",
+    "verificando": "Checking the link…",
+    "linkInvalido": "That link isn't valid anymore or expired. Ask for a new one from the login screen.",
+    "voltarLogin": "Back to login",
+    "sub": "Set your new password.",
+    "novaSenha": "New password",
+    "confirmarSenha": "Confirm password",
+    "salvar": "Save password",
+    "senhasDiferentes": "Passwords don't match",
+    "erro": "Couldn't change the password",
+    "sucesso": "Password updated"
   },
   "mentor": {
     "titulo": "Mentor panel",
