@@ -76,9 +76,9 @@ export default function SandboxNeonPage() {
   }, [notify, selectedPhase]);
 
   return (
-    <div className="app-shell">
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
+    <div className="app-shell bg-none bg-[#0B0F19] text-slate-200">
+      <div className="ambient ambient-one bg-[#4F46E5]/20" />
+      <div className="ambient ambient-two bg-[#6366F1]/15" />
 
       <Sidebar
         isOpen={sidebarOpen}
@@ -88,17 +88,17 @@ export default function SandboxNeonPage() {
         onNotify={notify}
       />
 
-      <main className="workspace" id="inicio">
+      <main className="workspace bg-[#0B0F19] text-slate-200" id="inicio">
         <TopNav
           onOpenSidebar={() => setSidebarOpen(true)}
           onExport={exportProgress}
           onNotify={notify}
         />
 
-        <div className="content">
+        <div className="content text-slate-200">
           <section className="hero" id="jornada">
-            <div className="hero-copy">
-              <div className="eyebrow">
+            <div className="hero-copy text-slate-400">
+              <div className="eyebrow text-indigo-400">
                 <Sparkles size={14} /> CAPÍTULO 2 • EM PROGRESSO
               </div>
               <h1>
@@ -112,22 +112,25 @@ export default function SandboxNeonPage() {
               </p>
             </div>
 
-            <div className="level-card" id="ranking">
-              <div className="level-top">
-                <div className="level-badge">
+            <div
+              className="level-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+              id="ranking"
+            >
+              <div className="level-top text-white">
+                <div className="level-badge bg-[#4F46E5]/15 border border-white/10 text-indigo-400">
                   <Crown size={18} /> 07
                 </div>
                 <div>
                   <span>NÍVEL ATUAL</span>
                   <strong>Fundador Audaz</strong>
                 </div>
-                <Sparkles className="level-spark" size={22} />
+                <Sparkles className="level-spark text-indigo-400" size={22} />
               </div>
-              <div className="xp-row">
+              <div className="xp-row text-slate-400">
                 <span>2.840 XP</span>
                 <span>3.500 XP</span>
               </div>
-              <div className="xp-track">
+              <div className="xp-track bg-white/5">
                 <span />
               </div>
               <small>
@@ -137,12 +140,14 @@ export default function SandboxNeonPage() {
           </section>
 
           <section className="board-section">
-            <div className="title-row">
+            <div className="title-row text-white">
               <div>
-                <span className="section-kicker">MAPA DA JORNADA</span>
+                <span className="section-kicker text-slate-400">
+                  MAPA DA JORNADA
+                </span>
                 <h2>Escolha sua próxima missão</h2>
               </div>
-              <div className="progress-summary">
+              <div className="progress-summary text-slate-400">
                 <span>Progresso geral</span>
                 <strong>48%</strong>
                 <div>
@@ -182,7 +187,7 @@ export default function SandboxNeonPage() {
       </main>
 
       {toast && (
-        <div className="toast">
+        <div className="toast bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl text-white">
           <Check size={17} /> {toast}
         </div>
       )}

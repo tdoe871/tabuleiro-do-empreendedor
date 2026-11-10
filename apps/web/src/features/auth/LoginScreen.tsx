@@ -139,38 +139,38 @@ export function LoginScreen() {
 
   return (
     <>
-      <div id="tela-login">
-        <div className="login-hero bg-transparent">
+      <div id="tela-login" className="bg-[#0B0F19] text-slate-200">
+        <div className="login-hero bg-[#0B0F19] text-slate-200 border-r border-white/5">
           <div className="glow-prob" />
           <div className="glow-parc" />
           <div className="glow-opor" />
           <div className="hero-star">
             <StarWatermark />
           </div>
-          <div className="login-hero-content anim-in">
+          <div className="login-hero-content anim-in text-slate-200">
             <div className="logo-row">
-              <div className="logo-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+              <div className="logo-gem bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
                 <GemLogo />
               </div>
               <div>
-                <div className="logo-nm">{tCommon("appName")}</div>
-                <div className="logo-sb">TdoE</div>
+                <div className="logo-nm text-white">{tCommon("appName")}</div>
+                <div className="logo-sb text-slate-400">TdoE</div>
               </div>
               <div style={{ marginLeft: "auto" }}>
                 <LangSwitcher />
               </div>
             </div>
             <div>
-              <div className="hero-hl">{t("heroHl")}</div>
+              <div className="hero-hl text-white">{t("heroHl")}</div>
               <div className="hero-jogo grad">{t("heroJogo")}</div>
-              <div className="hero-tag">{t("heroTag")}</div>
+              <div className="hero-tag text-slate-400">{t("heroTag")}</div>
               <div className="hero-chips">
                 {KEY_IDS.map((id) => {
                   const key = tKeys.raw(id) as KeyTranslation;
                   return (
                     <div
                       key={id}
-                      className="badge backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime"
+                      className="badge bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -185,32 +185,32 @@ export function LoginScreen() {
               <HeroConceitos />
             </div>
           </div>
-          <div className="hero-foot">© 2026 TdoE</div>
+          <div className="hero-foot text-slate-500">© 2026 TdoE</div>
           <div className="hero-bar" />
         </div>
 
-        <div className="login-panel bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
-          <div className="login-tabs bg-white/5 backdrop-blur-md border border-white/10">
+        <div className="login-panel bg-[#151B2B]/90 backdrop-blur-xl border-l border-white/5 text-slate-200">
+          <div className="login-tabs bg-[#0B0F19]/80 backdrop-blur-xl border border-white/5 rounded-xl">
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
+              className={`login-tab text-slate-400 transition-all duration-300 hover:bg-white/5 hover:text-white ${tab === "login" ? "on bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]" : ""}`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
+              className={`login-tab text-slate-400 transition-all duration-300 hover:bg-white/5 hover:text-white ${tab === "cadastro" ? "on bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]" : ""}`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
+              className={`login-tab text-slate-400 transition-all duration-300 hover:bg-white/5 hover:text-white ${tab === "codigo" ? "on bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]" : ""}`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "mentor" ? "on" : ""}`}
+              className={`login-tab text-slate-400 transition-all duration-300 hover:bg-white/5 hover:text-white ${tab === "mentor" ? "on bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]" : ""}`}
               onClick={() => setTab("mentor")}
             >
               {t("tabs.mentor")}
@@ -218,9 +218,9 @@ export function LoginScreen() {
           </div>
 
           {tab === "login" && (
-            <form className="anim-in" onSubmit={handleLogin}>
-              <div className="login-title">{t("form.titleEdu")}</div>
-              <div className="login-sub">{t("form.subEdu")}</div>
+            <form className="anim-in text-slate-200" onSubmit={handleLogin}>
+              <div className="login-title text-white">{t("form.titleEdu")}</div>
+              <div className="login-sub text-slate-400">{t("form.subEdu")}</div>
               <div className="field">
                 <label>{t("form.email")}</label>
                 <input
@@ -260,16 +260,19 @@ export function LoginScreen() {
                   {t("form.esqueceuSenha")}
                 </button>
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              >
                 {t("form.enter")}
               </button>
             </form>
           )}
 
           {tab === "cadastro" && (
-            <form className="anim-in" onSubmit={handleCadastro}>
-              <div className="login-title">{t("form.titleCad")}</div>
-              <div className="login-sub">{t("form.subCad")}</div>
+            <form className="anim-in text-slate-200" onSubmit={handleCadastro}>
+              <div className="login-title text-white">{t("form.titleCad")}</div>
+              <div className="login-sub text-slate-400">{t("form.subCad")}</div>
               <div
                 style={{
                   display: "grid",
@@ -333,16 +336,19 @@ export function LoginScreen() {
                   />
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              >
                 {t("form.criarConta")}
               </button>
             </form>
           )}
 
           {tab === "codigo" && (
-            <form className="anim-in" onSubmit={handleCodigo}>
-              <div className="login-title">{t("form.titleCod")}</div>
-              <div className="login-sub">{t("form.subCod")}</div>
+            <form className="anim-in text-slate-200" onSubmit={handleCodigo}>
+              <div className="login-title text-white">{t("form.titleCod")}</div>
+              <div className="login-sub text-slate-400">{t("form.subCod")}</div>
               <div className="field">
                 <label>{t("form.seuNome")}</label>
                 <input
@@ -366,17 +372,20 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              >
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
-                  <div className="code-gem">
+                <div className="code-blk bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+                  <div className="code-gem bg-white/5 border border-white/10 rounded-lg">
                     <GemLogo size={20} />
                   </div>
                   <div>
                     <div
-                      className="small muted"
+                      className="small muted text-white"
                       style={{
                         fontSize: 12,
                         fontWeight: 700,
@@ -385,7 +394,10 @@ export function LoginScreen() {
                     >
                       {t("form.codeHint1")}
                     </div>
-                    <div className="small muted" style={{ marginTop: 2 }}>
+                    <div
+                      className="small muted text-slate-400"
+                      style={{ marginTop: 2 }}
+                    >
                       {t("form.codeHint2")}
                     </div>
                   </div>
@@ -395,9 +407,13 @@ export function LoginScreen() {
           )}
 
           {tab === "mentor" && (
-            <form className="anim-in" onSubmit={handleMentor}>
-              <div className="login-title">{t("form.titleMentor")}</div>
-              <div className="login-sub">{t("form.subMentor")}</div>
+            <form className="anim-in text-slate-200" onSubmit={handleMentor}>
+              <div className="login-title text-white">
+                {t("form.titleMentor")}
+              </div>
+              <div className="login-sub text-slate-400">
+                {t("form.subMentor")}
+              </div>
               <div className="field">
                 <label>{t("form.seuNome")}</label>
                 <input
@@ -421,7 +437,10 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              >
                 {t("form.entrarMentor")}
               </button>
             </form>
@@ -467,7 +486,10 @@ export function LoginScreen() {
                   autoFocus
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              >
                 {t("forgot.enviar")}
               </button>
             </form>

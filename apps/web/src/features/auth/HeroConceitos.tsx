@@ -14,7 +14,7 @@ export function HeroConceitos() {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="hero-conceitos">
+    <div className="hero-conceitos text-slate-200">
       <div
         style={{
           fontSize: 9,
@@ -34,7 +34,7 @@ export function HeroConceitos() {
         return (
           <div
             key={id}
-            className={`hc-card backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime ${open ? "open" : ""}`}
+            className={`hc-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 ${open ? "open" : ""}`}
             style={{
               background: `var(${KEY_COLOR_VAR[id]}-bg)`,
               borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
@@ -42,7 +42,7 @@ export function HeroConceitos() {
           >
             <button
               type="button"
-              className="hc-head"
+              className="hc-head text-white transition-all"
               style={{
                 width: "100%",
                 background: "none",
@@ -52,20 +52,23 @@ export function HeroConceitos() {
               onClick={() => setOpenId(open ? null : id)}
             >
               <div
-                className="hc-icn"
+                className="hc-icn bg-white/5 border border-white/10 rounded-lg text-white"
                 style={{ background: `var(${KEY_COLOR_VAR[id]}-bg)` }}
               >
                 {key.icon}
               </div>
-              <div className="hc-nm" style={{ color: colorVar }}>
+              <div className="hc-nm text-white" style={{ color: colorVar }}>
                 {key.name}
               </div>
-              <span className="hc-chev" style={{ color: colorVar }}>
+              <span
+                className="hc-chev text-slate-400 transition-all"
+                style={{ color: colorVar }}
+              >
                 ›
               </span>
             </button>
             {open && (
-              <div className="hc-body">
+              <div className="hc-body text-slate-400">
                 {key.desc.split("\n\n").map((para, i) => (
                   <p key={i} style={{ marginBottom: i === 0 ? 10 : 0 }}>
                     {para}

@@ -438,10 +438,10 @@ export function PlayerBoard() {
   }
 
   return (
-    <div id="tela-jogadores">
-      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
-        <div className="tb-logo">
-          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+    <div id="tela-jogadores" className="bg-[#0B0F19] text-slate-200">
+      <div className="topbar bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/5 text-slate-200">
+        <div className="tb-logo text-white">
+          <div className="tb-gem bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-lg transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>
@@ -452,7 +452,7 @@ export function PlayerBoard() {
         <div className="tb-right" style={{ marginLeft: "auto" }}>
           {activitySeconds !== null && board.event.activityTimer?.visible && (
             <div
-              className="badge"
+              className="badge bg-[#151B2B]/90 backdrop-blur-xl border border-white/5"
               style={{
                 background: "var(--gold-bg)",
                 color: "var(--gold)",
@@ -464,7 +464,7 @@ export function PlayerBoard() {
             </div>
           )}
           <button
-            className="badge"
+            className="badge bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
             style={{
               background: "var(--sol-bg)",
               color: "var(--sol)",
@@ -494,7 +494,7 @@ export function PlayerBoard() {
             )}
           </button>
           <div
-            className="badge"
+            className="badge bg-[#151B2B]/90 backdrop-blur-xl border border-white/5"
             style={{
               background: "var(--prob-bg)",
               color: "var(--prob)",
@@ -507,7 +507,7 @@ export function PlayerBoard() {
           </div>
           <LangSwitcher />
           <button
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
             onClick={() => router.push("/")}
           >
             {t("sair")}
@@ -515,24 +515,24 @@ export function PlayerBoard() {
         </div>
       </div>
 
-      <div className="score-strip bg-white/[0.03] backdrop-blur-md border-b border-white/10">
+      <div className="score-strip bg-[#151B2B]/90 backdrop-blur-xl border-b border-white/5 text-slate-200">
         <div>
-          <div className="score-label">{t("score.label")}</div>
+          <div className="score-label text-slate-400">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-            <div className="score-val">{board.team.score}</div>
-            <div className="score-pts">{t("score.unidade")}</div>
+            <div className="score-val text-white">{board.team.score}</div>
+            <div className="score-pts text-slate-500">{t("score.unidade")}</div>
           </div>
         </div>
         <div style={{ flex: 1 }} />
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost btn-sm bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
           onClick={() => setShowSubmission(true)}
         >
           {board.submission ? t("entregaEditar") : t("entregaAbrir")}
         </button>
         {allDone && (
           <button
-            className="btn btn-sm"
+            className="btn btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
             style={{
               background: "rgba(255,215,0,.15)",
               color: "var(--gold)",
@@ -579,10 +579,12 @@ export function PlayerBoard() {
         </div>
       )}
 
-      <div className="jog-layout">
+      <div className="jog-layout bg-[#0B0F19] text-slate-200">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
-            <div className="cen-icon">⌖</div>
+          <div className="cenario-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+            <div className="cen-icon bg-white/5 border border-white/10 text-white">
+              ⌖
+            </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>
                 {t("cenario.titulo")}
@@ -614,12 +616,12 @@ export function PlayerBoard() {
                 return (
                   <div
                     key={member.id}
-                    className={`membro-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${member.isMe ? "ativo" : ""}`}
+                    className={`membro-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 ${member.isMe ? "ativo" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {!member.isMe && (
                       <div
-                        className="cutucar-btn"
+                        className="cutucar-btn bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
                         title={t("comm2.cutucarTitle")}
                         onClick={() => cutucar(member.id, member.nickname)}
                       >
@@ -638,9 +640,11 @@ export function PlayerBoard() {
                         ? RPG_ROLE_ICON[member.rpgRole]
                         : member.nickname.slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="membro-nm">{member.nickname}</div>
+                    <div className="membro-nm text-white">
+                      {member.nickname}
+                    </div>
                     <div
-                      className="membro-st"
+                      className="membro-st text-slate-400"
                       style={member.isMe ? { color: "var(--parc)" } : undefined}
                     >
                       {roleInfo ? roleInfo.nome : `● ${t("membros.ativo")}`}
@@ -668,22 +672,22 @@ export function PlayerBoard() {
             </div>
           </div>
 
-          <div className="card card-pad bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/20">
-            <div className="comm-tabs">
+          <div className="card card-pad bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+            <div className="comm-tabs border-b border-white/5">
               <div
-                className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
+                className={`comm-tab text-slate-400 transition-all hover:text-white ${commTab === "equipe" ? "on text-white border-[#4F46E5]" : ""}`}
                 onClick={() => setCommTab("equipe")}
               >
                 📢 {t("comm.equipe")}
               </div>
               <div
-                className={`comm-tab ${commTab === "individual" ? "on" : ""}`}
+                className={`comm-tab text-slate-400 transition-all hover:text-white ${commTab === "individual" ? "on text-white border-[#4F46E5]" : ""}`}
                 onClick={() => setCommTab("individual")}
               >
                 💬 {t("comm.individual")}
               </div>
               <div
-                className={`comm-tab ${commTab === "registro" ? "on" : ""}`}
+                className={`comm-tab text-slate-400 transition-all hover:text-white ${commTab === "registro" ? "on text-white border-[#4F46E5]" : ""}`}
                 onClick={() => setCommTab("registro")}
               >
                 📋 {t("comm.registro")}
@@ -701,12 +705,12 @@ export function PlayerBoard() {
                   {teamMessages.map((m) => (
                     <div
                       key={m.id}
-                      className={`balao ${m.mine ? "balao-proprio" : "balao-outro"}`}
+                      className={`balao rounded-xl border border-white/5 ${m.mine ? "balao-proprio bg-[#4F46E5]/20 border-[#4F46E5]/30 text-white" : "balao-outro bg-white/5 text-slate-200"}`}
                     >
-                      <div className="balao-nm">
+                      <div className="balao-nm text-white">
                         {m.from?.nickname ?? t("comm.participanteSaiu")}
                       </div>
-                      <div className="balao-txt">{m.text}</div>
+                      <div className="balao-txt text-slate-200">{m.text}</div>
                     </div>
                   ))}
                 </div>
@@ -730,7 +734,7 @@ export function PlayerBoard() {
                     }}
                   />
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                     disabled={!board.event.switches.chat}
                     onClick={() => void enviarBalao()}
                   >
@@ -764,7 +768,7 @@ export function PlayerBoard() {
                   {board.members.map((member) => (
                     <div
                       key={member.id}
-                      className={`mchip ${sussurroTo === member.id ? "sel" : ""}`}
+                      className={`mchip bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all ${sussurroTo === member.id ? "sel bg-[#4F46E5]/20 border-[#4F46E5] text-white" : ""}`}
                       onClick={() => setSussurroTo(member.id)}
                     >
                       {member.nickname}
@@ -800,7 +804,7 @@ export function PlayerBoard() {
                     {t("comm.soDestinatario")}
                   </div>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                     onClick={() => void enviarSussurro()}
                     disabled={!sussurroTo || !board.event.switches.chat}
                   >
@@ -838,9 +842,13 @@ export function PlayerBoard() {
                         key={m.id}
                         className={`chat-msg chat-${m.type === "TEAM" ? "balao" : m.type === "PRIVATE" ? "sussurro" : "cutucar"}`}
                       >
-                        <div className="chat-bubble">
-                          <div className="chat-nm">{label}</div>
-                          {m.text && <div className="chat-txt">{m.text}</div>}
+                        <div className="chat-bubble bg-white/5 border border-white/5 rounded-xl">
+                          <div className="chat-nm text-white">{label}</div>
+                          {m.text && (
+                            <div className="chat-txt text-slate-400">
+                              {m.text}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -885,17 +893,17 @@ export function PlayerBoard() {
 
               const hoverGlowClass =
                 id === "problema"
-                  ? "hover:shadow-glow-amber hover:ring-1 hover:ring-neon-amber/40"
+                  ? "hover:bg-[#1C2438] hover:border-white/10"
                   : id === "solucao"
-                    ? "hover:shadow-glow-lime hover:ring-1 hover:ring-neon-lime/40"
+                    ? "hover:bg-[#1C2438] hover:border-white/10"
                     : id === "parcerias"
-                      ? "hover:shadow-glow-purple hover:ring-1 hover:ring-neon-purple/40"
-                      : "hover:shadow-glow-cyan hover:ring-1 hover:ring-neon-cyan/40";
+                      ? "hover:bg-[#1C2438] hover:border-white/10"
+                      : "hover:bg-[#1C2438] hover:border-white/10";
 
               return (
                 <div
                   key={id}
-                  className={`chave-card bg-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
+                  className={`chave-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 ${hoverGlowClass}`}
                   style={{
                     background:
                       concluida || ativa
@@ -909,13 +917,13 @@ export function PlayerBoard() {
                 >
                   <div className="cc-head">
                     <div
-                      className="cc-icon"
+                      className="cc-icon bg-white/5 border border-white/10 rounded-lg"
                       style={{ background: `var(${KEY_COLOR_VAR[id]}-bg)` }}
                     >
                       {keyInfo.icon}
                     </div>
                     <div
-                      className="cc-name"
+                      className="cc-name text-white"
                       style={{
                         color:
                           concluida || ativa
@@ -926,7 +934,7 @@ export function PlayerBoard() {
                       {keyInfo.name}
                     </div>
                     <div
-                      className="cc-badge"
+                      className="cc-badge bg-white/5 border border-white/10 text-slate-300"
                       style={{
                         marginLeft: "auto",
                         background: concluida
@@ -961,7 +969,7 @@ export function PlayerBoard() {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase bg-white/5 backdrop-blur-sm border border-white/5 rounded-lg transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }
@@ -987,7 +995,7 @@ export function PlayerBoard() {
                             {done ? "✓" : numero}
                           </div>
                           <div
-                            className="cc-fnm"
+                            className="cc-fnm text-slate-200"
                             style={{
                               color: done
                                 ? "var(--t2)"
@@ -998,7 +1006,7 @@ export function PlayerBoard() {
                           >
                             {nome}
                           </div>
-                          <div className="cc-ftxt">
+                          <div className="cc-ftxt text-slate-400">
                             {done
                               ? "✓"
                               : active
@@ -1009,7 +1017,7 @@ export function PlayerBoard() {
                       );
                     })}
                   </div>
-                  <div className="cc-prog-bar">
+                  <div className="cc-prog-bar bg-white/5">
                     <div
                       className="cc-prog-fill"
                       style={{ width: `${pct}%`, background: colorVar }}
@@ -1066,7 +1074,7 @@ export function PlayerBoard() {
             >
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
                 onClick={() => setOpenPhase(null)}
                 disabled={savingPhase}
               >
@@ -1074,7 +1082,7 @@ export function PlayerBoard() {
               </button>
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                 disabled={savingPhase}
               >
                 {t("fase.concluir")}
@@ -1086,21 +1094,21 @@ export function PlayerBoard() {
 
       {congrats && (
         <div id="overlay-congrats">
-          <div className="congrats-box">
+          <div className="congrats-box bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl">
             <div className="congrats-stars">
               <span className="congrats-star">⭐</span>
               <span className="congrats-star">🌟</span>
               <span className="congrats-star">⭐</span>
             </div>
-            <div className="congrats-title">{congrats.titulo}</div>
-            <div className="congrats-sub">{congrats.sub}</div>
+            <div className="congrats-title text-white">{congrats.titulo}</div>
+            <div className="congrats-sub text-slate-400">{congrats.sub}</div>
             {congrats.pontos !== null && (
               <div className="congrats-pts-badge">
                 +{congrats.pontos} {t("congrats.pontos")}
               </div>
             )}
             <button
-              className="btn btn-primary"
+              className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
               style={{ width: "100%" }}
               onClick={() => setCongrats(null)}
             >
@@ -1190,9 +1198,12 @@ export function PlayerBoard() {
                   }))
                   .filter((f) => f.conteudo);
                 return (
-                  <div key={id} className="enc-chave-card">
+                  <div
+                    key={id}
+                    className="enc-chave-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                  >
                     <div
-                      className="enc-chave-titulo"
+                      className="enc-chave-titulo text-white"
                       style={{
                         color: colorVar,
                         borderBottom: `1px solid var(${KEY_COLOR_VAR[id]}-bd)`,
@@ -1209,12 +1220,14 @@ export function PlayerBoard() {
                       fasesComConteudo.map((f) => (
                         <div key={f.numero} className="enc-fase">
                           <div
-                            className="enc-fase-nome"
+                            className="enc-fase-nome text-slate-400"
                             style={{ color: colorVar }}
                           >
                             {f.nome}
                           </div>
-                          <div className="enc-fase-conteudo">{f.conteudo}</div>
+                          <div className="enc-fase-conteudo bg-white/5 text-slate-200">
+                            {f.conteudo}
+                          </div>
                         </div>
                       ))
                     )}
@@ -1224,14 +1237,14 @@ export function PlayerBoard() {
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button
-                className="btn btn-ghost"
+                className="btn btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
                 style={{ flex: 1 }}
                 onClick={() => setShowEncerramento(false)}
               >
                 {t("encerramento.revisar")}
               </button>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                 style={{ flex: 1 }}
                 onClick={() => {
                   setShowEncerramento(false);

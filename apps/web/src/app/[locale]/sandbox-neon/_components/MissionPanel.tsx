@@ -46,24 +46,26 @@ export function MissionPanel({
   onOpenMission,
 }: MissionPanelProps) {
   return (
-    <div className="mission-panel">
-      <div className="panel-heading">
+    <div className="mission-panel bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+      <div className="panel-heading border-b border-white/5 text-white">
         <div>
-          <span className="section-kicker">MISSÃO EM DESTAQUE</span>
+          <span className="section-kicker text-slate-400">
+            MISSÃO EM DESTAQUE
+          </span>
           <h2>
             {selectedPhase.id === 2
               ? "Valide antes de construir"
               : `Avance em ${selectedPhase.title}`}
           </h2>
         </div>
-        <div className="reward">
+        <div className="reward bg-white/5 border border-white/10 text-slate-300">
           <CircleDollarSign size={15} /> +240 XP
         </div>
       </div>
 
       <div className="mission-body">
         <ProgressRing value={selectedPhase.progress} />
-        <div className="mission-copy">
+        <div className="mission-copy text-slate-400">
           <span>DESAFIO PRINCIPAL</span>
           <h3>
             {selectedPhase.id === 2
@@ -74,7 +76,7 @@ export function MissionPanel({
             Conduza conversas rápidas, registre os aprendizados e descubra quais
             hipóteses precisam evoluir.
           </p>
-          <div className="mission-meta">
+          <div className="mission-meta text-slate-400">
             <span>
               <Users size={15} /> Em equipe
             </span>
@@ -88,14 +90,14 @@ export function MissionPanel({
         </div>
         <button
           type="button"
-          className="mission-button"
+          className="mission-button bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
           onClick={onOpenMission}
         >
           Abrir missão <ChevronRight size={17} />
         </button>
       </div>
 
-      <div className="mission-footer">
+      <div className="mission-footer border-t border-white/5 text-slate-400">
         <div className="team-stack">
           <span style={{ background: "#9b8cff" }}>JM</span>
           <span style={{ background: "#50ddff" }}>RL</span>

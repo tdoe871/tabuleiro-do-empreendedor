@@ -69,10 +69,13 @@ export function TeamChat() {
   }
 
   return (
-    <aside className="chat-panel" id="comunidade">
-      <div className="chat-head">
+    <aside
+      className="chat-panel bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+      id="comunidade"
+    >
+      <div className="chat-head border-b border-white/5 text-white">
         <div>
-          <div className="online-badge">
+          <div className="online-badge text-slate-400">
             <span /> 4 online
           </div>
           <h2>Base da equipe</h2>
@@ -83,19 +86,22 @@ export function TeamChat() {
       </div>
 
       <div className="messages">
-        <div className="date-divider">
+        <div className="date-divider text-slate-500">
           <span>HOJE</span>
         </div>
         {messages.map((item) => (
           <div
-            className={`message ${item.own ? "own-message" : ""}`}
+            className={`message text-slate-400 ${item.own ? "own-message text-slate-200" : ""}`}
             key={item.id}
           >
-            <div className="avatar" style={{ background: item.color }}>
+            <div
+              className="avatar text-white"
+              style={{ background: item.color }}
+            >
               {item.initials}
             </div>
             <div>
-              <div className="message-info">
+              <div className="message-info text-white">
                 <strong>{item.author}</strong>
                 <span>{item.time}</span>
               </div>
@@ -105,7 +111,10 @@ export function TeamChat() {
         ))}
       </div>
 
-      <form className="chat-form" onSubmit={handleSubmit}>
+      <form
+        className="chat-form bg-white/5 border border-white/10 rounded-lg"
+        onSubmit={handleSubmit}
+      >
         <button type="button" aria-label="Anexar arquivo">
           <Paperclip size={17} />
         </button>
@@ -116,7 +125,7 @@ export function TeamChat() {
           aria-label="Mensagem para a equipe"
         />
         <button
-          className="send-button"
+          className="send-button bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
           type="submit"
           aria-label="Enviar mensagem"
         >

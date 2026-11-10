@@ -84,8 +84,10 @@ export function Sidebar({
 
   return (
     <>
-      <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
-        <div className="brand">
+      <aside
+        className={`sidebar bg-[#0B0F19] border-r border-white/5 text-slate-200 ${isOpen ? "sidebar-open" : ""}`}
+      >
+        <div className="brand text-white">
           <LogoMark />
           <div>
             <strong>TABULEIRO</strong>
@@ -93,7 +95,7 @@ export function Sidebar({
           </div>
           <button
             type="button"
-            className="mobile-close"
+            className="mobile-close bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
             onClick={onClose}
             aria-label="Fechar menu"
           >
@@ -101,7 +103,10 @@ export function Sidebar({
           </button>
         </div>
 
-        <nav className="main-nav" aria-label="Navegação principal">
+        <nav
+          className="main-nav text-slate-400"
+          aria-label="Navegação principal"
+        >
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = activeNav === item.id;
@@ -109,7 +114,7 @@ export function Sidebar({
               <Link
                 key={item.id}
                 href={item.href}
-                className={`nav-item ${isActive ? "active" : ""}`}
+                className={`nav-item rounded-lg transition-all duration-300 ${isActive ? "active bg-none bg-[#151B2B]/90 border border-white/10 text-white" : "text-slate-400 hover:bg-[#1C2438] hover:text-white"}`}
                 onClick={() => {
                   setActiveNav(item.id);
                   onClose();
@@ -125,7 +130,7 @@ export function Sidebar({
         </nav>
 
         <div className="sidebar-section">
-          <div className="section-heading">
+          <div className="section-heading text-slate-500">
             <span>SEU PAPEL RPG</span>
             <HelpCircle size={14} />
           </div>
@@ -137,11 +142,11 @@ export function Sidebar({
                 <button
                   key={role.name}
                   type="button"
-                  className={`role ${isSelected ? "selected" : ""}`}
+                  className={`role rounded-xl border transition-all duration-300 ${isSelected ? "selected bg-[#151B2B]/90 backdrop-blur-xl border-[#4F46E5]/50 text-white shadow-[0_0_15px_rgba(79,70,229,0.2)]" : "border-transparent text-slate-400 hover:bg-[#1C2438] hover:border-white/10 hover:text-white"}`}
                   style={{ "--role-color": role.color } as CSSProperties}
                   onClick={() => onSelectRole(role.name)}
                 >
-                  <span className="role-icon">
+                  <span className="role-icon bg-white/5 border border-white/10">
                     <Icon size={17} />
                   </span>
                   <span>
@@ -157,8 +162,8 @@ export function Sidebar({
 
         <div className="sidebar-spacer" />
 
-        <div className="upgrade-card">
-          <div className="gem-orbit">
+        <div className="upgrade-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+          <div className="gem-orbit bg-[#4F46E5]/15 border-white/10 text-indigo-400">
             <Gem size={19} />
           </div>
           <span>DESBLOQUEIE SEU POTENCIAL</span>
@@ -172,8 +177,8 @@ export function Sidebar({
           </button>
         </div>
 
-        <div className="profile">
-          <div className="avatar avatar-main">
+        <div className="profile border-t border-white/5 text-slate-200">
+          <div className="avatar avatar-main bg-none bg-[#4F46E5] text-white">
             AC
             <span />
           </div>
@@ -190,7 +195,7 @@ export function Sidebar({
       {isOpen && (
         <button
           type="button"
-          className="sidebar-backdrop"
+          className="sidebar-backdrop bg-[#0B0F19]/80 backdrop-blur-sm"
           onClick={onClose}
           aria-label="Fechar menu"
         />

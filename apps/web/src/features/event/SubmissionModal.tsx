@@ -203,12 +203,12 @@ export function SubmissionModal({
     <Modal onClose={onClose} maxWidth={560}>
       <h3>{t("title")}</h3>
       {disabled && (
-        <p className="field-error" style={{ marginBottom: 10 }}>
+        <p className="field-error text-rose-400" style={{ marginBottom: 10 }}>
           {tCommon("errors.SUBMISSIONS_DISABLED")}
         </p>
       )}
       <form onSubmit={handleSubmit}>
-        <div className="field">
+        <div className="field text-slate-200">
           <label>{t("chooseType")}</label>
           <div
             style={{
@@ -224,7 +224,7 @@ export function SubmissionModal({
                 <button
                   key={ty}
                   type="button"
-                  className="option-card"
+                  className="option-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                   aria-pressed={selected}
                   disabled={disabled}
                   onClick={() => {
@@ -232,10 +232,12 @@ export function SubmissionModal({
                     setUrlTouched(false);
                   }}
                 >
-                  <span className="option-card-icon">
+                  <span className="option-card-icon bg-white/5 border border-white/10 text-slate-300">
                     <Icon size={16} />
                   </span>
-                  <span className="option-card-title">{typeLabel[ty]}</span>
+                  <span className="option-card-title text-white">
+                    {typeLabel[ty]}
+                  </span>
                 </button>
               );
             })}
@@ -243,7 +245,7 @@ export function SubmissionModal({
         </div>
 
         {needsUrl && (
-          <div className="field">
+          <div className="field text-slate-200">
             <label>{t("urlLabel")}</label>
             <input
               type="url"
@@ -256,12 +258,12 @@ export function SubmissionModal({
               required
             />
             {urlTouched && !urlValid && (
-              <p className="field-error">{t("invalidUrl")}</p>
+              <p className="field-error text-rose-400">{t("invalidUrl")}</p>
             )}
           </div>
         )}
 
-        <div className="field">
+        <div className="field text-slate-200">
           <label>{t("fileOrImage")}</label>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {files.map((f) => (
@@ -308,7 +310,7 @@ export function SubmissionModal({
             {files.length < MAX_FILES && (
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
                 disabled={disabled || uploading}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -334,13 +336,13 @@ export function SubmissionModal({
               }}
             />
             {needsFile && !fileValid && (
-              <p className="field-error">{t("fileRequired")}</p>
+              <p className="field-error text-rose-400">{t("fileRequired")}</p>
             )}
-            <p className="field-hint">{t("fileHint")}</p>
+            <p className="field-hint text-slate-400">{t("fileHint")}</p>
           </div>
         </div>
 
-        <div className="field">
+        <div className="field text-slate-200">
           <label>{t("linksExtraLabel")}</label>
           {links.map((link, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
@@ -353,7 +355,7 @@ export function SubmissionModal({
               />
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
                 onClick={() => removeLink(i)}
                 disabled={disabled}
               >
@@ -364,7 +366,7 @@ export function SubmissionModal({
           {links.length < MAX_EXTRA_LINKS && (
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
               onClick={addLink}
               disabled={disabled}
             >
@@ -373,7 +375,7 @@ export function SubmissionModal({
           )}
         </div>
 
-        <div className="field">
+        <div className="field text-slate-200">
           <label>{t("descriptionLabel")}</label>
           <textarea
             placeholder={t("descriptionPlaceholder")}
@@ -388,7 +390,7 @@ export function SubmissionModal({
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button
             type="button"
-            className="btn btn-ghost"
+            className="btn btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
             onClick={onClose}
             disabled={saving}
           >
@@ -396,7 +398,7 @@ export function SubmissionModal({
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
             disabled={disabled || saving}
           >
             {saving ? (
