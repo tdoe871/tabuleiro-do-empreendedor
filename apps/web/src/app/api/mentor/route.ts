@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
+import {
+  NEWEST_ANNOUNCEMENTS,
+  toAnnouncementDTO,
+} from "@/features/event/server/announcements";
 import { computeKeyStatuses } from "@/features/event/server/progress";
 import { toEvaluationDTO } from "@/features/mentor/server/dto";
 import { MAX_SCORE, MIN_SCORE, RUBRIC } from "@/features/mentor/server/rubric";
@@ -18,7 +22,11 @@ export async function GET(request: NextRequest) {
   const { mentor, event } = session;
 
   try {
-    const teams = await prisma.team.findMany({
+    const announcements = prisma.announcement.findMany({
+      where: { eventId: event.id },
+      ...NEWEST_ANNOUNCEMENTS,
+    });
+    const teams = prisma.team.findMany({
       where: { eventId: event.id },
       orderBy: { createdAt: "asc" },
       select: {
@@ -55,6 +63,11 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const [teamRows, announcementRows] = await Promise.all([
+      teams,
+      announcements,
+    ]);
+
     return NextResponse.json({
       serverNow: new Date().toISOString(),
       event: {
@@ -65,7 +78,7 @@ export async function GET(request: NextRequest) {
       },
       mentor: { id: mentor.id, name: mentor.name },
       rubric: { criteria: RUBRIC, min: MIN_SCORE, max: MAX_SCORE },
-      teams: teams.map((team) => ({
+      teams: teamRows.map((team) => ({
         id: team.id,
         name: team.name,
         memberCount: team._count.participants,
@@ -78,6 +91,8 @@ export async function GET(request: NextRequest) {
           ? toEvaluationDTO(team.evaluations[0])
           : null,
       })),
+      // The educator's newest announcements, newest first.
+      announcements: announcementRows.map(toAnnouncementDTO),
     });
   } catch (error) {
     console.error("Mentor overview failed:", error);

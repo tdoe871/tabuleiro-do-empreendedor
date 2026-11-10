@@ -14,6 +14,8 @@ import {
   parseMessageQuery,
   visibleMessages,
 } from "@/features/communication/server/rules";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -89,6 +91,8 @@ export async function POST(request: NextRequest) {
 
   const gate = canPlay(player.event, new Date());
   if (gate !== "ok") return apiError(gate);
+  const chat = switchGate(player.event, "chat");
+  if (chat !== "ok") return apiError(chat);
 
   try {
     const existing = await findByClientId(me, input.clientId);
@@ -137,6 +141,16 @@ export async function POST(request: NextRequest) {
       include: MESSAGE_PEOPLE,
     });
     notify({ topic: teamTopic(player.team.id), signal: "messages" });
+    // Who wrote to whom, never the text.
+    await recordActivity({
+      ...asPlayer(player),
+      action: "MESSAGE_SENT",
+      details: {
+        type: message.type,
+        toId: message.recipient?.id ?? null,
+        to: message.recipient?.nickname ?? null,
+      },
+    });
     return NextResponse.json(
       { message: toMessageDTO(message, me) },
       { status: 201 },

@@ -3,7 +3,13 @@
 // it again" and the browser asks our API, which checks the session. So a
 // signal that reaches the wrong place, or a fake one, leaks nothing.
 
-export const SIGNALS = ["messages", "board", "event", "overview"] as const;
+export const SIGNALS = [
+  "messages",
+  "board",
+  "event",
+  "overview",
+  "announcements",
+] as const;
 export type Signal = (typeof SIGNALS)[number];
 
 // "refresh" is not sent by the server: the browser emits it when polling,

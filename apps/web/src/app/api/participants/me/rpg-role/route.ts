@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { RPG_ROLE_IDS, type RpgRoleId } from "@/features/event/rpgRoles";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -24,6 +25,11 @@ export async function PUT(request: NextRequest) {
       select: { rpgRole: true },
     });
     notify({ topic: teamTopic(player.team.id), signal: "board" });
+    await recordActivity({
+      ...asPlayer(player),
+      action: "RPG_ROLE_CHANGED",
+      details: { rpgRole: updated.rpgRole },
+    });
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Set RPG role failed:", error);

@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
+import {
+  NEWEST_ANNOUNCEMENTS,
+  toAnnouncementDTO,
+} from "@/features/event/server/announcements";
 import { computeAlerts } from "@/features/event/server/alerts";
 import { toEventDTO } from "@/features/event/server/event";
 import { computeKeyStatuses } from "@/features/event/server/progress";
@@ -68,6 +72,7 @@ export async function GET(
           orderBy: { createdAt: "desc" },
           select: { id: true, severity: true, message: true, createdAt: true },
         },
+        announcements: NEWEST_ANNOUNCEMENTS,
       },
     });
     if (!event) return apiError("EVENT_NOT_FOUND");
@@ -142,6 +147,7 @@ export async function GET(
       metrics,
       teams,
       alerts: [...computed, ...custom],
+      announcements: event.announcements.map(toAnnouncementDTO),
     });
   } catch (error) {
     console.error("Event overview failed:", error);

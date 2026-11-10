@@ -5,6 +5,7 @@ import {
   parseCreateEventBody,
   toEventDTO,
 } from "@/features/event/server/event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
 import { generateCode } from "@/lib/codes";
@@ -31,6 +32,15 @@ export async function POST(request: NextRequest) {
           code: generateCode(),
           hostId: staff.id,
           phases: { createMany: { data: BOARD_PHASES } },
+        },
+      });
+      await recordActivity({
+        ...asStaff(staff, event.id),
+        action: "EVENT_CREATED",
+        details: {
+          mode: toEventDTO(event).mode,
+          maxTeams: event.maxTeams,
+          maxTeamSize: event.maxTeamSize,
         },
       });
       return NextResponse.json({ event: toEventDTO(event) }, { status: 201 });
