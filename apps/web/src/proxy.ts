@@ -1,18 +1,77 @@
 import createMiddleware from "next-intl/middleware";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
+import { getMentorFromToken } from "@/lib/auth/mentor";
+import { getPlayerFromToken } from "@/lib/auth/player";
+import {
+  MENTOR_SESSION_COOKIE,
+  PLAYER_SESSION_COOKIE,
+  STAFF_SESSION_COOKIE,
+} from "@/lib/auth/session";
+import { getStaffFromToken } from "@/lib/auth/staff";
 
 const intlMiddleware = createMiddleware(routing);
 
-// Same convention as Maestro-virtual: Next.js 16 renamed the middleware file
-// convention to "proxy" (middleware.ts is deprecated).
-//
-// TODO: once staff login (src/lib/auth/session.ts) is wired up, guard
-// /[locale]/mestre the same way Maestro-virtual guards /admin here — a
-// layout-level redirect isn't enough because Next renders layout + page in
-// parallel, so the protected page content can still ship in the response.
-export default function proxy(request: NextRequest) {
+// Any path Next resolves to src/app/[locale]/mestre (educator),
+// src/app/[locale]/jogador (player) or src/app/[locale]/mentor, including unsupported locales
+// (/xx/mestre). Next renders layout and page in parallel, so a layout-level
+// redirect does not stop the page content from shipping in the response: the
+// guard has to live here (same as Maestro-virtual's /admin).
+const STAFF_PATH = /^\/([^/]+)\/mestre(?:\/|$)/i;
+const PLAYER_PATH = /^\/([^/]+)\/jogador(?:\/|$)/i;
+const MENTOR_PATH = /^\/([^/]+)\/mentor(?:\/|$)/i;
+
+function decodePathname(pathname: string): string {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
+function loginLocale(segment: string): string {
+  const match = routing.locales.find(
+    (locale) => locale.toLowerCase() === segment.toLowerCase(),
+  );
+  return match ?? routing.defaultLocale;
+}
+
+// The login screen (educator login and player event code) is the locale's
+// home page.
+function redirectToLogin(request: NextRequest, localeSegment: string) {
+  const locale = loginLocale(localeSegment);
+  return NextResponse.redirect(new URL(`/${locale}`, request.url));
+}
+
+// Next.js 16 renamed the middleware file convention to "proxy".
+export default async function proxy(request: NextRequest) {
+  const pathname = decodePathname(request.nextUrl.pathname);
+
+  const staffMatch = pathname.match(STAFF_PATH);
+  if (staffMatch) {
+    const staff = await getStaffFromToken(
+      request.cookies.get(STAFF_SESSION_COOKIE)?.value,
+    );
+    if (!staff) return redirectToLogin(request, staffMatch[1] ?? "");
+  }
+
+  const playerMatch = pathname.match(PLAYER_PATH);
+  if (playerMatch) {
+    const player = await getPlayerFromToken(
+      request.cookies.get(PLAYER_SESSION_COOKIE)?.value,
+    );
+    if (!player) return redirectToLogin(request, playerMatch[1] ?? "");
+  }
+
+  const mentorMatch = pathname.match(MENTOR_PATH);
+  if (mentorMatch) {
+    const mentor = await getMentorFromToken(
+      request.cookies.get(MENTOR_SESSION_COOKIE)?.value,
+    );
+    if (!mentor) return redirectToLogin(request, mentorMatch[1] ?? "");
+  }
+
   return intlMiddleware(request);
 }
 

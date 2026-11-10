@@ -8,15 +8,17 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "seed": "prisma db seed"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.10.0",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
     "pg": "^8.23.0"
   },
   "devDependencies": {
-    "prisma": "^7.9.1",
+    "prisma": "7.10.1",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
