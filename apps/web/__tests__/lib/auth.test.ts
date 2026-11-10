@@ -9,7 +9,12 @@ import {
   normalizeEmail,
   passwordError,
 } from "@/lib/auth/account";
-import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import {
+  GENERATED_PASSWORD_ALPHABET,
+  generatePassword,
+  hashPassword,
+  verifyPassword,
+} from "@/lib/auth/password";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
 import { createStaffSession, verifyStaffSession } from "@/lib/auth/session";
 
@@ -27,6 +32,20 @@ describe("password", () => {
     await expect(verifyPassword("anything", "!")).resolves.toBe(false);
     await expect(verifyPassword("anything", "")).resolves.toBe(false);
     await expect(verifyPassword("x", "scrypt$a$b$c$$")).resolves.toBe(false);
+  });
+
+  it("generates readable passwords that pass the account rules", () => {
+    const passwords = new Set<string>();
+    for (let i = 0; i < 50; i++) {
+      const password = generatePassword();
+      expect(password).toMatch(/^[^-]{4}-[^-]{4}-[^-]{4}-[^-]{4}$/);
+      for (const char of password.replaceAll("-", "")) {
+        expect(GENERATED_PASSWORD_ALPHABET).toContain(char);
+      }
+      expect(passwordError(password)).toBeNull();
+      passwords.add(password);
+    }
+    expect(passwords.size).toBe(50);
   });
 });
 
