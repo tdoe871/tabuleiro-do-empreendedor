@@ -6,6 +6,8 @@ import {
   canSubmit,
   parseSubmissionBody,
 } from "@/features/submission/server/rules";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -54,6 +56,8 @@ export async function PUT(request: NextRequest) {
 
   const gate = canSubmit(canPlay(player.event, new Date()));
   if (gate !== "ok") return apiError(gate);
+  const open = switchGate(player.event, "submissions");
+  if (open !== "ok") return apiError(open);
 
   try {
     if (parsed.data.type === "FILE_OR_IMAGE") {
@@ -74,6 +78,11 @@ export async function PUT(request: NextRequest) {
       { topic: teamTopic(player.team.id), signal: "board" },
       { topic: staffTopic(player.event.id), signal: "overview" },
     );
+    await recordActivity({
+      ...asPlayer(player),
+      action: "SUBMISSION_SAVED",
+      details: { type: parsed.data.type, extraLinks: parsed.data.links.length },
+    });
     return NextResponse.json(await loadDelivery(player.team.id));
   } catch (error) {
     console.error("Save submission failed:", error);

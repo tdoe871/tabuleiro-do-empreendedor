@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { Prisma, prisma } from "@tdoe/db";
 
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { apiError } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
 import { generateCode } from "@/lib/codes";
@@ -23,6 +24,10 @@ export async function POST(request: NextRequest) {
         select: { joinCode: true },
       });
       notify({ topic: teamTopic(player.team.id), signal: "board" });
+      await recordActivity({
+        ...asPlayer(player),
+        action: "JOIN_CODE_REGENERATED",
+      });
       return NextResponse.json(team);
     } catch (error) {
       const collision =

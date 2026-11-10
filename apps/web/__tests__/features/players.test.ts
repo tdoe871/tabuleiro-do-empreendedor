@@ -112,6 +112,9 @@ describe("buildBoard", () => {
     challengeKey: null,
     challengeText: null,
     challengeSentAt: null,
+    chatEnabled: true,
+    submissionsEnabled: true,
+    joinsEnabled: true,
     name: "Prueba",
     mode: "SCHOOL",
     scenario: null,
@@ -175,6 +178,11 @@ describe("buildBoard", () => {
     expect(board.event.playable).toBe(true);
     expect(board.cartaAtiva).toBeNull();
     expect(board.announcements).toEqual([]);
+    expect(board.event.switches).toEqual({
+      chat: true,
+      submissions: true,
+      joins: true,
+    });
     expect(board.files).toEqual([]);
   });
 

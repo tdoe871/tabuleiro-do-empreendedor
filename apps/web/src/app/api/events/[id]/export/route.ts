@@ -2,6 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { BOARD_KEYS, PHASES_PER_KEY, prisma } from "@tdoe/db";
 
 import {
+  ACTIVITY_CSV_HEADER,
+  toActivityCsvRow,
+} from "@/features/activity/server/actions";
+import {
   computeKeyStatuses,
   toKeyId,
   type KeyStatus,
@@ -11,10 +15,13 @@ import { RUBRIC, summarizeEvaluations } from "@/features/mentor/server/rubric";
 import { apiError } from "@/lib/api/errors";
 import { toCsv } from "@/lib/csv";
 
-// GET /api/events/:id/export?type=report|proposals — CSV for the educator
-// (opens in Excel / Google Sheets), one row per team:
-// - report: members, progress per key, delivery, files and mentors' grades.
-// - proposals: the team's answer to each of the 12 phases plus its delivery.
+// GET /api/events/:id/export?type=report|proposals|activity — CSV for the
+// educator (opens in Excel / Google Sheets):
+// - report: one row per team: members, progress per key, delivery, files and
+//   mentors' grades.
+// - proposals: one row per team: its answer to each of the 12 phases plus
+//   its delivery.
+// - activity: the activity record, one row per action, oldest first.
 // Headers are in Spanish (the organizers' language).
 
 const KEY_LABEL: Record<(typeof BOARD_KEYS)[number], string> = {
@@ -41,7 +48,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const type = request.nextUrl.searchParams.get("type") ?? "report";
-  if (type !== "report" && type !== "proposals") {
+  if (type !== "report" && type !== "proposals" && type !== "activity") {
     return apiError("VALIDATION_ERROR", { type: "INVALID" });
   }
 
@@ -49,7 +56,21 @@ export async function GET(
   if ("error" in loaded) return loaded.error;
   const { event } = loaded;
 
+  const date = new Date().toISOString().slice(0, 10);
+  const download = (rows: unknown[][], name: string) =>
+    new NextResponse(toCsv(rows), {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="tdoe-${event.code}-${name}-${date}.csv"`,
+        "Cache-Control": "no-store",
+      },
+    });
+
   try {
+    if (type === "activity") {
+      return download(await activityRows(event), "actividad");
+    }
+
     const teams = await prisma.team.findMany({
       where: { eventId: event.id },
       orderBy: { createdAt: "asc" },
@@ -79,19 +100,33 @@ export async function GET(
       },
     });
 
-    const rows = type === "report" ? reportRows(teams) : proposalRows(teams);
-    const date = new Date().toISOString().slice(0, 10);
-    const name = type === "report" ? "reporte" : "propuestas";
-    return new NextResponse(toCsv(rows), {
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="tdoe-${event.code}-${name}-${date}.csv"`,
-        "Cache-Control": "no-store",
-      },
-    });
+    return type === "report"
+      ? download(reportRows(teams), "reporte")
+      : download(proposalRows(teams), "propuestas");
   } catch (error) {
     console.error("Export failed:", error);
     return apiError("INTERNAL_ERROR");
+  }
+}
+
+// Read in pages so a long event does not load in one query.
+const ACTIVITY_BATCH = 5000;
+
+async function activityRows(event: {
+  id: string;
+  startedAt: Date | null;
+}): Promise<unknown[][]> {
+  const rows: unknown[][] = [ACTIVITY_CSV_HEADER];
+  let after = 0;
+  for (;;) {
+    const batch = await prisma.activityLog.findMany({
+      where: { eventId: event.id, id: { gt: after } },
+      orderBy: { id: "asc" },
+      take: ACTIVITY_BATCH,
+    });
+    for (const row of batch) rows.push(toActivityCsvRow(row, event.startedAt));
+    if (batch.length < ACTIVITY_BATCH) return rows;
+    after = batch[batch.length - 1]!.id;
   }
 }
 

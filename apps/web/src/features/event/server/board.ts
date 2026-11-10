@@ -18,6 +18,7 @@ import {
 } from "@/features/submission/server/dto";
 import { canPlay } from "@/features/team/server/team";
 import { toAnnouncementDTO, type AnnouncementDTO } from "./announcements";
+import { toSwitchesDTO, type SwitchesDTO } from "./switches";
 import {
   toActivityTimerDTO,
   toChallengeCardDTO,
@@ -59,6 +60,8 @@ export type BoardDTO = {
     playable: boolean;
     // The educator's activity timer, only while they show it to players.
     activityTimer: ActivityTimerDTO | null;
+    // What the educator turned off (false = off), to disable those buttons.
+    switches: SwitchesDTO;
   };
   team: { id: string; name: string; joinCode: string; score: number };
   me: MemberDTO;
@@ -154,6 +157,7 @@ export function buildBoard(input: {
       endsAt: event.endsAt?.toISOString() ?? null,
       playable: canPlay(event, now) === "ok",
       activityTimer: event.activityVisible ? toActivityTimerDTO(event) : null,
+      switches: toSwitchesDTO(event),
     },
     team: {
       id: team.id,

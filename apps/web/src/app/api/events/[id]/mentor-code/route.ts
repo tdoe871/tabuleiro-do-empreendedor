@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { Prisma, prisma } from "@tdoe/db";
 
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
 import { generateCode } from "@/lib/codes";
@@ -25,6 +26,10 @@ export async function POST(
         data: { mentorCode: generateCode() },
       });
       if (count === 0) return apiError("EVENT_NOT_FOUND");
+      await recordActivity({
+        ...asStaff(staff, id),
+        action: "MENTOR_CODE_CHANGED",
+      });
       const event = await prisma.event.findUniqueOrThrow({
         where: { id },
         select: { mentorCode: true },
