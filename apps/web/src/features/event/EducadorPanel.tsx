@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { GemLogo } from "@/components/ui/GemLogo";
 import { LangSwitcher } from "@/components/shared/LangSwitcher";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/providers/ToastProvider";
+import { sendJson, readApiError, translateApiError } from "@/lib/api/client";
+import { useRealtime } from "@/lib/realtime/useRealtime";
 import {
   KEY_IDS,
   KEY_COLOR_VAR,
@@ -28,8 +30,8 @@ export interface EduSession {
   cenario: string | null;
 }
 
-// Shape of docs/backend/api.md's EventDTO — what POST/GET /api/events and
-// PATCH /api/events/:id/status actually return.
+// Shape of docs/backend/api.md's EventDTO — what POST/GET /api/events,
+// PATCH /api/events/:id/status and GET /api/events/:id/overview return.
 export interface EventDTO {
   id: string;
   code: string;
@@ -39,6 +41,10 @@ export interface EventDTO {
   status: "DRAFT" | "ACTIVE" | "PAUSED" | "FINISHED";
   maxTeams: number;
   maxTeamSize: number;
+  mentorCode: string | null;
+  activityTimer: { endsAt: string; seconds: number; visible: boolean } | null;
+  challengeCard: { key: KeyId; text: string } | null;
+  switches: { chat: boolean; submissions: boolean; joins: boolean };
 }
 
 const STATUS_FROM_API: Record<EventDTO["status"], SessionStatus> = {
@@ -74,14 +80,25 @@ interface OverviewTeam {
 
 interface OverviewAlert {
   id: string;
+  type: "NO_SUBMISSION" | "TEAM_STUCK" | "TEAM_INCOMPLETE" | "CUSTOM";
   severity: "INFO" | "WARNING" | "CRITICAL";
+  team: { id: string; name: string } | null;
+  minutes: number | null;
   message: string;
 }
 
+interface Announcement {
+  id: string;
+  text: string;
+  createdAt: string;
+}
+
 interface Overview {
+  event: EventDTO;
   metrics: { activeTeams: number; participants: number; keysCompleted: number };
   teams: OverviewTeam[];
   alerts: OverviewAlert[];
+  announcements: Announcement[];
 }
 
 const NEXT_STATUS: Partial<
@@ -96,22 +113,15 @@ const NEXT_STATUS: Partial<
 };
 
 const AVATAR_COLORS = ["#2E80F0", "#22C97A", "#A040E0", "#0FD4B0", "#F0BC40"];
+const ACTIVITY_PRESETS = [5, 15, 20, 30];
 
 // Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
-// roadmap list, not a backend-driven feature. Kept hardcoded like the icons
-// in keys.ts/rpgRoles.ts.
-const EXTENSOES_IDS = [
-  "desafiosExtras",
-  "coringas",
-  "cartasPedagogicas",
-] as const;
-const EXTENSOES_ICON: Record<(typeof EXTENSOES_IDS)[number], string> = {
+// roadmap list, not a backend-driven feature.
+const EXTENSOES_ICON = {
   desafiosExtras: "⚡",
   coringas: "🃏",
   cartasPedagogicas: "📚",
-};
-
-const OVERVIEW_POLL_MS = 15_000;
+} as const;
 
 export function EducadorPanel() {
   const t = useTranslations("educador");
@@ -133,25 +143,27 @@ export function EducadorPanel() {
   const [showExtensoes, setShowExtensoes] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
-  const [cartaAtiva, setCartaAtiva] = useState<{
-    keyId: string;
-    text: string;
+  const [showMentores, setShowMentores] = useState(false);
+  const [evaluations, setEvaluations] = useState<{
+    mentorCode: string | null;
+    mentors: { id: string; name: string; evaluated: number }[];
+    teams: {
+      id: string;
+      name: string;
+      summary: { count: number; average: number | null };
+    }[];
   } | null>(null);
-
-  const [timerMinutes, setTimerMinutes] = useState<number | null>(null);
-  const [timerPreset, setTimerPreset] = useState<number | null>(null);
-  const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
-  const [timerRunning, setTimerRunning] = useState(false);
-  const [showTimerToStudents, setShowTimerToStudents] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [announcementInput, setAnnouncementInput] = useState("");
+  const [activityMinutes, setActivityMinutes] = useState(15);
 
   const selected = sessions.find((s) => s.id === selectedId) ?? null;
+  const event = overview?.event ?? null;
 
-  function errorMessage(code: string | undefined, fallback: string) {
-    return code && tCommon.has(`errors.${code}`)
-      ? tCommon(`errors.${code}`)
-      : fallback;
-  }
+  const errorMessage = useCallback(
+    (code: string | undefined, fallback: string) =>
+      translateApiError(tCommon, code, fallback),
+    [tCommon],
+  );
 
   // The educator's own sessions, for the sidebar list.
   useEffect(() => {
@@ -175,49 +187,32 @@ export function EducadorPanel() {
     };
   }, [router]);
 
-  // Metrics/teams/alerts for the selected session — refreshed on selection
-  // and polled while a hackathon is live, so the educator sees progress
-  // without reloading the page.
-  useEffect(() => {
+  const loadOverview = useCallback(async () => {
     if (!selectedId) return;
-    let cancelled = false;
-    async function load() {
-      const res = await fetch(`/api/events/${selectedId}/overview`);
-      if (res.status === 401) {
-        router.push("/");
-        return;
-      }
-      const body = (await res.json().catch(() => null)) as Overview | null;
-      if (!cancelled && res.ok && body && selectedId) {
-        setOverviewState({ ...body, sessionId: selectedId });
-      }
+    const res = await fetch(`/api/events/${selectedId}/overview`, {
+      cache: "no-store",
+    });
+    if (res.status === 401) {
+      router.push("/");
+      return;
     }
-    load();
-    const interval = setInterval(load, OVERVIEW_POLL_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
+    const body = (await res.json().catch(() => null)) as Overview | null;
+    if (res.ok && body) {
+      setOverviewState({ ...body, sessionId: selectedId });
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === body.event.id ? eventToSession(body.event) : s,
+        ),
+      );
+    }
   }, [selectedId, router]);
 
   useEffect(() => {
-    if (!timerRunning) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      return;
-    }
-    intervalRef.current = setInterval(() => {
-      setTimerSeconds((s) => {
-        if (s === null || s <= 0) {
-          setTimerRunning(false);
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [timerRunning]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch on selection change, not a render-time update
+    void loadOverview();
+  }, [loadOverview]);
+
+  useRealtime(() => void loadOverview(), { eventId: selectedId ?? undefined });
 
   function selectSession(id: string) {
     setSelectedId(id);
@@ -229,10 +224,8 @@ export function EducadorPanel() {
       return;
     }
     try {
-      const res = await fetch(`/api/events/${selected.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: target }),
+      const res = await sendJson(`/api/events/${selected.id}/status`, "PATCH", {
+        status: target,
       });
       if (res.status === 401) {
         router.push("/");
@@ -254,6 +247,7 @@ export function EducadorPanel() {
         prev.map((s) => (s.id === updated.id ? updated : s)),
       );
       toast("ok", t(`status.${updated.status}`));
+      void loadOverview();
     } catch {
       toast("err", tCommon("errors.INTERNAL_ERROR"));
     }
@@ -282,16 +276,12 @@ export function EducadorPanel() {
     }
   }
 
-  function handlePending(label: string) {
-    toast("info", tCommon("toasts.featurePendente", { feature: label }));
-  }
-
   function handleSocializar() {
     if (!selected) {
       toast("err", t("toasts.selecioneSessao"));
       return;
     }
-    router.push(`/mestre/socializacao?numEquipes=${selected.numEquipes}`);
+    router.push(`/mestre/socializacao?eventId=${selected.id}`);
   }
 
   function openCartaPreview(keyId: string) {
@@ -299,11 +289,147 @@ export function EducadorPanel() {
     setPreviewText(t(`carta.prompts.${keyId}`));
   }
 
-  function confirmarEnvioCarta() {
-    if (!previewKey) return;
-    setCartaAtiva({ keyId: previewKey, text: previewText });
+  async function confirmarEnvioCarta() {
+    if (!previewKey || !selected) return;
+    const res = await sendJson(
+      `/api/events/${selected.id}/challenge-card`,
+      "PUT",
+      { key: previewKey, text: previewText },
+    );
+    if (!res.ok) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
     setPreviewKey(null);
     toast("ok", t("carta.enviar"));
+    void loadOverview();
+  }
+
+  async function removerCarta() {
+    if (!selected) return;
+    const res = await sendJson(
+      `/api/events/${selected.id}/challenge-card`,
+      "DELETE",
+    );
+    if (!res.ok && res.status !== 204) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    void loadOverview();
+  }
+
+  async function iniciarTimer() {
+    if (!selected) return;
+    const res = await sendJson(
+      `/api/events/${selected.id}/activity-timer`,
+      "PUT",
+      {
+        minutes: activityMinutes,
+        visible: true,
+      },
+    );
+    if (!res.ok) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    void loadOverview();
+  }
+
+  async function pararTimer() {
+    if (!selected) return;
+    await sendJson(`/api/events/${selected.id}/activity-timer`, "DELETE");
+    void loadOverview();
+  }
+
+  async function toggleTimerVisible(visible: boolean) {
+    if (!selected) return;
+    await sendJson(`/api/events/${selected.id}/activity-timer`, "PATCH", {
+      visible,
+    });
+    void loadOverview();
+  }
+
+  async function toggleSwitch(
+    name: "chat" | "submissions" | "joins",
+    value: boolean,
+  ) {
+    if (!selected) return;
+    const res = await sendJson(`/api/events/${selected.id}/switches`, "PATCH", {
+      [name]: value,
+    });
+    if (!res.ok) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    void loadOverview();
+  }
+
+  async function enviarAviso() {
+    if (!selected || !announcementInput.trim()) return;
+    const text = announcementInput.trim();
+    const res = await sendJson(
+      `/api/events/${selected.id}/announcements`,
+      "POST",
+      {
+        text,
+      },
+    );
+    if (!res.ok) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    setAnnouncementInput("");
+    void loadOverview();
+  }
+
+  async function removerAviso(id: string) {
+    if (!selected) return;
+    await sendJson(`/api/events/${selected.id}/announcements/${id}`, "DELETE");
+    void loadOverview();
+  }
+
+  async function gerarCodigoMentores() {
+    if (!selected) return;
+    const res = await sendJson(
+      `/api/events/${selected.id}/mentor-code`,
+      "POST",
+    );
+    if (!res.ok) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    void loadOverview();
+  }
+
+  async function abrirEvaluacoes() {
+    if (!selected) return;
+    const res = await fetch(`/api/events/${selected.id}/evaluations`);
+    const body = (await res.json().catch(() => null)) as typeof evaluations;
+    if (res.ok && body) {
+      setEvaluations(body);
+      setShowMentores(true);
+    }
+  }
+
+  function exportar(type: "report" | "proposals" | "activity") {
+    if (!selected) {
+      toast("err", t("toasts.selecioneSessao"));
+      return;
+    }
+    window.open(`/api/events/${selected.id}/export?type=${type}`, "_blank");
+  }
+
+  function alertText(alert: OverviewAlert): string {
+    if (alert.type === "CUSTOM") return alert.message;
+    const team = alert.team?.name ?? "";
+    const minutes = alert.minutes ?? 0;
+    return t(`alertas.${alert.type}`, { team, minutes });
   }
 
   function fmtClock(total: number) {
@@ -441,19 +567,31 @@ export function EducadorPanel() {
           >
             ↗ {t("socializar")}
           </div>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={() => void abrirEvaluacoes()}
+          >
+            🎓 {t("sidebar.mentores")}
+          </div>
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
           <div
             className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
-            onClick={() => handlePending(t("sidebar.relatorio"))}
+            onClick={() => exportar("report")}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
             className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
-            onClick={() => handlePending(t("sidebar.exportarPropostas"))}
+            onClick={() => exportar("proposals")}
           >
             📄 {t("sidebar.exportarPropostas")}
+          </div>
+          <div
+            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            onClick={() => exportar("activity")}
+          >
+            🗒 {t("sidebar.exportarAtividade")}
           </div>
           <div
             className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
@@ -757,7 +895,7 @@ export function EducadorPanel() {
                     </div>
                     <div>
                       <div className="alert-nm" style={{ color }}>
-                        {alert.message}
+                        {alertText(alert)}
                       </div>
                     </div>
                   </div>
@@ -800,15 +938,11 @@ export function EducadorPanel() {
               {t("timer.duracao")}
             </div>
             <div className="timer-presets">
-              {[5, 15, 20, 30].map((min) => (
+              {ACTIVITY_PRESETS.map((min) => (
                 <button
                   key={min}
-                  className={`timer-preset-btn ${timerPreset === min ? "sel" : ""}`}
-                  onClick={() => {
-                    setTimerPreset(min);
-                    setTimerMinutes(min);
-                    setTimerSeconds(min * 60);
-                  }}
+                  className={`timer-preset-btn ${activityMinutes === min ? "sel" : ""}`}
+                  onClick={() => setActivityMinutes(min)}
                 >
                   {min} min
                 </button>
@@ -825,22 +959,20 @@ export function EducadorPanel() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              {timerSeconds !== null ? fmtClock(timerSeconds) : "—"}
+              {event?.activityTimer
+                ? fmtClock(event.activityTimer.seconds)
+                : "—"}
             </div>
             <div className="timer-ctrl-row">
               <button
                 className="timer-ctrl-btn timer-start"
-                onClick={() => {
-                  if (timerSeconds === null && timerMinutes)
-                    setTimerSeconds(timerMinutes * 60);
-                  if (timerSeconds !== null) setTimerRunning(true);
-                }}
+                onClick={() => void iniciarTimer()}
               >
                 ▶ {t("timer.iniciar")}
               </button>
               <button
                 className="timer-ctrl-btn timer-stop"
-                onClick={() => setTimerRunning(false)}
+                onClick={() => void pararTimer()}
               >
                 ⏹ {t("timer.parar")}
               </button>
@@ -852,8 +984,8 @@ export function EducadorPanel() {
               <label className="toggle-sw">
                 <input
                   type="checkbox"
-                  checked={showTimerToStudents}
-                  onChange={(e) => setShowTimerToStudents(e.target.checked)}
+                  checked={event?.activityTimer?.visible ?? false}
+                  onChange={(e) => void toggleTimerVisible(e.target.checked)}
                 />
                 <div className="toggle-track" />
                 <div className="toggle-thumb" />
@@ -891,7 +1023,7 @@ export function EducadorPanel() {
               );
             })}
           </div>
-          {cartaAtiva && (
+          {event?.challengeCard && (
             <div
               style={{
                 marginTop: 8,
@@ -912,10 +1044,10 @@ export function EducadorPanel() {
                 🃏 {t("carta.ativa")}
               </div>
               <div style={{ fontSize: 11, color: "var(--t2)" }}>
-                {cartaAtiva.text}
+                {event.challengeCard.text}
               </div>
               <button
-                onClick={() => setCartaAtiva(null)}
+                onClick={() => void removerCarta()}
                 style={{
                   marginTop: 6,
                   fontSize: 10,
@@ -930,14 +1062,120 @@ export function EducadorPanel() {
               </button>
             </div>
           )}
+          <div className="sidebar-divider" />
+          <div className="panel-title">📢 {t("avisos.titulo")}</div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+            <input
+              style={{ flex: 1 }}
+              placeholder={t("avisos.placeholder")}
+              value={announcementInput}
+              maxLength={1000}
+              onChange={(e) => setAnnouncementInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void enviarAviso();
+              }}
+            />
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => void enviarAviso()}
+            >
+              {t("avisos.enviar")}
+            </button>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+              maxHeight: 160,
+              overflowY: "auto",
+            }}
+          >
+            {(overview?.announcements ?? []).length === 0 && (
+              <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                {t("avisos.vazio")}
+              </div>
+            )}
+            {(overview?.announcements ?? []).map((a) => (
+              <div
+                key={a.id}
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  alignItems: "flex-start",
+                  background: "rgba(255,255,255,.04)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  padding: "6px 8px",
+                  fontSize: 11,
+                }}
+              >
+                <span style={{ flex: 1 }}>{a.text}</span>
+                <button
+                  onClick={() => void removerAviso(a.id)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#ef4444",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="sidebar-divider" />
+          <div className="panel-title">🚨 {t("interruptores.titulo")}</div>
+          {(["chat", "submissions", "joins"] as const).map((name) => (
+            <div
+              key={name}
+              className="timer-toggle-row bg-white/5 backdrop-blur-md border-white/10"
+              style={{ marginBottom: 6 }}
+            >
+              <span className="timer-toggle-lbl">
+                {t(`interruptores.${name}`)}
+              </span>
+              <label className="toggle-sw">
+                <input
+                  type="checkbox"
+                  checked={event?.switches[name] ?? true}
+                  onChange={(e) => void toggleSwitch(name, e.target.checked)}
+                />
+                <div className="toggle-track" />
+                <div className="toggle-thumb" />
+              </label>
+            </div>
+          ))}
+          <div className="sidebar-divider" />
+          <div className="panel-title">🎓 {t("mentores.titulo")}</div>
+          <div style={{ fontSize: 11, color: "var(--t3)", marginBottom: 6 }}>
+            {event?.mentorCode ? (
+              <>
+                {t("mentores.codigo")}:{" "}
+                <strong style={{ color: "var(--gold)" }}>
+                  {event.mentorCode}
+                </strong>
+              </>
+            ) : (
+              t("mentores.semCodigo")
+            )}
+          </div>
+          <button
+            className="btn btn-ghost btn-sm w100"
+            onClick={() => void gerarCodigoMentores()}
+          >
+            {event?.mentorCode ? t("mentores.regenerar") : t("mentores.gerar")}
+          </button>
         </div>
       </div>
 
       {showCreate && (
         <CreateSessionModal
           onClose={() => setShowCreate(false)}
-          onCreated={(event) => {
-            const session = eventToSession(event);
+          onCreated={(ev) => {
+            const session = eventToSession(ev);
             setSessions((prev) => [session, ...prev]);
             setSelectedId(session.id);
             setShowCreate(false);
@@ -991,6 +1229,7 @@ export function EducadorPanel() {
             <textarea
               style={{ height: 90, resize: "vertical" }}
               value={previewText}
+              maxLength={500}
               onChange={(e) => setPreviewText(e.target.value)}
             />
           </div>
@@ -1008,9 +1247,52 @@ export function EducadorPanel() {
             >
               {t("modalSessao.cancelar")}
             </button>
-            <button className="btn btn-primary" onClick={confirmarEnvioCarta}>
+            <button
+              className="btn btn-primary"
+              onClick={() => void confirmarEnvioCarta()}
+            >
               🃏 {t("carta.enviar")}
             </button>
+          </div>
+        </Modal>
+      )}
+
+      {showMentores && evaluations && (
+        <Modal onClose={() => setShowMentores(false)} maxWidth={520}>
+          <h3>🎓 {t("mentores.titulo")}</h3>
+          <p style={{ fontSize: 11, color: "var(--t3)" }}>
+            {t("mentores.mentoresCount", { count: evaluations.mentors.length })}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+              maxHeight: 360,
+              overflowY: "auto",
+            }}
+          >
+            {evaluations.teams.map((team) => (
+              <div
+                key={team.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  background: "rgba(255,255,255,.04)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  padding: "8px 10px",
+                  fontSize: 12,
+                }}
+              >
+                <span>{team.name}</span>
+                <span style={{ color: "var(--gold)", fontWeight: 700 }}>
+                  {team.summary.average !== null
+                    ? `${team.summary.average.toFixed(1)} (${team.summary.count})`
+                    : t("mentores.semNota")}
+                </span>
+              </div>
+            ))}
           </div>
         </Modal>
       )}
@@ -1020,41 +1302,45 @@ export function EducadorPanel() {
           <h3>☕ {t("extensoes")}</h3>
           <p>{t("extensoesModal.subtitulo")}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {EXTENSOES_IDS.map((id) => (
-              <div
-                key={id}
-                style={{
-                  background: "var(--gold-bg)",
-                  border: "1px solid var(--gold-bd)",
-                  borderRadius: 9,
-                  padding: "9px 11px",
-                }}
-              >
+            {(["desafiosExtras", "coringas", "cartasPedagogicas"] as const).map(
+              (id) => (
                 <div
+                  key={id}
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "var(--gold)",
+                    background: "var(--gold-bg)",
+                    border: "1px solid var(--gold-bd)",
+                    borderRadius: 9,
+                    padding: "9px 11px",
                   }}
                 >
-                  {EXTENSOES_ICON[id]} {t(`extensoesModal.items.${id}.nome`)}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "var(--gold)",
+                    }}
+                  >
+                    {EXTENSOES_ICON[id]} {t(`extensoesModal.items.${id}.nome`)}
+                  </div>
+                  <div
+                    style={{ fontSize: 10, color: "var(--t3)", marginTop: 3 }}
+                  >
+                    {t(`extensoesModal.items.${id}.descricao`)}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 8,
+                      color: "rgba(240,188,64,.5)",
+                      marginTop: 4,
+                      textTransform: "uppercase",
+                      letterSpacing: ".06em",
+                    }}
+                  >
+                    {t("extensoesModal.emBreve")}
+                  </div>
                 </div>
-                <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 3 }}>
-                  {t(`extensoesModal.items.${id}.descricao`)}
-                </div>
-                <div
-                  style={{
-                    fontSize: 8,
-                    color: "rgba(240,188,64,.5)",
-                    marginTop: 4,
-                    textTransform: "uppercase",
-                    letterSpacing: ".06em",
-                  }}
-                >
-                  {t("extensoesModal.emBreve")}
-                </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
           <button
             className="btn btn-ghost w100"

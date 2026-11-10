@@ -182,9 +182,37 @@
       "acoes": "Actions",
       "novaSessao": "New session",
       "verificarAlertas": "Check alerts",
+      "mentores": "View mentor scores",
       "exportar": "Export",
       "relatorio": "Interaction report",
-      "exportarPropostas": "Export proposals"
+      "exportarPropostas": "Export proposals",
+      "exportarAtividade": "Export activity"
+    },
+    "avisos": {
+      "titulo": "Announcements",
+      "placeholder": "Announce to the whole event…",
+      "enviar": "Send",
+      "vazio": "You haven't sent any announcements yet"
+    },
+    "interruptores": {
+      "titulo": "Emergency switches",
+      "chat": "Chat",
+      "submissions": "Submissions",
+      "joins": "New entries"
+    },
+    "mentores": {
+      "titulo": "Mentors",
+      "codigo": "Code",
+      "semCodigo": "You haven't generated a mentor code yet",
+      "gerar": "Generate code",
+      "regenerar": "Generate new code",
+      "mentoresCount": "{count} mentor(s) scoring",
+      "semNota": "Not scored yet"
+    },
+    "alertas": {
+      "NO_SUBMISSION": "{team}: no submission, {minutes} min left",
+      "TEAM_STUCK": "{team}: stuck for {minutes} min",
+      "TEAM_INCOMPLETE": "{team}: missing a member"
     },
     "metrics": {
       "equipesAtivas": "Active teams",

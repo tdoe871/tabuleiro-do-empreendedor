@@ -182,9 +182,37 @@
       "acoes": "Acciones",
       "novaSessao": "Nueva sesión",
       "verificarAlertas": "Verificar alertas",
+      "mentores": "Ver calificaciones de mentores",
       "exportar": "Exportar",
       "relatorio": "Reporte de interacción",
-      "exportarPropostas": "Exportar propuestas"
+      "exportarPropostas": "Exportar propuestas",
+      "exportarAtividade": "Exportar actividad"
+    },
+    "avisos": {
+      "titulo": "Avisos generales",
+      "placeholder": "Avisar a todo el evento…",
+      "enviar": "Enviar",
+      "vazio": "Todavía no has enviado avisos"
+    },
+    "interruptores": {
+      "titulo": "Interruptores de emergencia",
+      "chat": "Chat",
+      "submissions": "Entregas",
+      "joins": "Entradas nuevas"
+    },
+    "mentores": {
+      "titulo": "Mentores",
+      "codigo": "Código",
+      "semCodigo": "Todavía no generas un código de mentores",
+      "gerar": "Generar código",
+      "regenerar": "Generar nuevo código",
+      "mentoresCount": "{count} mentor(es) calificando",
+      "semNota": "Sin calificar"
+    },
+    "alertas": {
+      "NO_SUBMISSION": "{team}: sin entrega y faltan {minutes} min",
+      "TEAM_STUCK": "{team}: sin avanzar hace {minutes} min",
+      "TEAM_INCOMPLETE": "{team}: le falta un integrante"
     },
     "metrics": {
       "equipesAtivas": "Equipos activos",
