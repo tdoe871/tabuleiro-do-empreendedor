@@ -1,5 +1,5 @@
 import {
-  expect,
+  expect as baseExpect,
   test,
   type APIResponse,
   type Browser,
@@ -20,6 +20,11 @@ import { E2E_EMAIL_DOMAIN } from "./support/cleanup";
 // runs with E2E_DB=1, never against a deployed site (playwright.config.ts).
 
 test.describe.configure({ mode: "serial", timeout: 60_000 });
+
+// Every step goes to the real database (far from a local machine) and the
+// dev server compiles each page and route the first time it is used, so
+// give the UI more than the default 5 s to catch up.
+const expect = baseExpect.configure({ timeout: 15_000 });
 
 const RUN = Date.now().toString(36).toUpperCase();
 const EDUCATOR = {
