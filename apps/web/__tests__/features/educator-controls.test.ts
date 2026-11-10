@@ -221,6 +221,7 @@ describe("toCsv", () => {
       ['Los "Innovadores", MX', "línea 1\nlínea 2"],
       ['=HYPERLINK("x")', null],
       [new Date("2026-11-13T10:00:00Z"), 4.5],
+      [-2, "-2"],
     ]);
     expect(csv.startsWith("﻿")).toBe(true);
     expect(csv.slice(1).split("\r\n")).toEqual([
@@ -228,6 +229,8 @@ describe("toCsv", () => {
       '"Los ""Innovadores"", MX","línea 1\nlínea 2"',
       '"\'=HYPERLINK(""x"")",',
       "2026-11-13T10:00:00.000Z,4.5",
+      // A negative number stays a number; the same text is neutralized.
+      "-2,'-2",
     ]);
   });
 });

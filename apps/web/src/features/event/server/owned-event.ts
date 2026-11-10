@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { prisma, type Event } from "@tdoe/db";
 
 import { apiError } from "@/lib/api/errors";
-import { getStaffFromRequest } from "@/lib/auth/staff";
+import { getStaffFromRequest, type StaffUser } from "@/lib/auth/staff";
 import { eventTopic, notify, staffTopic } from "@/lib/realtime/server";
 
 // For the educator's event controls: the event behind :id if the session's
@@ -11,14 +11,14 @@ import { eventTopic, notify, staffTopic } from "@/lib/realtime/server";
 export async function loadOwnedEvent(
   request: NextRequest,
   id: string,
-): Promise<{ event: Event } | { error: Response }> {
+): Promise<{ event: Event; staff: StaffUser } | { error: Response }> {
   const staff = await getStaffFromRequest(request);
   if (!staff) return { error: apiError("UNAUTHORIZED") };
   const event = await prisma.event.findFirst({
     where: { id, hostId: staff.id },
   });
   if (!event) return { error: apiError("EVENT_NOT_FOUND") };
-  return { event };
+  return { event, staff };
 }
 
 // Everyone in the event (players and the educator, who also listens to the

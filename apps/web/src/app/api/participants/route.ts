@@ -7,6 +7,7 @@ import {
   normalizeCode,
   sameName,
 } from "@/features/team/server/team";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { switchGate } from "@/features/event/server/switches";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
@@ -87,6 +88,14 @@ export async function POST(request: NextRequest) {
       joined.participant,
       joined.team.eventId,
     );
+    await recordActivity({
+      ...asPlayer({
+        participant: joined.participant,
+        team: joined.team,
+        event: joined.team.event,
+      }),
+      action: joined.recovered ? "SESSION_RECOVERED" : "PARTICIPANT_JOINED",
+    });
     if (!joined.recovered) {
       notify(
         { topic: teamTopic(joined.team.id), signal: "board" },

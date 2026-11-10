@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@tdoe/db";
 
 import { canSubmit } from "@/features/submission/server/rules";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { apiError } from "@/lib/api/errors";
@@ -79,6 +80,14 @@ export async function DELETE(request: NextRequest, { params }: Context) {
 
     await removeObjects([file.path]);
     await prisma.submissionFile.delete({ where: { id: file.id } });
+    // Abandoned uploads (never confirmed) are not part of the record.
+    if (file.status === "READY") {
+      await recordActivity({
+        ...asPlayer(player),
+        action: "FILE_DELETED",
+        details: { fileId: file.id, fileName: file.fileName },
+      });
+    }
     notify(
       { topic: teamTopic(player.team.id), signal: "board" },
       { topic: staffTopic(player.event.id), signal: "overview" },

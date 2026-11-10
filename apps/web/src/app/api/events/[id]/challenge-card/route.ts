@@ -9,6 +9,7 @@ import {
   loadOwnedEvent,
   notifyEventChanged,
 } from "@/features/event/server/owned-event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 
 type Context = { params: Promise<{ id: string }> };
@@ -21,7 +22,7 @@ type Context = { params: Promise<{ id: string }> };
 export async function PUT(request: NextRequest, { params }: Context) {
   const loaded = await loadOwnedEvent(request, (await params).id);
   if ("error" in loaded) return loaded.error;
-  const { event } = loaded;
+  const { event, staff } = loaded;
   if (event.status === "FINISHED") return apiError("EVENT_FINISHED");
 
   const body = await readJsonObject(request);
@@ -39,6 +40,11 @@ export async function PUT(request: NextRequest, { params }: Context) {
       },
     });
     notifyEventChanged(event.id);
+    await recordActivity({
+      ...asStaff(staff, event.id),
+      action: "CHALLENGE_CARD_SENT",
+      details: { key: toChallengeCardDTO(updated)?.key ?? null },
+    });
     return NextResponse.json({ challengeCard: toChallengeCardDTO(updated) });
   } catch (error) {
     console.error("Send challenge card failed:", error);
@@ -57,6 +63,10 @@ export async function DELETE(request: NextRequest, { params }: Context) {
       data: { challengeKey: null, challengeText: null, challengeSentAt: null },
     });
     notifyEventChanged(loaded.event.id);
+    await recordActivity({
+      ...asStaff(loaded.staff, loaded.event.id),
+      action: "CHALLENGE_CARD_REMOVED",
+    });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("Remove challenge card failed:", error);

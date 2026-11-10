@@ -8,6 +8,7 @@ import {
   sameName,
   teamNameError,
 } from "@/features/team/server/team";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import { switchGate } from "@/features/event/server/switches";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
@@ -94,6 +95,10 @@ export async function POST(request: NextRequest) {
         created.event.id,
       );
       notify({ topic: staffTopic(created.event.id), signal: "overview" });
+      await recordActivity({
+        ...asPlayer(created),
+        action: "TEAM_CREATED",
+      });
       return response;
     } catch (error) {
       if (error instanceof ApiFailure) return apiError(error.code);

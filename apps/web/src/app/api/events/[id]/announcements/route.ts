@@ -11,6 +11,7 @@ import {
   loadOwnedEvent,
   notifyAnnouncementsChanged,
 } from "@/features/event/server/owned-event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { createRateLimiter } from "@/lib/auth/rate-limit";
 
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest, { params }: Context) {
 export async function POST(request: NextRequest, { params }: Context) {
   const loaded = await loadOwnedEvent(request, (await params).id);
   if ("error" in loaded) return loaded.error;
-  const { event } = loaded;
+  const { event, staff } = loaded;
 
   const body = await readJsonObject(request);
   if (!body) return apiError("VALIDATION_ERROR");
@@ -65,6 +66,11 @@ export async function POST(request: NextRequest, { params }: Context) {
       data: { eventId: event.id, text: parsed.text },
     });
     notifyAnnouncementsChanged(event.id);
+    await recordActivity({
+      ...asStaff(staff, event.id),
+      action: "ANNOUNCEMENT_SENT",
+      details: { announcementId: announcement.id },
+    });
     return NextResponse.json(
       { announcement: toAnnouncementDTO(announcement) },
       { status: 201 },

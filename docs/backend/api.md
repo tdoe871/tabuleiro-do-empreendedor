@@ -1,10 +1,12 @@
 # Contrato de la API — Tabuleiro do Empreendedor
 
-> **Estado: BORRADOR para revisar con JP (frontend).** Nada de esto está implementado todavía,
-> salvo `GET /api/health`. Lo marcado con ❓ es una decisión abierta; lo marcado con 🆕 es un
-> endpoint que el frontend todavía no llama. Si algo no te cuadra, coméntalo en el PR.
+> **Estado (9 nov): todo lo de este contrato está implementado y probado contra Supabase**, en los
+> PRs #7 y #11 a #17 (todavía sin merge a `dev`). Lo marcado con ❓ es una decisión abierta; lo
+> marcado con 🆕 es un endpoint que el frontend todavía no llama. La lista de cambios para el
+> frontend está en la [sección 8](#8-resumen-de-cambios-para-el-frontend). Si algo no te cuadra,
+> coméntalo en el PR.
 >
-> Responsable: Eddy (backend). Base: rama `dev` + PR #2 (esquema con 4 llaves × 3 fases).
+> Responsable: Eddy (backend). Estado general del proyecto: `docs/backend/ESTADO-BACKEND.md`.
 >
 > **Glosario.** El tablero tiene 4 **llaves** (etapas): Problema, Solución, Alianzas y
 > Oportunidades. Cada llave tiene 3 **fases** (preguntas que contesta el equipo). En el código y en
@@ -97,6 +99,48 @@ Registro de educador (pestaña de registro del login).
   contraseña está mal), `RATE_LIMITED` (10 intentos por IP cada 15 min), `VALIDATION_ERROR`
   (`email` o `senha` vacíos).
 - Sin sesión de staff, cualquier página de `/[locale]/mestre/*` redirige al login (`/[locale]`).
+
+### Recuperar la contraseña — Público 🆕
+
+**Implementado.** "¿Olvidaste tu contraseña?" para educadores, en 3 pasos:
+
+```json
+// 1. POST /api/auth/password/forgot — en el login
+{ "email": "ana@ejemplo.com", "locale": "es" }
+// 202 (siempre, exista o no la cuenta)
+{ "ok": true }
+
+// 2. POST /api/auth/password/check — al abrir la página del enlace
+{ "token": "<lo que viene después de #token=>" }
+// 200
+{ "valid": true, "expiresAt": "..." }
+
+// 3. POST /api/auth/password/reset — al mandar la contraseña nueva
+{ "token": "...", "senha": "********" }
+// 200 + cookie tdoe_staff (igual que el login)
+{ "staff": { "id": "uuid", "name": "Ana Souza", "email": "ana@ejemplo.com" } }
+```
+
+- **Paso 1** responde `202` aunque el correo no tenga cuenta, y el trabajo se hace después de
+  responder: ni la respuesta ni el tiempo revelan qué correos están registrados. El correo sale en
+  el idioma de `locale` (`pt-BR`, `es`, `en`, `fr`; si falta o no existe, `pt-BR`). La pantalla
+  siempre muestra "si el correo está registrado, te llegó un enlace".
+- **El enlace** es `<NEXT_PUBLIC_APP_URL>/<locale>/reset-password#token=<token>`. El token va
+  **después de `#`**: el navegador no lo manda al servidor, así no queda en logs. La página lo lee
+  con `window.location.hash` (componente de cliente) y llama al paso 2 para saber si todavía sirve.
+- El enlace **vale 60 minutos y se usa una vez**. Pedir otro deja sin efecto el anterior. Máximo 3
+  enlaces por cuenta por hora (los demás pedidos responden `202` pero no mandan nada).
+- **Paso 3** cambia la contraseña (mismas reglas que el registro), **cierra todas las demás
+  sesiones** de ese educador (las que tenía abiertas responden `401`) y deja iniciada la sesión en
+  este navegador: después se puede mandar directo al panel.
+- Errores: paso 1 `VALIDATION_ERROR` (`email` → `REQUIRED` / `INVALID`), `RATE_LIMITED` (5 por IP
+  cada 15 min); pasos 2 y 3 `RESET_TOKEN_INVALID` (no existe, ya se usó o se pidió uno más nuevo),
+  `RESET_TOKEN_EXPIRED`, `RATE_LIMITED`; paso 3 además `VALIDATION_ERROR` (`senha` → `REQUIRED` /
+  `TOO_SHORT` / `TOO_LONG`).
+- **Para que lleguen los correos** hacen falta en el servidor `RESEND_API_KEY`, `MAIL_FROM` (en un
+  dominio verificado en Resend) y `NEXT_PUBLIC_APP_URL` con la URL real. Sin ellos el paso 1 sigue
+  respondiendo `202` pero no manda nada (queda el error en los logs); en local el correo se imprime
+  en la terminal.
 
 ### `POST /api/events` — Staff
 
@@ -275,7 +319,7 @@ Ya implementado. Sin datos sensibles.
 
 ## 3. Endpoints nuevos para el jugador 🆕
 
-**Implementados** (salvo los de entregas). Defaults que se tomaron mientras no haya otra decisión;
+**Implementados.** Defaults que se tomaron mientras no haya otra decisión;
 cualquiera se puede cambiar después sin rehacer nada:
 
 - Cualquier miembro del equipo puede contestar fases; una fase concluida ya no se edita.
@@ -574,7 +618,7 @@ Botón iniciar / pausar / retomar, y "terminar sesión".
 ### `GET /api/events/:id/overview` — Staff
 
 Métricas, equipos y alertas para `EducadorPanel` y `SocializacaoPanel`, en una sola consulta
-agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `teams` llega vacío.
+agregada (sin N+1). **Implementado.**
 
 ```json
 {
@@ -597,8 +641,9 @@ agregada (sin N+1). **Implementado.** Mientras no exista el bloque de equipos, `
 
 - `metrics.activeTeams`: equipos con al menos un integrante. `keysCompleted`: total de llaves
   concluidas sumando todos los equipos.
-- `submission` es `null` hasta que el equipo entrega. El archivo subido no viene aquí; su descarga
-  con URL firmada llega con el bloque de entregas.
+- `submission` es `null` hasta que el equipo entrega. Cada equipo trae también `files` (sus archivos,
+  con `downloadUrl`; el educador los puede descargar) y `evaluation` (`{ count, average }` de los
+  mentores).
 - `alerts`: alertas de mediación calculadas más las filas abiertas de `Alert` (ver "Alertas de
   mediación").
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador).
@@ -831,18 +876,94 @@ resumen.
 
 ### Exportar — Staff 🆕
 
-**Implementado.** `GET /api/events/:id/export?type=report|proposals` → descarga un CSV (UTF-8 con
-BOM, abre bien en Excel y Google Sheets), una fila por equipo. Encabezados en español.
+**Implementado.** `GET /api/events/:id/export?type=report|proposals|activity` → descarga un CSV
+(UTF-8 con BOM, abre bien en Excel y Google Sheets). Encabezados en español.
 
 - `report` ("Reporte"): integrantes y líder, estado de cada llave, fases concluidas, última
   actividad, entrega (tipo, links, descripción, fecha), archivos y calificaciones de mentores
   (cantidad, promedio y promedio por criterio).
 - `proposals` ("Exportar propuestas"): la respuesta del equipo a cada una de las 12 fases (con
   quién y cuándo) y su entrega.
+- `activity`: el registro de actividad completo, una fila por acción (ver "Registro de actividad").
 - Para descargarlo basta un enlace o `window.location` a la URL (la cookie del educador va sola).
 - Las celdas que empiezan con `=`, `+`, `-` o `@` se guardan con un `'` adelante para que Excel no
-  las ejecute como fórmula.
+  las ejecute como fórmula (los números, también los negativos, quedan como números).
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
+
+### Registro de actividad — Staff 🆕
+
+**Implementado.** Para la investigación: quién hizo qué y cuándo en el evento. El backend lo
+escribe solo en cada acción; nadie lo edita. **Nunca guarda contenido**: ni el texto del chat ni las
+respuestas de las fases (esas están en "Exportar propuestas"), solo que pasaron.
+
+`GET /api/events/:id/activity` — del más nuevo al más viejo, 100 por página.
+
+| Query          | Devuelve                                        |
+| -------------- | ----------------------------------------------- |
+| (nada)         | Las 100 acciones más recientes                  |
+| `?before=<id>` | Las 100 anteriores a `id` (página siguiente)    |
+| `?teamId=<id>` | Solo las de un equipo (se combina con `before`) |
+
+```json
+{
+  "serverNow": "...",
+  "activity": [
+    {
+      "id": 42,
+      "createdAt": "2026-11-12T10:30:59.000Z",
+      "minutesFromStart": 90,
+      "actor": { "type": "PARTICIPANT", "id": "uuid", "name": "Ana" },
+      "team": { "id": "uuid", "name": "Los Innovadores" },
+      "action": "PHASE_COMPLETED",
+      "details": { "key": "problema", "order": 2, "answerLength": 312 }
+    }
+  ],
+  "hasMore": true,
+  "cursor": 42
+}
+```
+
+- `actor.type`: `PARTICIPANT` | `MENTOR` | `STAFF`. `team` es `null` en las acciones del educador.
+- `minutesFromStart`: minutos desde que el educador inició la sesión (negativo antes de iniciar;
+  `null` si nunca se inició).
+- Los nombres se copian al guardar: una fila sigue legible aunque el participante ya no exista.
+- **Siguiente página:** si `hasMore` es `true`, pedir `?before=<cursor>`.
+- Todo el registro en CSV (del más viejo al más nuevo): `GET /api/events/:id/export?type=activity`.
+  Columnas: #, fecha (UTC), minutos desde el inicio, tipo de actor, id y nombre del actor, id y
+  nombre del equipo, acción (en español), código de acción y detalle (`clave=valor; ...`). Los ids
+  sirven para anonimizar: basta borrar las columnas de nombres.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`before` → `INVALID`).
+
+| `action`                             | Quién        | `details`                                       |
+| ------------------------------------ | ------------ | ----------------------------------------------- |
+| `EVENT_CREATED`                      | Educador     | `mode`, `maxTeams`, `maxTeamSize`               |
+| `EVENT_STATUS_CHANGED`               | Educador     | `from`, `to`                                    |
+| `ACTIVITY_TIMER_STARTED`             | Educador     | `minutes`, `visible`                            |
+| `ACTIVITY_TIMER_VISIBILITY_CHANGED`  | Educador     | `visible`                                       |
+| `ACTIVITY_TIMER_STOPPED`             | Educador     | —                                               |
+| `CHALLENGE_CARD_SENT`                | Educador     | `key`                                           |
+| `CHALLENGE_CARD_REMOVED`             | Educador     | —                                               |
+| `ANNOUNCEMENT_SENT` / `_DELETED`     | Educador     | `announcementId`                                |
+| `SWITCHES_CHANGED`                   | Educador     | Los que cambió (`chat`, `submissions`, `joins`) |
+| `MENTOR_CODE_CHANGED`                | Educador     | —                                               |
+| `TEAM_CREATED`                       | Participante | —                                               |
+| `PARTICIPANT_JOINED`                 | Participante | —                                               |
+| `SESSION_RECOVERED`                  | Participante | — (volvió a entrar con su nickname)             |
+| `JOIN_CODE_REGENERATED`              | Participante | —                                               |
+| `RPG_ROLE_CHANGED`                   | Participante | `rpgRole`                                       |
+| `PHASE_COMPLETED`                    | Participante | `key`, `order`, `answerLength` (caracteres)     |
+| `SUBMISSION_SAVED`                   | Participante | `type`, `extraLinks`                            |
+| `FILE_UPLOADED`                      | Participante | `fileId`, `fileName`, `contentType`, `size`     |
+| `FILE_DELETED`                       | Participante | `fileId`, `fileName`                            |
+| `MESSAGE_SENT`                       | Participante | `type` y, en privados y toques, `toId` y `to`   |
+| `MENTOR_JOINED` / `MENTOR_RECOVERED` | Mentor       | —                                               |
+| `EVALUATION_SAVED`                   | Mentor       | `average` (con `team`)                          |
+
+- Lo repetido no se registra dos veces: concluir una fase que ya estaba concluida, reenviar un
+  mensaje con el mismo `clientId` o confirmar un archivo dos veces.
+- ❓ **Mensajes privados:** hoy el registro guarda **a quién** le escribió cada participante (no
+  el texto), útil para estudiar cómo colaboran los equipos. Si el equipo prefiere no guardarlo,
+  se quitan `toId` y `to` en `app/api/messages/route.ts`.
 
 ---
 
@@ -910,49 +1031,57 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 
 ## 6. Códigos de error
 
-| Código                      | HTTP | Cuándo                                                           |
-| --------------------------- | ---- | ---------------------------------------------------------------- |
-| `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo            |
-| `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                     |
-| `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                 |
-| `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                      |
-| `INVALID_CREDENTIALS`       | 401  | Login fallido                                                    |
-| `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff) |
-| `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                           |
-| `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                           |
-| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                             |
-| `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                       |
-| `EMAIL_TAKEN`               | 409  | Correo ya registrado                                             |
-| `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                     |
-| `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                  |
-| `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                     |
-| `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                             |
-| `EVENT_FINISHED`            | 409  | El evento terminó                                                |
-| `CHAT_DISABLED`             | 409  | El educador apagó el chat (interruptor de emergencia)            |
-| `SUBMISSIONS_DISABLED`      | 409  | El educador apagó las entregas (interruptor de emergencia)       |
-| `JOINS_DISABLED`            | 409  | El educador cerró las entradas (interruptor de emergencia)       |
-| `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                   |
-| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                   |
-| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                         |
-| `TOO_MANY_MENTORS`          | 409  | El evento llegó al máximo de mentores                            |
-| `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                  |
-| `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                      |
-| `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                         |
-| `RATE_LIMITED`              | 429  | Demasiados intentos                                              |
-| `INTERNAL_ERROR`            | 500  | Error del servidor (el detalle solo va a los logs)               |
+| Código                      | HTTP | Cuándo                                                            |
+| --------------------------- | ---- | ----------------------------------------------------------------- |
+| `VALIDATION_ERROR`          | 400  | Body inválido. Trae `fields` con el detalle por campo             |
+| `FILE_TYPE_NOT_ALLOWED`     | 400  | Tipo de archivo no permitido                                      |
+| `FILE_TOO_LARGE`            | 400  | Archivo más grande que el límite                                  |
+| `UNAUTHORIZED`              | 401  | Sin sesión o sesión vencida                                       |
+| `INVALID_CREDENTIALS`       | 401  | Login fallido                                                     |
+| `RESET_TOKEN_INVALID`       | 400  | Enlace para recuperar la contraseña inválido, usado o reemplazado |
+| `RESET_TOKEN_EXPIRED`       | 400  | Enlace para recuperar la contraseña vencido (más de 60 min)       |
+| `FORBIDDEN`                 | 403  | Tiene sesión pero no permiso (no es líder, evento de otro staff)  |
+| `EVENT_NOT_FOUND`           | 404  | Evento inexistente, o de otro educador                            |
+| `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                            |
+| `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                              |
+| `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                        |
+| `EMAIL_TAKEN`               | 409  | Correo ya registrado                                              |
+| `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                      |
+| `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                   |
+| `EVENT_FULL`                | 409  | El evento llegó a `maxTeams`                                      |
+| `EVENT_NOT_ACTIVE`          | 409  | El evento está en `DRAFT` o `PAUSED`                              |
+| `EVENT_FINISHED`            | 409  | El evento terminó                                                 |
+| `CHAT_DISABLED`             | 409  | El educador apagó el chat (interruptor de emergencia)             |
+| `SUBMISSIONS_DISABLED`      | 409  | El educador apagó las entregas (interruptor de emergencia)        |
+| `JOINS_DISABLED`            | 409  | El educador cerró las entradas (interruptor de emergencia)        |
+| `DEADLINE_PASSED`           | 409  | Pasó la hora límite de entrega                                    |
+| `FILE_NOT_UPLOADED`         | 409  | Se confirmó un archivo que todavía no se subió                    |
+| `TOO_MANY_FILES`            | 409  | El equipo ya tiene el máximo de archivos                          |
+| `TOO_MANY_MENTORS`          | 409  | El evento llegó al máximo de mentores                             |
+| `KEY_LOCKED`                | 409  | La llave todavía está bloqueada                                   |
+| `PHASE_LOCKED`              | 409  | Fase bloqueada (falta concluir la anterior)                       |
+| `INVALID_STATUS_TRANSITION` | 409  | Cambio de estado del evento no permitido                          |
+| `RATE_LIMITED`              | 429  | Demasiados intentos                                               |
+| `INTERNAL_ERROR`            | 500  | Error del servidor (el detalle solo va a los logs)                |
 
 `501 not_implemented` desaparece endpoint por endpoint a medida que se implementan.
 
 ---
 
-## 7. Pendiente de decidir con el equipo (no está en este contrato)
+## 7. Pendiente de decidir con el equipo
+
+Cada punto tiene un default implementado; cambiarlo no obliga a rehacer nada.
 
 - **Chat:** ¿el educador (o un mentor) puede leer los mensajes del equipo, para moderar? Hoy no.
-- **Tiempo real** (decisión 6.2.5): Supabase Broadcast desde el servidor u otra opción. Mientras
-  tanto, el frontend puede refrescar `GET /api/board` cada 10-15 s.
+- **Registro de actividad:** ¿se guarda a quién le escribe cada participante en privado? Hoy sí
+  (sin el texto).
 - **Mentores:** ¿la rúbrica de 5 criterios del 1 al 5 está bien? ¿Cada mentor califica a todos o a
   equipos asignados? (hoy: a todos).
-- **Registro del líder** (decisión 6.2.1).
+- **Registro del líder** (decisión 6.2.1): ¿el líder necesita cuenta con correo y contraseña? Hoy
+  entra con código y nickname, como todos.
+- **Modo personalizado y puntos:** ¿qué cambia además de guardar el escenario? ¿Cuántos puntos da
+  cada fase? (hoy 0).
+- **Mural:** ¿`proposta` es la descripción de la entrega o algo aparte?
 
 ---
 
@@ -987,3 +1116,11 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
     contra `PATCH /api/events/:id/switches`; en `PlayerBoard`, deshabilitar el chat o la entrega
     según `event.switches`, y en `team/create` / `team/join` avisar si `joinsEnabled` es `false`.
     Traducir `CHAT_DISABLED`, `SUBMISSIONS_DISABLED` y `JOINS_DISABLED`.
+15. Registro de actividad (opcional, para el educador o el equipo de investigación): una lista con
+    `GET /api/events/:id/activity` (traducir `action`) y un botón "Exportar actividad" que abra
+    `GET /api/events/:id/export?type=activity`.
+16. Recuperar la contraseña: en el login, un enlace "¿Olvidaste tu contraseña?" que llame a
+    `POST /api/auth/password/forgot` con el `locale` actual; y una página nueva
+    `/[locale]/reset-password` que lea el token de `window.location.hash`, lo revise con
+    `/check` y mande la contraseña nueva a `/reset` (ver "Recuperar la contraseña" en la
+    sección 2). Traducir `RESET_TOKEN_INVALID` y `RESET_TOKEN_EXPIRED`.
