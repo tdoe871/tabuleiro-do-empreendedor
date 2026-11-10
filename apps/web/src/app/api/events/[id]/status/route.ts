@@ -6,6 +6,7 @@ import {
   planStatusChange,
   toEventDTO,
 } from "@/features/event/server/event";
+import { asStaff, recordActivity } from "@/features/activity/server/record";
 import { apiError, readJsonObject } from "@/lib/api/errors";
 import { getStaffFromRequest } from "@/lib/auth/staff";
 import { eventTopic, notify, staffTopic } from "@/lib/realtime/server";
@@ -45,6 +46,11 @@ export async function PATCH(
       data: change.data,
     });
     if (count === 0) return apiError("INVALID_STATUS_TRANSITION");
+    await recordActivity({
+      ...asStaff(staff, id),
+      action: "EVENT_STATUS_CHANGED",
+      details: { from: event.status, to: change.data.status },
+    });
     notify(
       { topic: eventTopic(id), signal: "event" },
       { topic: staffTopic(id), signal: "overview" },

@@ -12,6 +12,8 @@ import { isSignal, type RealtimeConfig, type RealtimeSignal } from "./signals";
 // - "board": GET /api/board
 // - "event": the session changed (status, clock): board or overview
 // - "overview": GET /api/events/:id/overview (educator)
+// - "announcements": the educator sent or removed an announcement: board
+//   (players) or overview (educator); new ones can pop up as a notice
 // - "refresh": catch up with everything (polling, tab visible again,
 //   connection back)
 //

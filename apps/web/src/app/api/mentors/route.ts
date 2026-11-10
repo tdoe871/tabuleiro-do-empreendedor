@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { Prisma, prisma } from "@tdoe/db";
+import { Prisma, INTERACTIVE_TX, prisma } from "@tdoe/db";
 
+import { asMentor, recordActivity } from "@/features/activity/server/record";
 import {
   MAX_MENTORS_PER_EVENT,
   mentorNameError,
@@ -57,6 +58,10 @@ export async function POST(request: NextRequest) {
       { status: joined.recovered ? 200 : 201 },
     );
     await setMentorSessionCookie(response, joined.mentor);
+    await recordActivity({
+      ...asMentor(joined.mentor),
+      action: joined.recovered ? "MENTOR_RECOVERED" : "MENTOR_JOINED",
+    });
     return response;
   } catch (error) {
     if (error instanceof ApiFailure) return apiError(error.code);
@@ -86,5 +91,5 @@ function enter(mentorCode: string, name: string) {
       data: { eventId: event.id, name },
     });
     return { mentor, event, recovered: false };
-  });
+  }, INTERACTIVE_TX);
 }
