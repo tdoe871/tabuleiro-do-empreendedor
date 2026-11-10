@@ -12,13 +12,31 @@ datasource db {
 // redesign in docs/architecture/DECISIONS-UX.md.
 // ---------------------------------------------------------------------------
 model Staff {
-  id             String   @id @default(uuid())
-  name           String
-  email          String   @unique
-  hashedPassword String
-  events         Event[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                String          @id @default(uuid())
+  name              String
+  email             String          @unique
+  hashedPassword    String
+  // Set when the password changes: sessions issued before it stop working.
+  passwordChangedAt DateTime?
+  events            Event[]
+  passwordResets    PasswordReset[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+// A "forgot my password" link. Only the SHA-256 of the token is stored, so
+// a copy of the database cannot be used to reset anyone's password. One use,
+// short-lived.
+model PasswordReset {
+  id        String    @id @default(uuid())
+  staffId   String
+  staff     Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([staffId])
 }
 
 // PAUSED does not stop the clock: endsAt stays the same and participants just
