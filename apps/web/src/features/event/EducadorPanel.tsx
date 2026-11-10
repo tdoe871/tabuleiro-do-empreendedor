@@ -112,8 +112,24 @@ const NEXT_STATUS: Partial<
   pausada: { next: "ativa", actionKey: "retomar" },
 };
 
-const AVATAR_COLORS = ["#2E80F0", "#22C97A", "#A040E0", "#0FD4B0", "#F0BC40"];
+// Modern Interactive Turquoise palette (docs/backend/themes-info/theme.md),
+// scoped to this screen only via inline Tailwind arbitrary values — no
+// global theme bridge, so the player/mentor/login screens keep their own
+// look untouched.
+const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
+const AG_SIDEBAR = "bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))]";
+const AG_BORDER = "border-[var(--ag-color-border,rgba(45,212,191,0.24))]";
+const AG_SURFACE = "bg-[var(--ag-color-surface,rgba(10,38,54,0.78))]";
+const AG_SURFACE_SOLID = "bg-[var(--ag-color-surface-solid,#0c2d40)]";
+const AG_SURFACE_FEATURED =
+  "bg-[var(--ag-color-surface-featured,rgba(14,48,66,0.88))]";
+const AG_HOVER =
+  "hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))]";
+const AG_TEXT = "text-[var(--ag-color-text,#ecfeff)]";
+const AG_CARD = `${AG_SURFACE} backdrop-blur-2xl border ${AG_BORDER} rounded-[20px]`;
+const AG_START_BTN =
+  "bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] rounded-[12px] transition-all duration-200 hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98]";
 
 // Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
 // roadmap list, not a backend-driven feature.
@@ -445,10 +461,15 @@ export function EducadorPanel() {
   const canResume = selected?.status === "pausada";
 
   return (
-    <div id="tela-educador">
-      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
+    <div
+      id="tela-educador"
+      className={`min-h-screen bg-[var(--ag-color-background,#04151f)] ${AG_TEXT}`}
+    >
+      <div
+        className={`topbar ${AG_SIDEBAR} backdrop-blur-2xl border-b ${AG_BORDER}`}
+      >
         <div className="tb-logo">
-          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+          <div className="tb-gem transition-all duration-300 shadow-[0_0_16px_-3px_rgba(0,245,212,0.4)]">
             <GemLogo size={14} />
           </div>
           <span style={{ fontSize: 12, fontWeight: 700 }}>TdoE</span>
@@ -479,12 +500,7 @@ export function EducadorPanel() {
           </button>
           {selected && selected.status !== "finalizada" && (
             <button
-              className="btn btn-sm"
-              style={{
-                background: "var(--parc-bg)",
-                color: "var(--parc)",
-                border: "1.5px solid var(--parc-bd)",
-              }}
+              className={`btn btn-sm ${AG_START_BTN}`}
               onClick={handleSessionAction}
             >
               ▶ {t(`acao.${NEXT_STATUS[selected.status]?.actionKey}`)}
@@ -493,8 +509,8 @@ export function EducadorPanel() {
           <button
             className="btn btn-sm"
             style={{
-              background: "linear-gradient(135deg,var(--parc),#5B6CF0)",
-              color: "#fff",
+              background: "var(--ag-color-accent, #00f5d4)",
+              color: "var(--ag-color-on-accent, #031924)",
             }}
             onClick={handleSocializar}
           >
@@ -510,7 +526,9 @@ export function EducadorPanel() {
       </div>
 
       <div className="edu-layout">
-        <div className="sidebar bg-white/[0.03] backdrop-blur-xl border-r border-white/10">
+        <div
+          className={`sidebar ${AG_SIDEBAR} backdrop-blur-2xl border-r ${AG_BORDER}`}
+        >
           <div className="sidebar-sec">{t("sidebar.sessoes")}</div>
           <div>
             {sessions.length === 0 && (
@@ -527,7 +545,7 @@ export function EducadorPanel() {
             {sessions.map((s, i) => (
               <div
                 key={s.id}
-                className={`eq-item transition-all duration-200 hover:bg-white/5 hover:translate-x-0.5 ${s.id === selectedId ? "on" : ""}`}
+                className={`eq-item transition-all duration-200 ${AG_HOVER} hover:translate-x-1 ${s.id === selectedId ? "on" : ""}`}
                 onClick={() => selectSession(s.id)}
               >
                 <div
@@ -550,25 +568,25 @@ export function EducadorPanel() {
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.acoes")}</div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => setShowCreate(true)}
           >
             ＋ {t("sidebar.novaSessao")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={handleVerificarAlertas}
           >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => void abrirEvaluacoes()}
           >
             🎓 {t("sidebar.mentores")}
@@ -576,25 +594,25 @@ export function EducadorPanel() {
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => exportar("report")}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => exportar("proposals")}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => exportar("activity")}
           >
             🗒 {t("sidebar.exportarAtividade")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 transition-all duration-200 hover:bg-white/5 hover:text-neon-lime"
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => router.push("/")}
           >
             ← {t("sair")}
@@ -603,7 +621,9 @@ export function EducadorPanel() {
 
         <div className="edu-main">
           <div className="metrics">
-            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime">
+            <div
+              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#2DD4BF]/50 hover:shadow-[0_12px_32px_-8px_rgba(45,212,191,0.28)]`}
+            >
               <div
                 style={{
                   position: "absolute",
@@ -619,7 +639,9 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.equipesAtivas")}</div>
             </div>
-            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+            <div
+              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]`}
+            >
               <div
                 style={{
                   position: "absolute",
@@ -635,7 +657,9 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.participantes")}</div>
             </div>
-            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-purple/40 hover:shadow-glow-purple">
+            <div
+              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]/50 hover:shadow-[0_12px_32px_-8px_rgba(56,189,248,0.28)]`}
+            >
               <div
                 style={{
                   position: "absolute",
@@ -651,7 +675,9 @@ export function EducadorPanel() {
               </div>
               <div className="m-lbl">{t("metrics.chavesConcluidas")}</div>
             </div>
-            <div className="metric-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-amber/40 hover:shadow-glow-amber">
+            <div
+              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00BBF9]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,187,249,0.28)]`}
+            >
               <div
                 style={{
                   position: "absolute",
@@ -684,7 +710,7 @@ export function EducadorPanel() {
                 : 0;
               return (
                 <div
-                  className="prog-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/35 hover:shadow-glow-lime"
+                  className={`prog-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_10px_28px_-6px_rgba(0,245,212,0.25)]`}
                   key={id}
                 >
                   <div className="pc-head">
@@ -726,11 +752,11 @@ export function EducadorPanel() {
             )}
             {selected && overview && overview.teams.length === 0 && (
               <div
-                className="card card-pad"
+                className={`card card-pad ${AG_CARD}`}
                 style={{
                   gridColumn: "1 / -1",
                   textAlign: "center",
-                  border: "1px dashed var(--border2)",
+                  borderStyle: "dashed",
                 }}
               >
                 <div style={{ fontSize: 24, marginBottom: 6 }}>👥</div>
@@ -750,7 +776,10 @@ export function EducadorPanel() {
                 ).length;
                 const pct = Math.round((completed / KEY_IDS.length) * 100);
                 return (
-                  <div className="eq-card" key={team.id}>
+                  <div
+                    className={`eq-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]`}
+                    key={team.id}
+                  >
                     <div className="eq-card-head">
                       <div
                         className="eq-card-av"
@@ -777,7 +806,7 @@ export function EducadorPanel() {
                             ? 1
                             : status === "ativa"
                               ? 0.6
-                              : 0.15;
+                              : 0.25;
                         return (
                           <div
                             key={id}
@@ -812,7 +841,7 @@ export function EducadorPanel() {
                       <div
                         className="badge tiny"
                         style={{
-                          background: "rgba(255,255,255,.05)",
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
                           color: "var(--t3)",
                           borderColor: "var(--border)",
                         }}
@@ -822,7 +851,7 @@ export function EducadorPanel() {
                       <div
                         className="badge tiny"
                         style={{
-                          background: "rgba(255,255,255,.05)",
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
                           color: "var(--t3)",
                           borderColor: "var(--border)",
                         }}
@@ -833,9 +862,9 @@ export function EducadorPanel() {
                         <div
                           className="badge tiny"
                           style={{
-                            background: "rgba(34,197,94,.12)",
-                            color: "#22c55e",
-                            borderColor: "rgba(34,197,94,.3)",
+                            background: "var(--prob-bg)",
+                            color: "var(--prob)",
+                            borderColor: "var(--prob-bd)",
                           }}
                         >
                           ✓ {t("equipeCard.entregou")}
@@ -848,7 +877,9 @@ export function EducadorPanel() {
           </div>
         </div>
 
-        <div className="edu-right bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
+        <div
+          className={`edu-right ${AG_SIDEBAR} backdrop-blur-2xl border-l ${AG_BORDER}`}
+        >
           <div className="panel-title">{t("right.alertasMediacao")}</div>
           {!overview || overview.alerts.length === 0 ? (
             <div style={{ fontSize: 11, color: "var(--t3)" }}>
@@ -859,22 +890,22 @@ export function EducadorPanel() {
               {overview.alerts.map((alert) => {
                 const color =
                   alert.severity === "CRITICAL"
-                    ? "#ef4444"
+                    ? "var(--ag-color-warning, #fbbf24)"
                     : alert.severity === "WARNING"
                       ? "var(--gold)"
-                      : "var(--parc)";
+                      : "var(--opor)";
                 const bg =
                   alert.severity === "CRITICAL"
-                    ? "rgba(239,68,68,.1)"
+                    ? "var(--gold-bg)"
                     : alert.severity === "WARNING"
                       ? "var(--gold-bg)"
-                      : "var(--parc-bg)";
+                      : "var(--opor-bg)";
                 const bd =
                   alert.severity === "CRITICAL"
-                    ? "1.5px solid rgba(239,68,68,.3)"
+                    ? "1.5px solid var(--gold-bd)"
                     : alert.severity === "WARNING"
                       ? "1.5px solid var(--gold-bd)"
-                      : "1.5px solid var(--parc-bd)";
+                      : "1.5px solid var(--opor-bd)";
                 const icon =
                   alert.severity === "CRITICAL"
                     ? "⚠"
@@ -884,7 +915,7 @@ export function EducadorPanel() {
                 return (
                   <div
                     key={alert.id}
-                    className="alert-card"
+                    className="alert-card rounded-[20px]"
                     style={{ background: bg, border: bd }}
                   >
                     <div
@@ -907,25 +938,25 @@ export function EducadorPanel() {
           <div className="panel-title">{t("right.controlesSessao")}</div>
           <div className="ctrl-grid">
             <div
-              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-lime/40 hover:text-white hover:shadow-glow-lime ${!canStart ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn ${AG_START_BTN} ${!canStart ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canStart && changeStatus("ACTIVE")}
             >
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-amber/40 hover:text-white hover:shadow-glow-amber ${!canPause ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50 ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className={`ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-cyan/40 hover:text-white hover:shadow-glow-cyan ${!canResume ? "opacity-40 pointer-events-none" : ""}`}
+              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50 ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
             <div
-              className="ctrl-btn bg-white/5 backdrop-blur-md border-white/10 transition-all duration-200 hover:border-neon-purple/40 hover:text-white hover:shadow-glow-purple"
+              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50`}
               onClick={handleVerificarAlertas}
             >
               🔔 {t("right.alertas")}
@@ -933,7 +964,9 @@ export function EducadorPanel() {
           </div>
           <div className="sidebar-divider" />
           <div className="panel-title">⏱ {t("timer.titulo")}</div>
-          <div className="timer-edu-block">
+          <div
+            className={`timer-edu-block ${AG_SURFACE_FEATURED} backdrop-blur-xl border ${AG_BORDER} rounded-[20px] p-3 my-2`}
+          >
             <div style={{ fontSize: 10, color: "var(--t3)", marginBottom: 4 }}>
               {t("timer.duracao")}
             </div>
@@ -965,19 +998,21 @@ export function EducadorPanel() {
             </div>
             <div className="timer-ctrl-row">
               <button
-                className="timer-ctrl-btn timer-start"
+                className={`timer-ctrl-btn timer-start ${AG_START_BTN}`}
                 onClick={() => void iniciarTimer()}
               >
                 ▶ {t("timer.iniciar")}
               </button>
               <button
-                className="timer-ctrl-btn timer-stop"
+                className="timer-ctrl-btn timer-stop bg-[#EF4444]/12 border border-[#EF4444]/35 text-[#EF4444] font-bold rounded-[12px] hover:bg-[#EF4444]/20 shadow-[0_0_15px_-5px_rgba(239,68,68,0.25)] transition-all"
                 onClick={() => void pararTimer()}
               >
                 ⏹ {t("timer.parar")}
               </button>
             </div>
-            <div className="timer-toggle-row bg-white/5 backdrop-blur-md border-white/10">
+            <div
+              className={`timer-toggle-row ${AG_SIDEBAR} border ${AG_BORDER} rounded-[12px]`}
+            >
               <span className="timer-toggle-lbl">
                 {t("timer.mostrarEstudantes")}
               </span>
@@ -1000,7 +1035,7 @@ export function EducadorPanel() {
               return (
                 <button
                   key={id}
-                  className="carta-launcher-btn backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-purple"
+                  className={`carta-launcher-btn ${AG_SURFACE} backdrop-blur-2xl border ${AG_BORDER} rounded-[20px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(0,245,212,0.25)]`}
                   style={{
                     borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
                     background: `var(${KEY_COLOR_VAR[id]}-bg)`,
@@ -1025,19 +1060,14 @@ export function EducadorPanel() {
           </div>
           {event?.challengeCard && (
             <div
-              style={{
-                marginTop: 8,
-                padding: "10px 12px",
-                borderRadius: 9,
-                background: "var(--gold-bg)",
-                border: "1px solid var(--gold-bd)",
-              }}
+              className={`${AG_SURFACE_FEATURED} border ${AG_BORDER} rounded-[20px]`}
+              style={{ marginTop: 8, padding: "10px 12px" }}
             >
               <div
                 style={{
                   fontSize: 10,
                   fontWeight: 700,
-                  color: "var(--gold)",
+                  color: "var(--ag-color-accent,#00f5d4)",
                   marginBottom: 4,
                 }}
               >
@@ -1066,6 +1096,7 @@ export function EducadorPanel() {
           <div className="panel-title">📢 {t("avisos.titulo")}</div>
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
             <input
+              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT}`}
               style={{ flex: 1 }}
               placeholder={t("avisos.placeholder")}
               value={announcementInput}
@@ -1076,7 +1107,7 @@ export function EducadorPanel() {
               }}
             />
             <button
-              className="btn btn-primary btn-sm"
+              className={`btn btn-sm ${AG_START_BTN}`}
               onClick={() => void enviarAviso()}
             >
               {t("avisos.enviar")}
@@ -1099,13 +1130,11 @@ export function EducadorPanel() {
             {(overview?.announcements ?? []).map((a) => (
               <div
                 key={a.id}
+                className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px]`}
                 style={{
                   display: "flex",
                   gap: 6,
                   alignItems: "flex-start",
-                  background: "rgba(255,255,255,.04)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
                   padding: "6px 8px",
                   fontSize: 11,
                 }}
@@ -1131,7 +1160,7 @@ export function EducadorPanel() {
           {(["chat", "submissions", "joins"] as const).map((name) => (
             <div
               key={name}
-              className="timer-toggle-row bg-white/5 backdrop-blur-md border-white/10"
+              className={`timer-toggle-row ${AG_SIDEBAR} border ${AG_BORDER} rounded-[12px]`}
               style={{ marginBottom: 6 }}
             >
               <span className="timer-toggle-lbl">
@@ -1154,7 +1183,7 @@ export function EducadorPanel() {
             {event?.mentorCode ? (
               <>
                 {t("mentores.codigo")}:{" "}
-                <strong style={{ color: "var(--gold)" }}>
+                <strong style={{ color: "var(--ag-color-accent,#00f5d4)" }}>
                   {event.mentorCode}
                 </strong>
               </>
@@ -1163,7 +1192,7 @@ export function EducadorPanel() {
             )}
           </div>
           <button
-            className="btn btn-ghost btn-sm w100"
+            className={`btn btn-sm w100 ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} ${AG_HOVER} hover:border-[#00F5D4]/50`}
             onClick={() => void gerarCodigoMentores()}
           >
             {event?.mentorCode ? t("mentores.regenerar") : t("mentores.gerar")}
@@ -1248,7 +1277,7 @@ export function EducadorPanel() {
               {t("modalSessao.cancelar")}
             </button>
             <button
-              className="btn btn-primary"
+              className={`btn ${AG_START_BTN}`}
               onClick={() => void confirmarEnvioCarta()}
             >
               🃏 {t("carta.enviar")}
@@ -1275,18 +1304,21 @@ export function EducadorPanel() {
             {evaluations.teams.map((team) => (
               <div
                 key={team.id}
+                className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px]`}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  background: "rgba(255,255,255,.04)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
                   padding: "8px 10px",
                   fontSize: 12,
                 }}
               >
                 <span>{team.name}</span>
-                <span style={{ color: "var(--gold)", fontWeight: 700 }}>
+                <span
+                  style={{
+                    color: "var(--ag-color-accent,#00f5d4)",
+                    fontWeight: 700,
+                  }}
+                >
                   {team.summary.average !== null
                     ? `${team.summary.average.toFixed(1)} (${team.summary.count})`
                     : t("mentores.semNota")}
