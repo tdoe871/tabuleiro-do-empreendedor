@@ -53,6 +53,7 @@
     "joinTeam": "Rejoindre une équipe existante",
     "createNameLabel": "Nom de l'équipe",
     "joinCodeLabel": "Code de l'équipe (ou utilisez le lien envoyé par le chef)",
+    "joinNicknameLabel": "Votre nom",
     "youAreLeader": "Vous êtes le chef de cette équipe",
     "shareLink": "Partagez ce lien avec votre équipe",
     "enterBoardPreview": "Entrer dans le plateau (aperçu) →",
@@ -127,7 +128,8 @@
     "tabs": {
       "login": "Connexion",
       "cadastro": "Créer un compte",
-      "codigo": "Code"
+      "codigo": "Code",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Content de vous revoir",
@@ -149,7 +151,11 @@
       "codigoPlaceholder": "Ex : A7X3K2",
       "entrarJogo": "Rejoindre la partie →",
       "codeHint1": "Code fourni par le formateur",
-      "codeHint2": "Demandez le code à 6 lettres pour commencer"
+      "codeHint2": "Demandez le code à 6 lettres pour commencer",
+      "titleMentor": "Connexion mentor",
+      "subMentor": "Notez les équipes — sans inscription",
+      "codigoMentores": "Code mentor",
+      "entrarMentor": "Se connecter →"
     },
     "toasts": {
       "backendPendingLogin": "Connexion formateur : backend en construction — ouverture du panneau en mode aperçu.",
@@ -157,7 +163,8 @@
       "passwordMismatch": "Les mots de passe ne correspondent pas",
       "backendPendingRegister": "Inscription formateur : backend en construction — ouverture du panneau en mode aperçu.",
       "registerError": "Impossible de créer le compte",
-      "missingFields": "Renseignez votre nom et le code"
+      "missingFields": "Renseignez votre nom et le code",
+      "mentorError": "Connexion impossible. Vérifiez le code mentor."
     }
   },
   "educador": {
@@ -478,6 +485,28 @@
       "maisAvancadaLbl": "La plus avancée"
     },
     "avisoDemo": "Aperçu — données d'exemple, il faut encore connecter le vrai backend."
+  },
+  "mentor": {
+    "titulo": "Panneau mentor",
+    "carregando": "Chargement…",
+    "sair": "Se déconnecter",
+    "semEquipes": "Pas encore d'équipes dans cet événement",
+    "criterios": {
+      "problema": "Problème",
+      "solucao": "Solution",
+      "impacto": "Impact",
+      "viabilidade": "Viabilité",
+      "apresentacao": "Présentation"
+    },
+    "avaliar": {
+      "chaves": "clés",
+      "editar": "✏️ Modifier la note",
+      "calificar": "⭐ Noter",
+      "comentario": "Commentaire (optionnel)",
+      "cancelar": "Annuler",
+      "salvar": "Enregistrer la note",
+      "salvo": "Note enregistrée"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

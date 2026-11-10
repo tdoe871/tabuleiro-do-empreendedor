@@ -53,6 +53,7 @@
     "joinTeam": "Unirme a un equipo existente",
     "createNameLabel": "Nombre del equipo",
     "joinCodeLabel": "Código del equipo (o usa el link que te mandó el líder)",
+    "joinNicknameLabel": "Tu nombre",
     "youAreLeader": "Eres el líder de este equipo",
     "shareLink": "Comparte este link con tu equipo",
     "enterBoardPreview": "Entrar al tablero (vista previa) →",
@@ -127,7 +128,8 @@
     "tabs": {
       "login": "Entrar",
       "cadastro": "Crear cuenta",
-      "codigo": "Código"
+      "codigo": "Código",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Bienvenido de nuevo",
@@ -149,7 +151,11 @@
       "codigoPlaceholder": "Ej: A7X3K2",
       "entrarJogo": "Entrar al juego →",
       "codeHint1": "Código proporcionado por el educador",
-      "codeHint2": "Pide el código de 6 letras para empezar"
+      "codeHint2": "Pide el código de 6 letras para empezar",
+      "titleMentor": "Entrar como mentor",
+      "subMentor": "Califica a los equipos — sin registro",
+      "codigoMentores": "Código de mentores",
+      "entrarMentor": "Entrar →"
     },
     "toasts": {
       "backendPendingLogin": "Inicio de sesión de educador: backend en construcción — abriendo panel en modo vista previa.",
@@ -157,7 +163,8 @@
       "passwordMismatch": "Las contraseñas no coinciden",
       "backendPendingRegister": "Registro de educador: backend en construcción — abriendo panel en modo vista previa.",
       "registerError": "No se pudo crear la cuenta",
-      "missingFields": "Completa tu nombre y el código"
+      "missingFields": "Completa tu nombre y el código",
+      "mentorError": "No se pudo entrar. Revisa el código de mentores."
     }
   },
   "educador": {
@@ -478,6 +485,28 @@
       "maisAvancadaLbl": "Más avanzado"
     },
     "avisoDemo": "Vista previa — datos de ejemplo, falta conectar con el backend real."
+  },
+  "mentor": {
+    "titulo": "Panel de mentor",
+    "carregando": "Cargando…",
+    "sair": "Salir",
+    "semEquipes": "Todavía no hay equipos en este evento",
+    "criterios": {
+      "problema": "Problema",
+      "solucao": "Solución",
+      "impacto": "Impacto",
+      "viabilidade": "Viabilidad",
+      "apresentacao": "Presentación"
+    },
+    "avaliar": {
+      "chaves": "claves",
+      "editar": "✏️ Editar calificación",
+      "calificar": "⭐ Calificar",
+      "comentario": "Comentario (opcional)",
+      "cancelar": "Cancelar",
+      "salvar": "Guardar calificación",
+      "salvo": "Calificación guardada"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

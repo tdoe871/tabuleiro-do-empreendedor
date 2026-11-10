@@ -13,7 +13,7 @@ import {
 } from "@/features/event/keys";
 import { useToast } from "@/components/providers/ToastProvider";
 
-type LoginTab = "login" | "cadastro" | "codigo";
+type LoginTab = "login" | "cadastro" | "codigo" | "mentor";
 
 async function postJson(url: string, body: unknown) {
   const res = await fetch(url, {
@@ -43,6 +43,9 @@ export function LoginScreen() {
 
   const [jogNome, setJogNome] = useState("");
   const [jogCodigo, setJogCodigo] = useState("");
+
+  const [mentNome, setMentNome] = useState("");
+  const [mentCodigo, setMentCodigo] = useState("");
 
   function authErrorMessage(code: string | undefined, fallback: string) {
     return code && tCommon.has(`errors.${code}`)
@@ -99,6 +102,22 @@ export function LoginScreen() {
       nickname: jogNome.trim(),
     });
     router.push(`/team?${params.toString()}`);
+  }
+
+  async function handleMentor(e: FormEvent) {
+    e.preventDefault();
+    const res = await postJson("/api/mentors", {
+      mentorCode: mentCodigo.trim(),
+      name: mentNome.trim(),
+    });
+    if (res.ok) {
+      router.push("/mentor/dashboard");
+      return;
+    }
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.mentorError")));
   }
 
   const footerLines = t("footer").split("\n");
@@ -174,6 +193,12 @@ export function LoginScreen() {
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
+            </div>
+            <div
+              className={`login-tab transition-all duration-200 hover:text-white ${tab === "mentor" ? "on" : ""}`}
+              onClick={() => setTab("mentor")}
+            >
+              {t("tabs.mentor")}
             </div>
           </div>
 
@@ -331,6 +356,39 @@ export function LoginScreen() {
                   </div>
                 </div>
               </div>
+            </form>
+          )}
+
+          {tab === "mentor" && (
+            <form className="anim-in" onSubmit={handleMentor}>
+              <div className="login-title">{t("form.titleMentor")}</div>
+              <div className="login-sub">{t("form.subMentor")}</div>
+              <div className="field">
+                <label>{t("form.seuNome")}</label>
+                <input
+                  placeholder={t("form.comoChamado")}
+                  value={mentNome}
+                  onChange={(e) => setMentNome(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="field">
+                <label>{t("form.codigoMentores")}</label>
+                <input
+                  placeholder={t("form.codigoPlaceholder")}
+                  style={{
+                    textTransform: "uppercase",
+                    letterSpacing: ".2em",
+                    fontWeight: 700,
+                  }}
+                  value={mentCodigo}
+                  onChange={(e) => setMentCodigo(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w100">
+                {t("form.entrarMentor")}
+              </button>
             </form>
           )}
         </div>

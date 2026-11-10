@@ -53,6 +53,7 @@
     "joinTeam": "Entrar em uma equipe existente",
     "createNameLabel": "Nome da equipe",
     "joinCodeLabel": "Código da equipe (ou use o link que o líder te enviou)",
+    "joinNicknameLabel": "Seu nome",
     "youAreLeader": "Você é o líder desta equipe",
     "shareLink": "Compartilhe este link com sua equipe",
     "enterBoardPreview": "Entrar no tabuleiro (prévia) →",
@@ -127,7 +128,8 @@
     "tabs": {
       "login": "Entrar",
       "cadastro": "Criar conta",
-      "codigo": "Código"
+      "codigo": "Código",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Bem-vindo de volta",
@@ -149,7 +151,11 @@
       "codigoPlaceholder": "Ex: A7X3K2",
       "entrarJogo": "Entrar no jogo →",
       "codeHint1": "Código fornecido pelo educador",
-      "codeHint2": "Peça o código de 6 letras para começar"
+      "codeHint2": "Peça o código de 6 letras para começar",
+      "titleMentor": "Entrar como mentor",
+      "subMentor": "Avalie as equipes — sem cadastro",
+      "codigoMentores": "Código de mentores",
+      "entrarMentor": "Entrar →"
     },
     "toasts": {
       "backendPendingLogin": "Login de educador: backend em construção — abrindo painel em modo de visualização.",
@@ -157,7 +163,8 @@
       "passwordMismatch": "As senhas não coincidem",
       "backendPendingRegister": "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
       "registerError": "Não foi possível criar a conta",
-      "missingFields": "Preencha seu nome e o código"
+      "missingFields": "Preencha seu nome e o código",
+      "mentorError": "Não foi possível entrar. Confira o código de mentores."
     }
   },
   "educador": {
@@ -478,6 +485,28 @@
       "maisAvancadaLbl": "Mais avançada"
     },
     "avisoDemo": "Vista prévia — dados de exemplo, falta conectar ao backend real."
+  },
+  "mentor": {
+    "titulo": "Painel do mentor",
+    "carregando": "Carregando…",
+    "sair": "Sair",
+    "semEquipes": "Ainda não há equipes neste evento",
+    "criterios": {
+      "problema": "Problema",
+      "solucao": "Solução",
+      "impacto": "Impacto",
+      "viabilidade": "Viabilidade",
+      "apresentacao": "Apresentação"
+    },
+    "avaliar": {
+      "chaves": "chaves",
+      "editar": "✏️ Editar nota",
+      "calificar": "⭐ Avaliar",
+      "comentario": "Comentário (opcional)",
+      "cancelar": "Cancelar",
+      "salvar": "Salvar nota",
+      "salvo": "Nota salva"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

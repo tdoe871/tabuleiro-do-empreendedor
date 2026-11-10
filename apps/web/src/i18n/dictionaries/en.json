@@ -53,6 +53,7 @@
     "joinTeam": "Join an existing team",
     "createNameLabel": "Team name",
     "joinCodeLabel": "Team code (or use the link your leader sent you)",
+    "joinNicknameLabel": "Your name",
     "youAreLeader": "You are this team's leader",
     "shareLink": "Share this link with your team",
     "enterBoardPreview": "Enter the board (preview) →",
@@ -127,7 +128,8 @@
     "tabs": {
       "login": "Sign in",
       "cadastro": "Create account",
-      "codigo": "Code"
+      "codigo": "Code",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Welcome back",
@@ -149,7 +151,11 @@
       "codigoPlaceholder": "e.g. A7X3K2",
       "entrarJogo": "Join the game →",
       "codeHint1": "Code provided by your educator",
-      "codeHint2": "Ask for the 6-letter code to get started"
+      "codeHint2": "Ask for the 6-letter code to get started",
+      "titleMentor": "Sign in as a mentor",
+      "subMentor": "Score teams — no sign-up",
+      "codigoMentores": "Mentor code",
+      "entrarMentor": "Sign in →"
     },
     "toasts": {
       "backendPendingLogin": "Educator login: backend under construction — opening the panel in preview mode.",
@@ -157,7 +163,8 @@
       "passwordMismatch": "Passwords don't match",
       "backendPendingRegister": "Educator sign-up: backend under construction — opening the panel in preview mode.",
       "registerError": "Couldn't create the account",
-      "missingFields": "Fill in your name and the code"
+      "missingFields": "Fill in your name and the code",
+      "mentorError": "Couldn't sign in. Check the mentor code."
     }
   },
   "educador": {
@@ -478,6 +485,28 @@
       "maisAvancadaLbl": "Most advanced"
     },
     "avisoDemo": "Preview — sample data, still needs to connect to the real backend."
+  },
+  "mentor": {
+    "titulo": "Mentor panel",
+    "carregando": "Loading…",
+    "sair": "Sign out",
+    "semEquipes": "No teams in this event yet",
+    "criterios": {
+      "problema": "Problem",
+      "solucao": "Solution",
+      "impacto": "Impact",
+      "viabilidade": "Viability",
+      "apresentacao": "Presentation"
+    },
+    "avaliar": {
+      "chaves": "keys",
+      "editar": "✏️ Edit score",
+      "calificar": "⭐ Score",
+      "comentario": "Comment (optional)",
+      "cancelar": "Cancel",
+      "salvar": "Save score",
+      "salvo": "Score saved"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

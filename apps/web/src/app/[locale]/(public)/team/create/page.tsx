@@ -6,9 +6,11 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
 import { TeamFlowHeader } from "@/components/shared/TeamFlowHeader";
+import { sendJson, readApiError, translateApiError } from "@/lib/api/client";
 
 export default function CreateTeamPage() {
   const t = useTranslations("team");
+  const tCommon = useTranslations("common");
   const toast = useToast();
   const router = useRouter();
   const params = useSearchParams();
@@ -16,6 +18,7 @@ export default function CreateTeamPage() {
   const nickname = params.get("nickname") ?? "";
 
   const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [created, setCreated] = useState<{
     name: string;
     joinCode: string;
@@ -23,26 +26,29 @@ export default function CreateTeamPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/teams", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ eventCode, name, nickname }),
-    });
-    if (res.status === 501) {
-      toast("info", t("toasts.backendPendingCreate"));
-      setCreated({
+    setSubmitting(true);
+    try {
+      const res = await sendJson("/api/teams", "POST", {
+        eventCode,
         name,
-        joinCode:
-          eventCode.slice(0, 3) +
-          "-" +
-          Math.random().toString(36).slice(2, 5).toUpperCase(),
+        nickname,
       });
-      return;
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          translateApiError(tCommon, err?.error, t("toasts.createError")),
+        );
+        return;
+      }
+      const body = (await res.json()) as {
+        team: { name: string; joinCode: string };
+      };
+      toast("ok", t("toasts.created"));
+      setCreated({ name: body.team.name, joinCode: body.team.joinCode });
+    } finally {
+      setSubmitting(false);
     }
-    toast(
-      res.ok ? "ok" : "err",
-      res.ok ? t("toasts.created") : t("toasts.createError"),
-    );
   }
 
   if (created) {
@@ -101,11 +107,7 @@ export default function CreateTeamPage() {
               type="button"
               className="btn btn-primary w100"
               style={{ marginTop: 14 }}
-              onClick={() =>
-                router.push(
-                  `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
-                )
-              }
+              onClick={() => router.push("/jogador/dashboard")}
             >
               {t("enterBoardPreview")}
             </button>
@@ -149,7 +151,11 @@ export default function CreateTeamPage() {
               autoFocus
             />
           </div>
-          <button type="submit" className="btn btn-primary w100">
+          <button
+            type="submit"
+            className="btn btn-primary w100"
+            disabled={submitting}
+          >
             {t("createTeam")}
           </button>
         </form>
