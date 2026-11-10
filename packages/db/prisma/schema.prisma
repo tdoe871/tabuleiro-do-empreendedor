@@ -12,13 +12,31 @@ datasource db {
 // redesign in docs/architecture/DECISIONS-UX.md.
 // ---------------------------------------------------------------------------
 model Staff {
-  id             String   @id @default(uuid())
-  name           String
-  email          String   @unique
-  hashedPassword String
-  events         Event[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                String          @id @default(uuid())
+  name              String
+  email             String          @unique
+  hashedPassword    String
+  // Set when the password changes: sessions issued before it stop working.
+  passwordChangedAt DateTime?
+  events            Event[]
+  passwordResets    PasswordReset[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+// A "forgot my password" link. Only the SHA-256 of the token is stored, so
+// a copy of the database cannot be used to reset anyone's password. One use,
+// short-lived.
+model PasswordReset {
+  id        String    @id @default(uuid())
+  staffId   String
+  staff     Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([staffId])
 }
 
 // PAUSED does not stop the clock: endsAt stays the same and participants just
@@ -46,38 +64,45 @@ enum TimerMode {
 }
 
 model Event {
-  id              String      @id @default(uuid())
-  code            String      @unique // short code to join as a participant
+  id                 String         @id @default(uuid())
+  code               String         @unique // short code to join as a participant
   // Short code the educator shares with the event's mentors (judges). Null
   // until the educator creates it; regenerating it stops new entries.
-  mentorCode      String?     @unique
-  name            String
-  mode            EventMode   @default(SCHOOL)
-  scenario        String? // required when mode = CUSTOM
-  status          EventStatus @default(DRAFT)
-  timerMode       TimerMode   @default(GLOBAL)
-  durationMinutes Int? // used when timerMode = GLOBAL
-  maxTeams        Int         @default(60)
-  maxTeamSize     Int         @default(5)
-  startedAt       DateTime?
-  endsAt          DateTime?
+  mentorCode         String?        @unique
+  name               String
+  mode               EventMode      @default(SCHOOL)
+  scenario           String? // required when mode = CUSTOM
+  status             EventStatus    @default(DRAFT)
+  timerMode          TimerMode      @default(GLOBAL)
+  durationMinutes    Int? // used when timerMode = GLOBAL
+  maxTeams           Int            @default(60)
+  maxTeamSize        Int            @default(5)
+  startedAt          DateTime?
+  endsAt             DateTime?
   // Short activity timer the educator runs on top of the event clock (for
   // example 15 min for pitches). Players see it only while it is visible.
-  activityEndsAt  DateTime?
-  activitySeconds Int? // its full length, to draw progress
-  activityVisible Boolean     @default(false)
+  activityEndsAt     DateTime?
+  activitySeconds    Int? // its full length, to draw progress
+  activityVisible    Boolean        @default(false)
   // The educator's challenge card: one at a time, for every team.
-  challengeKey    BoardKey?
-  challengeText   String?
-  challengeSentAt DateTime?
-  hostId          String
-  host            Staff       @relation(fields: [hostId], references: [id])
-  phases          Phase[]
-  teams           Team[]
-  alerts          Alert[]
-  mentors         Mentor[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  challengeKey       BoardKey?
+  challengeText      String?
+  challengeSentAt    DateTime?
+  // Emergency switches: the educator turns off part of the app without a
+  // new deploy (abuse in the chat, Storage trouble, closing the doors).
+  chatEnabled        Boolean        @default(true)
+  submissionsEnabled Boolean        @default(true)
+  joinsEnabled       Boolean        @default(true)
+  hostId             String
+  host               Staff          @relation(fields: [hostId], references: [id])
+  phases             Phase[]
+  teams              Team[]
+  alerts             Alert[]
+  mentors            Mentor[]
+  announcements      Announcement[]
+  activity           ActivityLog[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   // `code` is already indexed by @unique; hostId backs the FK to Staff.
   @@index([hostId])
@@ -280,6 +305,48 @@ model Evaluation {
 
   @@unique([mentorId, teamId])
   @@index([teamId])
+}
+
+// The educator's announcements to the whole event ("lunch is ready", "pitches
+// start at 3 pm"). Players and mentors see the newest ones on their screens.
+model Announcement {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([eventId, createdAt])
+}
+
+// Who did an action in the activity record.
+enum ActorType {
+  PARTICIPANT
+  MENTOR
+  STAFF
+}
+
+// Activity record for the research: who did what and when, append-only.
+// Actor and team names are copied so a row stays readable after a rename or
+// a deletion (no foreign keys besides the event). `action` is a string (the
+// list is in apps/web/src/features/activity/server/actions.ts), so a new
+// action needs no migration. It never holds chat text or phase answers,
+// only that they happened.
+model ActivityLog {
+  id        Int       @id @default(autoincrement())
+  eventId   String
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  actorType ActorType
+  actorId   String?
+  actorName String?
+  teamId    String?
+  teamName  String?
+  action    String
+  details   Json?
+  createdAt DateTime  @default(now())
+
+  @@index([eventId, id])
+  @@index([teamId, id])
 }
 
 enum AlertSeverity {

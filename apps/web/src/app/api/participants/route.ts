@@ -7,6 +7,8 @@ import {
   normalizeCode,
   sameName,
 } from "@/features/team/server/team";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
+import { switchGate } from "@/features/event/server/switches";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
@@ -56,6 +58,10 @@ export async function POST(request: NextRequest) {
       );
       if (existing) return { team, participant: existing, recovered: true };
 
+      // Closed entries still let people recover their session (above).
+      const joins = switchGate(team.event, "joins");
+      if (joins !== "ok") throw new ApiFailure(joins);
+
       if (team.participants.length >= team.event.maxTeamSize) {
         throw new ApiFailure("TEAM_FULL");
       }
@@ -82,6 +88,14 @@ export async function POST(request: NextRequest) {
       joined.participant,
       joined.team.eventId,
     );
+    await recordActivity({
+      ...asPlayer({
+        participant: joined.participant,
+        team: joined.team,
+        event: joined.team.event,
+      }),
+      action: joined.recovered ? "SESSION_RECOVERED" : "PARTICIPANT_JOINED",
+    });
     if (!joined.recovered) {
       notify(
         { topic: teamTopic(joined.team.id), signal: "board" },

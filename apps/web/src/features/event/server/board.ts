@@ -1,6 +1,7 @@
 import {
   BOARD_KEYS,
   PHASES_PER_KEY,
+  type Announcement,
   type BoardKey,
   type Event,
   type Participant,
@@ -16,6 +17,8 @@ import {
   type SubmissionFileDTO,
 } from "@/features/submission/server/dto";
 import { canPlay } from "@/features/team/server/team";
+import { toAnnouncementDTO, type AnnouncementDTO } from "./announcements";
+import { toSwitchesDTO, type SwitchesDTO } from "./switches";
 import {
   toActivityTimerDTO,
   toChallengeCardDTO,
@@ -57,6 +60,8 @@ export type BoardDTO = {
     playable: boolean;
     // The educator's activity timer, only while they show it to players.
     activityTimer: ActivityTimerDTO | null;
+    // What the educator turned off (false = off), to disable those buttons.
+    switches: SwitchesDTO;
   };
   team: { id: string; name: string; joinCode: string; score: number };
   me: MemberDTO;
@@ -67,6 +72,8 @@ export type BoardDTO = {
   >;
   // The educator's challenge card (one for every team), or null.
   cartaAtiva: ChallengeCardDTO | null;
+  // The educator's newest announcements to the whole event, newest first.
+  announcements: AnnouncementDTO[];
   submission: SubmissionDTO | null;
   // The team's uploaded files (ready ones only).
   files: SubmissionFileDTO[];
@@ -105,6 +112,7 @@ export function buildBoard(input: {
   completed: CompletedPhase[];
   submission: Submission | null;
   files: SubmissionFile[];
+  announcements: Pick<Announcement, "id" | "text" | "createdAt">[];
   now: Date;
 }): BoardDTO {
   const { event, team, me, members, completed, submission, files, now } = input;
@@ -149,6 +157,7 @@ export function buildBoard(input: {
       endsAt: event.endsAt?.toISOString() ?? null,
       playable: canPlay(event, now) === "ok",
       activityTimer: event.activityVisible ? toActivityTimerDTO(event) : null,
+      switches: toSwitchesDTO(event),
     },
     team: {
       id: team.id,
@@ -160,6 +169,7 @@ export function buildBoard(input: {
     members: members.filter((member) => member.id !== me.id).map(toMember),
     keys,
     cartaAtiva: toChallengeCardDTO(event),
+    announcements: input.announcements.map(toAnnouncementDTO),
     submission: submission ? toSubmissionDTO(submission) : null,
     files: files.map(toFileDTO),
   };

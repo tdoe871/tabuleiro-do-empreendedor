@@ -12,7 +12,9 @@ export const STAFF_SESSION_DURATION_SECONDS = 60 * 60 * 12;
 const MIN_SECRET_LENGTH = 32;
 const ALGORITHM = "HS256";
 
-export type StaffSession = { staffId: string };
+// issuedAt (seconds) lets the account reject sessions issued before its
+// password changed.
+export type StaffSession = { staffId: string; issuedAt: number | null };
 
 // Read on every call (not at import) so the build does not fail when
 // AUTH_SECRET is missing, and so verification fails closed at runtime.
@@ -52,7 +54,10 @@ export async function verifyStaffSession(
     });
     if (payload.kind !== "staff" || typeof payload.sub !== "string")
       return null;
-    return { staffId: payload.sub };
+    return {
+      staffId: payload.sub,
+      issuedAt: typeof payload.iat === "number" ? payload.iat : null,
+    };
   } catch {
     return null;
   }

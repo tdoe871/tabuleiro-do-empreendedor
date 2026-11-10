@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { BOARD_KEYS, PHASES_PER_KEY, Prisma, prisma } from "@tdoe/db";
 
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
 import {
   MAX_ANSWER_LENGTH,
   POINTS_PER_PHASE,
@@ -60,6 +61,7 @@ export async function PUT(
         },
         select: { id: true },
       });
+      let completedNow = true;
       try {
         await prisma.$transaction([
           prisma.teamPhase.create({
@@ -84,6 +86,14 @@ export async function PUT(
           error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === "P2002";
         if (!alreadyDone) throw error;
+        completedNow = false;
+      }
+      if (completedNow) {
+        await recordActivity({
+          ...asPlayer(player),
+          action: "PHASE_COMPLETED",
+          details: { key: keyParam, order, answerLength: conteudo.length },
+        });
       }
       notify(
         { topic: teamTopic(player.team.id), signal: "board" },

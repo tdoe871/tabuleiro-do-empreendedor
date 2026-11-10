@@ -8,6 +8,8 @@ import {
   sameName,
   teamNameError,
 } from "@/features/team/server/team";
+import { asPlayer, recordActivity } from "@/features/activity/server/record";
+import { switchGate } from "@/features/event/server/switches";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { setPlayerSessionCookie } from "@/lib/auth/player";
 import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
@@ -54,6 +56,8 @@ export async function POST(request: NextRequest) {
         if (canJoinEvent(event, new Date()) !== "ok") {
           throw new ApiFailure("EVENT_FINISHED");
         }
+        const joins = switchGate(event, "joins");
+        if (joins !== "ok") throw new ApiFailure(joins);
         if (event.teams.length >= event.maxTeams) {
           throw new ApiFailure("EVENT_FULL");
         }
@@ -91,6 +95,10 @@ export async function POST(request: NextRequest) {
         created.event.id,
       );
       notify({ topic: staffTopic(created.event.id), signal: "overview" });
+      await recordActivity({
+        ...asPlayer(created),
+        action: "TEAM_CREATED",
+      });
       return response;
     } catch (error) {
       if (error instanceof ApiFailure) return apiError(error.code);
@@ -121,6 +129,7 @@ export async function GET(request: NextRequest) {
       where: { code: eventCode },
       select: {
         maxTeamSize: true,
+        joinsEnabled: true,
         teams: {
           orderBy: { createdAt: "asc" },
           select: { name: true, _count: { select: { participants: true } } },
@@ -135,6 +144,8 @@ export async function GET(request: NextRequest) {
         memberCount: team._count.participants,
         maxTeamSize: event.maxTeamSize,
       })),
+      // false while the educator has new entries turned off.
+      joinsEnabled: event.joinsEnabled,
     });
   } catch (error) {
     console.error("List teams failed:", error);

@@ -112,6 +112,9 @@ describe("buildBoard", () => {
     challengeKey: null,
     challengeText: null,
     challengeSentAt: null,
+    chatEnabled: true,
+    submissionsEnabled: true,
+    joinsEnabled: true,
     name: "Prueba",
     mode: "SCHOOL",
     scenario: null,
@@ -158,6 +161,7 @@ describe("buildBoard", () => {
       completed: [],
       submission: null,
       files: [],
+      announcements: [],
       now,
     });
     expect(board.keys.problema).toEqual({
@@ -173,6 +177,12 @@ describe("buildBoard", () => {
     expect(board.members.map((m) => m.nickname)).toEqual(["Ana"]);
     expect(board.event.playable).toBe(true);
     expect(board.cartaAtiva).toBeNull();
+    expect(board.announcements).toEqual([]);
+    expect(board.event.switches).toEqual({
+      chat: true,
+      submissions: true,
+      joins: true,
+    });
     expect(board.files).toEqual([]);
   });
 
@@ -190,6 +200,7 @@ describe("buildBoard", () => {
       ],
       submission: null,
       files: [],
+      announcements: [],
       now,
     });
     expect(board.keys.problema.status).toBe("concluida");
