@@ -1,5 +1,13 @@
 import type { Event, EventMode, EventStatus } from "@tdoe/db";
 
+import {
+  toActivityTimerDTO,
+  toChallengeCardDTO,
+  type ActivityTimerDTO,
+  type ChallengeCardDTO,
+} from "./controls";
+import { toSwitchesDTO, type SwitchesDTO } from "./switches";
+
 // Server-side rules for events. Pure functions (no database access) so they
 // can be unit-tested; the route handlers in src/app/api/events use them.
 
@@ -22,6 +30,9 @@ const MODE_FROM_DB: Record<EventMode, ApiMode> = {
 export type EventDTO = {
   id: string;
   code: string;
+  // For the educator only (this DTO never reaches players): the code mentors
+  // use to enter; null until it is created.
+  mentorCode: string | null;
   name: string;
   mode: ApiMode;
   scenario: string | null;
@@ -32,12 +43,19 @@ export type EventDTO = {
   maxTeamSize: number;
   startedAt: string | null;
   endsAt: string | null;
+  // The educator's controls (see controls.ts).
+  activityTimer: ActivityTimerDTO | null;
+  activityVisible: boolean;
+  challengeCard: ChallengeCardDTO | null;
+  // Emergency switches (see switches.ts): false = turned off.
+  switches: SwitchesDTO;
 };
 
 export function toEventDTO(event: Event): EventDTO {
   return {
     id: event.id,
     code: event.code,
+    mentorCode: event.mentorCode,
     name: event.name,
     mode: MODE_FROM_DB[event.mode],
     scenario: event.scenario,
@@ -48,6 +66,10 @@ export function toEventDTO(event: Event): EventDTO {
     maxTeamSize: event.maxTeamSize,
     startedAt: event.startedAt?.toISOString() ?? null,
     endsAt: event.endsAt?.toISOString() ?? null,
+    activityTimer: toActivityTimerDTO(event),
+    activityVisible: event.activityVisible,
+    challengeCard: toChallengeCardDTO(event),
+    switches: toSwitchesDTO(event),
   };
 }
 

@@ -2,7 +2,7 @@
 
 > Bitácora del backend y la base de datos (responsable: Eddy). Dice **qué está hecho, dónde está,
 > cómo se trabaja y qué sigue**, para que cualquiera (o Claude en una sesión nueva) retome sin
-> perder el hilo. Última actualización: **6 nov 2026 (noche)**.
+> perder el hilo. Última actualización: **9 nov 2026 (madrugada)**.
 >
 > Documentos relacionados:
 >
@@ -18,38 +18,58 @@
 ## 1. Resumen en 30 segundos
 
 - Plataforma del LATAM Social Business Hackathon (Monterrey, **12-13 nov 2026**, 24 h, ~300
-  participantes, ~60 equipos de 2 a 5). **Lunes 9: todo terminado.** Martes 10 y miércoles 11: QA.
+  participantes, ~60 equipos de 2 a 5). Plan: **lunes 9 todo terminado**, martes 10 y miércoles 11
+  QA, jueves 12 el evento.
 - Un solo deploy de Next.js 16 (API en route handlers) + Prisma 7 sobre Postgres de Supabase.
-- **Hechos y probados contra Supabase real:** base de datos, login del educador, sesiones del
-  educador (crear / listar / iniciar / pausar / terminar / resumen), equipos y jugadores, tablero con
-  avance automático entre llaves, entregas con links y archivos, chat del equipo (mensajes al
-  equipo, privados y toques), tiempo real (avisos por Supabase Broadcast con refresco de respaldo).
-- **Falta:** mentores y calificación, las partes del panel del educador que no se han definido
-  (timer con presets, carta de reto, alertas, exportar) y la prueba de carga.
+- **El backend del alcance acordado está terminado y probado contra Supabase real:** cuentas del
+  educador (con recuperar contraseña), sesiones del evento, equipos y jugadores, tablero con avance
+  automático, entregas con links y archivos, chat del equipo, tiempo real, mentores y calificación,
+  controles del educador (timer, carta de reto, alertas, exportar), avisos generales, interruptores
+  de emergencia, registro de actividad y prueba de carga local (300 personas, 0 errores).
+- **Pero el proyecto todavía no está listo para el evento.** Lo que falta (detalle en la sección 8):
+  1. **Merge de los PRs del backend** (#7 → #11 → … → #17): ninguno está en `dev` todavía.
+  2. **Conectar el frontend** (JP): en `dev` solo están conectados login, sesiones del educador,
+     crear/unirse a equipo y guardar la entrega; falta el tablero, el chat, el tiempo real, los
+     archivos, los mentores y los controles nuevos.
+  3. **Hosting** (Brandon): elegir Vercel o Azure, desplegar y poner las variables.
+  4. **Antes del evento:** prueba de carga contra el hosting real, prueba en el wifi del lugar,
+     limpiar la base y auditoría de seguridad.
 
 ---
 
 ## 2. Dónde estamos ahora (git y PRs)
 
-| PR  | Rama                    | Base              | Estado       | Contenido                                                                                         |
-| --- | ----------------------- | ----------------- | ------------ | ------------------------------------------------------------------------------------------------- |
-| #2  | `feature/backend-base`  | `dev`             | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
-| #3  | `feature/staff-auth`    | `dev`             | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
-| #7  | `feature/players`       | `dev`             | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
-| #8  | `feature/submissions`   | `feature/players` | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
-| #9  | `feature/chat`          | `feature/players` | **Abierto**  | Bloque de chat del equipo (montado sobre #7)                                                      |
-| —   | `feature/realtime`      | `feature/chat`    | Por abrir    | Bloque de tiempo real (montado sobre #9)                                                          |
-| #6  | `ui/theme-sandbox-test` | `dev`             | Abierto (JP) | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
-| #5  | `test/initial-tests`    | `qa`              | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
+| PR  | Rama                         | Base                         | Estado       | Contenido                                                                                         |
+| --- | ---------------------------- | ---------------------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| #2  | `feature/backend-base`       | `dev`                        | **Merged**   | `prisma.config.ts`, Prisma fijo en 7.10.1, 3 migraciones, seed, borrador del contrato             |
+| #3  | `feature/staff-auth`         | `dev`                        | **Merged**   | Bloque del educador: login/registro/logout, eventos, correos (Resend), nombre de la llave pública |
+| #7  | `feature/players`            | `dev`                        | **Abierto**  | Bloque de jugadores: equipos, sesión del jugador, tablero                                         |
+| #8  | `feature/submissions`        | `feature/players`            | **Merged**   | Bloque de entregas. Se hizo merge a `feature/players`, así que ya viene dentro del #7             |
+| #9  | `feature/chat`               | `feature/players`            | **Merged**   | Chat del equipo (merge a `feature/players`)                                                       |
+| #10 | `feature/realtime`           | `feature/chat`               | **Merged**   | Tiempo real (merge en cascada a `feature/players`)                                                |
+| #11 | `feature/mentors`            | `feature/players`            | **Abierto**  | Mentores y calificación (montado sobre #7)                                                        |
+| #12 | `feature/educator-controls`  | `feature/mentors`            | **Abierto**  | Timer de actividad, carta de reto, alertas y exportar (montado sobre #11)                         |
+| #13 | `feature/load-test`          | `feature/educator-controls`  | **Abierto**  | Prueba de carga, pool configurable y espera de transacciones (montado sobre #12)                  |
+| #14 | `feature/announcements`      | `feature/load-test`          | **Abierto**  | Avisos generales del educador a todo el evento (montado sobre #13)                                |
+| #15 | `feature/emergency-switches` | `feature/announcements`      | **Abierto**  | Interruptores de emergencia: apagar chat, entregas o entradas (montado sobre #14)                 |
+| #16 | `feature/activity-log`       | `feature/emergency-switches` | **Abierto**  | Registro de actividad para la investigación, con CSV (montado sobre #15)                          |
+| #17 | `feature/password-reset`     | `feature/activity-log`       | **Abierto**  | Recuperar la contraseña del educador por correo (montado sobre #16)                               |
+| #6  | `ui/theme-sandbox-test`      | `dev`                        | Merged (JP)  | Frontend: diseño nuevo + conexión real del panel del educador y login                             |
+| #5  | `test/initial-tests`         | `qa`                         | Merged (Leo) | Pruebas iniciales (unitarias, contrato y E2E)                                                     |
 
-- **#7 trae ahora jugadores + entregas** y no tiene conflictos con `dev`. Lo tiene que aprobar
-  alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs (ni Claude por él).**
+- **Ningún PR del backend desde el #7 está en `dev`.** El #7 trae jugadores, entregas, chat y tiempo
+  real; lo tiene que aprobar alguien del equipo: **Eddy no aprueba ni hace merge de sus propios PRs
+  (ni Claude por él).** Al 8 nov no tenía conflictos con `dev`; el #6 de JP entró a `dev` después,
+  así que conviene revisarlo otra vez al hacer el merge.
 - Ramas locales de Eddy: `local/prueba` (= `feature/players` + `dev`, **solo para probar en local,
-  no se sube**) y `feature/chat` / `feature/realtime` (en la carpeta aparte `../tabuleiro-chat`, un
+  no se sube**) y las ramas de bloque (en la carpeta aparte `../tabuleiro-chat`, un
   `git worktree`, con un enlace a `apps/web/.env`).
 - Archivos locales **sin versionar** (a propósito): `.mcp.json` (config del MCP de Supabase) y
   `docs/architecture/backend/` (contexto inicial).
-- **Orden de merge:** #7, luego #9 (chat), luego el de tiempo real.
+- **#9 y #10 ya están dentro de `feature/players`**: el #7 trae jugadores, entregas, chat y tiempo
+  real. **Orden de merge (en cascada):** #7 → #11 (mentores) → #12 (controles del educador) → #13
+  (carga) → #14 (avisos generales) → #15 (interruptores) → #16 (registro de actividad) → #17 (recuperar contraseña).
+  Cada uno está montado sobre el anterior; al hacer merge de uno, GitHub pasa el siguiente a su base.
 - **Forma de trabajo acordada:** **un PR por bloque grande** (educador, jugadores, entregas, ...),
   no uno por cada tarea chica.
 
@@ -69,17 +89,18 @@
 Un solo archivo: **`apps/web/.env`** (ignorado por git; la plantilla es `apps/web/.env.example`).
 `packages/db/prisma.config.ts` lo carga solo cuando existe.
 
-| Variable                               | Para qué                                 | Notas                                                                                      |
-| -------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`                         | La app (Prisma con `@prisma/adapter-pg`) | Pooler de transacción, puerto **6543**                                                     |
-| `DIRECT_URL`                           | Solo migraciones (CLI de Prisma)         | Pooler de sesión, puerto **5432** (las migraciones necesitan locks que el 6543 no soporta) |
-| `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                       |
-| `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local                                                           |
-| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                            |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | Todavía no la usa ningún código. Antes se llamaba `..._ANON_KEY`; se unificó el nombre     |
-| `SUPABASE_SECRET_KEY`                  | Storage desde el servidor                | **Solo servidor**, se salta RLS. Necesaria para archivos                                   |
-| `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal)                       |
-| `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                       |
+| Variable                               | Para qué                                 | Notas                                                                                                                        |
+| -------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                         | La app (Prisma con `@prisma/adapter-pg`) | Pooler de transacción, puerto **6543**                                                                                       |
+| `DIRECT_URL`                           | Solo migraciones (CLI de Prisma)         | Pooler de sesión, puerto **5432** (las migraciones necesitan locks que el 6543 no soporta)                                   |
+| `AUTH_SECRET`                          | Firmar sesiones (jose)                   | Mínimo 32 caracteres                                                                                                         |
+| `NEXT_PUBLIC_APP_URL`                  | URL base                                 | `http://localhost:3000` en local. **En producción, la URL real**: arma el enlace de recuperar contraseña                     |
+| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase                |                                                                                                                              |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`)       | La recibe el navegador para escuchar el tiempo real. Antes se llamaba `..._ANON_KEY`; se unificó el nombre                   |
+| `SUPABASE_SECRET_KEY`                  | Storage y tiempo real desde el servidor  | **Solo servidor**, se salta RLS. Necesaria para archivos y para mandar avisos en vivo                                        |
+| `DATABASE_POOL_MAX`                    | Conexiones a la base por instancia       | Opcional (5). Vercel: 3-5. Una VM: 10-20                                                                                     |
+| `RESEND_API_KEY`, `MAIL_FROM`          | Correos                                  | Opcionales en local (sin ellas, el correo se imprime en la terminal). En producción, necesarias para recuperar la contraseña |
+| `REALTIME_PROVIDER`                    | Tiempo real: `supabase` o `none`         | Opcional. Vacía: Supabase si existen las llaves, si no solo refresco                                                         |
 
 - Eddy ya pasó su `.env` al equipo.
 - **Brandon:** en GitHub (secrets del CI) y en Vercel, los nombres tienen que ser **exactamente** los
@@ -120,15 +141,21 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 
 ### Migraciones (todas aplicadas)
 
-| Migración                                     | Qué hace                                                                                                                                           |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261105145444_init`                         | Tablas Staff, Event, Phase, Team, Participant, TeamPhase, Submission, Alert. **RLS activo sin políticas en todas** (incluida `_prisma_migrations`) |
-| `20261105145757_fk_indexes`                   | Índices en llaves foráneas; quita índices que repetían un `@unique`                                                                                |
-| `20261105150323_board_keys_and_phase_content` | `Phase.key` (enum `BoardKey`) + `order` 1-3; `TeamPhase.content`                                                                                   |
-| `20261105231454_event_mode_and_scenario`      | `Event.mode` (`SCHOOL`/`CUSTOM`) y `Event.scenario`                                                                                                |
-| `20261106011207_team_phase_completed_by`      | Quita `TeamPhase.keyActivated`; agrega `completedById` (quién contestó)                                                                            |
-| `20261106161554_submission_files_and_links`   | `Submission.links` y tabla `SubmissionFile` (con RLS)                                                                                              |
-| `20261107002643_team_messages`                | Tabla `Message` (chat: `TEAM` / `PRIVATE` / `NUDGE`, id secuencial, `clientId` único por remitente) con RLS                                        |
+| Migración                                          | Qué hace                                                                                                                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261105145444_init`                              | Tablas Staff, Event, Phase, Team, Participant, TeamPhase, Submission, Alert. **RLS activo sin políticas en todas** (incluida `_prisma_migrations`)        |
+| `20261105145757_fk_indexes`                        | Índices en llaves foráneas; quita índices que repetían un `@unique`                                                                                       |
+| `20261105150323_board_keys_and_phase_content`      | `Phase.key` (enum `BoardKey`) + `order` 1-3; `TeamPhase.content`                                                                                          |
+| `20261105231454_event_mode_and_scenario`           | `Event.mode` (`SCHOOL`/`CUSTOM`) y `Event.scenario`                                                                                                       |
+| `20261106011207_team_phase_completed_by`           | Quita `TeamPhase.keyActivated`; agrega `completedById` (quién contestó)                                                                                   |
+| `20261106161554_submission_files_and_links`        | `Submission.links` y tabla `SubmissionFile` (con RLS)                                                                                                     |
+| `20261107002643_team_messages`                     | Tabla `Message` (chat: `TEAM` / `PRIVATE` / `NUDGE`, id secuencial, `clientId` único por remitente) con RLS                                               |
+| `20261108220835_mentors_and_evaluations`           | `Event.mentorCode`, tablas `Mentor` y `Evaluation` (calificación en JSON) con RLS                                                                         |
+| `20261108221623_activity_timer_and_challenge_card` | `Event`: timer de actividad (`activityEndsAt`, `activitySeconds`, `activityVisible`) y carta de reto (`challengeKey`, `challengeText`, `challengeSentAt`) |
+| `20261108230000_announcements`                     | Tabla `Announcement` (avisos generales del educador: `eventId`, `text`, `createdAt`) con RLS                                                              |
+| `20261108233000_emergency_switches`                | `Event`: interruptores de emergencia `chatEnabled`, `submissionsEnabled`, `joinsEnabled` (todos `true` por defecto)                                       |
+| `20261109000000_activity_log`                      | Enum `ActorType` y tabla `ActivityLog` (registro de actividad: actor, equipo, acción, detalle; sin llaves foráneas salvo el evento) con RLS               |
+| `20261109010000_password_reset`                    | `Staff.passwordChangedAt` (cierra las sesiones anteriores) y tabla `PasswordReset` (solo el hash del token, vence, un uso) con RLS                        |
 
 ### Reglas de la base
 
@@ -148,17 +175,22 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
   5. **Si la migración borra algo** (columnas, tablas), Claude no puede aplicarla: la corre Eddy con
      `! source ~/.nvm/nvm.sh && nvm use 22 && pnpm --filter @tdoe/db exec prisma migrate deploy`.
 
-### Datos actuales
+### Datos actuales (revisado el 9 nov)
 
-- Solo el seed: Staff `seed@tabuleiro.local` (**no puede iniciar sesión**: su hash es `"!"`) y el
-  evento **`QATEST`** con sus 12 fases. **Hay que quitarlos antes del 12 de noviembre.**
-- Todas las pruebas en vivo crean sus propios datos y los borran al terminar.
+- 13 migraciones aplicadas; la base está al día con la rama `feature/password-reset`.
+- 3 eventos: el seed **`QATEST`** (Staff `seed@tabuleiro.local`, que **no puede iniciar sesión**: su
+  hash es `"!"`) y dos de prueba del equipo, `WDAFL7` ("Prueba Proyecto") y `FVR7SM` ("Prueba
+  Hackaton"). 3 cuentas de educador y 5 equipos en total. **Hay que quitar todo esto antes del 12 de
+  noviembre.**
+- Registro de actividad y enlaces de recuperar contraseña: vacíos.
+- Todas las pruebas en vivo de Claude crean sus propios datos (cuentas `@tabuleiro.test`) y los
+  borran al terminar, con un script de Prisma (no con SQL).
 
 ### Storage
 
 - Bucket **`submissions`**: privado, límite de 20 MB y solo tipos permitidos (PDF, Word, PowerPoint,
   imágenes). Lo crea el código la primera vez que se usa (`ensureBucket` en
-  `apps/web/src/lib/storage/submissions.ts`). Hoy está vacío.
+  `apps/web/src/lib/storage/submissions.ts`). Hoy está vacío (0 archivos).
 
 ---
 
@@ -167,35 +199,50 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 ```
 apps/web/src/
   app/api/...                   route handlers (uno por endpoint, ver sección 6)
-  proxy.ts                      protege /[locale]/mestre/* (educador) y /[locale]/jogador/* (jugador)
+  proxy.ts                      protege /[locale]/mestre/* (educador), /[locale]/jogador/* (jugador) y /[locale]/mentor/*
   lib/api/errors.ts             apiError(code), ApiFailure (para abortar transacciones), readJsonObject
-  lib/auth/session.ts           JWT con jose: sesión de educador (tdoe_staff, 12 h) y de jugador (tdoe_player, 36 h)
-  lib/auth/staff.ts             getStaffFromRequest / getStaffFromToken (revisa que la cuenta exista)
+  lib/auth/session.ts           JWT con jose: sesión de educador (tdoe_staff, 12 h), jugador (tdoe_player, 36 h) y mentor (tdoe_mentor, 36 h)
+  lib/auth/staff.ts             getStaffFromRequest / getStaffFromToken (la cuenta existe y la sesión es posterior al último cambio de contraseña)
+  lib/auth/mentor.ts            getMentorFromRequest, setMentorSessionCookie
   lib/auth/player.ts            getPlayerFromRequest (participante + equipo + evento), setPlayerSessionCookie
   lib/auth/password.ts          hash de contraseñas con scrypt de Node (igual que Maestro-virtual)
   lib/auth/account.ts           reglas de correo, nombre y contraseña
   lib/auth/rate-limit.ts        límite de intentos por IP (en memoria)
   lib/codes.ts                  códigos de 6 caracteres sin I/O/0/1 (eventos y equipos)
-  lib/email/send.ts             sendEmail() con Resend (todavía ningún flujo lo usa)
+  lib/auth/password-reset.ts    recuperar contraseña: token y su hash, vencimiento, enlace, sesiones anteriores al cambio
+  lib/email/send.ts             sendEmail() con Resend (lo usa recuperar contraseña)
+  lib/email/password-reset-email.ts  el correo de recuperar contraseña en los 4 idiomas
   lib/storage/submissions.ts    Storage por REST: bucket, URL de subida, lectura de bytes, URL de descarga, borrar
+  lib/csv.ts                    CSV con BOM y celdas protegidas contra fórmulas
   lib/realtime/
-    signals.ts                  tipos de aviso (messages, board, event, overview) y de configuración
+    signals.ts                  tipos de aviso (messages, board, event, overview, announcements) y de configuración
     server.ts                   proveedor, nombres de canal firmados, notify() (se envía después de responder)
     batcher.ts                  junta avisos seguidos en el navegador (uno por tipo cada segundo)
     useRealtime.ts              hook del frontend: escucha, refresca de respaldo y se pone al día
   features/event/server/
     event.ts                    validación de crear evento, transiciones de estado, EventDTO
     progress.ts                 estado de cada llave a partir de las fases concluidas
+    controls.ts                 timer de actividad y carta de reto (validación y DTOs)
+    announcements.ts            avisos generales: validar, DTO, cuántos se muestran, límite por minuto
+    switches.ts                 interruptores de emergencia: validar, DTO y switchGate() que revisa cada ruta
+    alerts.ts                   alertas de mediación calculadas (equipo detenido, sin entrega, incompleto)
+    owned-event.ts              cargar el evento del educador y avisar cambios
     board.ts                    arma GET /api/board, orden de fases, POINTS_PER_PHASE
     load-board.ts               consultas para el tablero
+  features/activity/server/
+    actions.ts                  acciones del registro (con su nombre en español), DTO, fila del CSV, query
+    record.ts                   recordActivity() (escribe sin lanzar errores) y asPlayer/asStaff/asMentor
   features/team/server/team.ts  nombres, nicknames, códigos, cuándo se puede unir y jugar
   features/submission/server/
     rules.ts                    tipos de archivo, firmas (primeros bytes), tamaños, links https, validación
     dto.ts                      formatos de respuesta de entregas y archivos
+  features/mentor/server/
+    rubric.ts                   rúbrica (5 criterios, 1-5), validar calificaciones, promedios
+    dto.ts                      formato de respuesta de una calificación
   features/communication/server/
     rules.ts                    chat: validar mensajes y query, quién ve qué, límites
     dto.ts                      formato de respuesta de los mensajes
-apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages
+apps/web/__tests__/             pruebas unitarias (Jest): lib/auth, lib/email, lib/realtime, features/event-server, players, submissions, messages, mentors, educator-controls, announcements, switches, activity
 packages/db/                    esquema, migraciones, seed, prisma.config.ts
 ```
 
@@ -218,26 +265,34 @@ packages/db/                    esquema, migraciones, seed, prisma.config.ts
 
 Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
-| Bloque      | Endpoint                                                                            | Quién                |
-| ----------- | ----------------------------------------------------------------------------------- | -------------------- |
-| Educador    | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`          | Público              |
-| Educador    | `POST /api/events`, `GET /api/events`                                               | Educador             |
-| Educador    | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                 | Educador             |
-| Educador    | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)       | Educador             |
-| Jugadores   | `POST /api/teams`, `GET /api/teams?eventCode=`                                      | Público              |
-| Jugadores   | `POST /api/participants` (unirse o recuperar sesión)                                | Público              |
-| Jugadores   | `POST /api/teams/me/join-code` (nuevo código)                                       | Líder                |
-| Jugadores   | `GET /api/board`, `PUT /api/board/keys/:key/phases/:order`                          | Jugador              |
-| Jugadores   | `PUT /api/participants/me/rpg-role`                                                 | Jugador              |
-| Entregas    | `GET /api/submissions`, `PUT /api/submissions`                                      | Jugador              |
-| Entregas    | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id` | Jugador              |
-| Entregas    | `GET /api/submissions/files/:id` (descarga)                                         | Equipo o su educador |
-| Chat        | `GET /api/messages` (`?after=` / `?before=`), `POST /api/messages`                  | Jugador              |
-| Tiempo real | `GET /api/realtime` (`?eventId=` para el educador)                                  | Jugador o educador   |
-| —           | `GET /api/health`                                                                   | Público              |
+| Bloque      | Endpoint                                                                                       | Quién                |
+| ----------- | ---------------------------------------------------------------------------------------------- | -------------------- |
+| Educador    | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`                     | Público              |
+| Educador    | `POST /api/auth/password/forgot`, `.../check`, `.../reset` (recuperar la contraseña)           | Público              |
+| Educador    | `POST /api/events`, `GET /api/events`                                                          | Educador             |
+| Educador    | `PATCH /api/events/:id/status` (iniciar, pausar, retomar, terminar)                            | Educador             |
+| Educador    | `GET /api/events/:id/overview` (métricas, equipos, avance, entregas, alertas)                  | Educador             |
+| Jugadores   | `POST /api/teams`, `GET /api/teams?eventCode=`                                                 | Público              |
+| Jugadores   | `POST /api/participants` (unirse o recuperar sesión)                                           | Público              |
+| Jugadores   | `POST /api/teams/me/join-code` (nuevo código)                                                  | Líder                |
+| Jugadores   | `GET /api/board`, `PUT /api/board/keys/:key/phases/:order`                                     | Jugador              |
+| Jugadores   | `PUT /api/participants/me/rpg-role`                                                            | Jugador              |
+| Entregas    | `GET /api/submissions`, `PUT /api/submissions`                                                 | Jugador              |
+| Entregas    | `POST /api/submissions/files`, `POST .../files/:id/confirm`, `DELETE .../files/:id`            | Jugador              |
+| Entregas    | `GET /api/submissions/files/:id` (descarga)                                                    | Equipo o su educador |
+| Chat        | `GET /api/messages` (`?after=` / `?before=`), `POST /api/messages`                             | Jugador              |
+| Tiempo real | `GET /api/realtime` (`?eventId=` para el educador)                                             | Jugador o educador   |
+| Mentores    | `POST /api/events/:id/mentor-code`, `GET /api/events/:id/evaluations`                          | Educador             |
+| Mentores    | `POST /api/mentors` (entrar), `GET /api/mentor`, `PUT /api/mentor/evaluations/:teamId`         | Público / Mentor     |
+| Educador    | `PUT/PATCH/DELETE /api/events/:id/activity-timer`, `PUT/DELETE /api/events/:id/challenge-card` | Educador             |
+| Educador    | `GET /api/events/:id/export?type=report\|proposals` (CSV)                                      | Educador             |
+| Educador    | `GET/POST /api/events/:id/announcements`, `DELETE .../announcements/:announcementId`           | Educador             |
+| Educador    | `PATCH /api/events/:id/switches` (apagar chat, entregas o entradas)                            | Educador             |
+| Educador    | `GET /api/events/:id/activity` (registro de actividad) y `export?type=activity` (CSV)          | Educador             |
+| —           | `GET /api/health`                                                                              | Público              |
 
 - `GET /api/phases` sigue respondiendo 501 a propósito: lo reemplaza `GET /api/board`.
-- Pruebas: **73 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
+- Pruebas: **115 unitarias** (Jest), más pruebas en vivo de cada bloque contra Supabase (tablas en
   la descripción de cada PR).
 
 ---
@@ -255,90 +310,222 @@ Detalle completo (bodies, respuestas, errores) en **`docs/backend/api.md`**.
 
 ### Defaults tomados (se cambian sin rehacer nada)
 
-| Tema                           | Default                                                                     | Dónde se cambia                                |
-| ------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------- |
-| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                | —                                              |
-| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                             | `app/api/participants/route.ts`                |
-| Quién contesta fases y entrega | Cualquier miembro                                                           | —                                              |
-| Editar una fase concluida      | No se puede                                                                 | `features/event/server/board.ts`               |
-| Puntos por fase                | 0                                                                           | `POINTS_PER_PHASE` en `board.ts`               |
-| Rol del juego de rol           | Se puede repetir en el equipo                                               | `app/api/participants/me/rpg-role/route.ts`    |
-| Carta de reto                  | `cartaAtiva` siempre `null`                                                 | `board.ts`                                     |
-| Duración del evento            | 24 h, timer global                                                          | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
-| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra         | `features/submission/server/rules.ts`          |
-| Registro de educadores         | Abierto a cualquiera                                                        | `app/api/auth/register/route.ts`               |
-| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino         | `features/communication/server/rules.ts`       |
-| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                 | `app/api/messages/route.ts`                    |
-| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona      | `rules.ts` y `route.ts` del chat               |
-| Chat: el educador lee mensajes | No                                                                          | —                                              |
-| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
-| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                            | `POLL_MS` en `lib/realtime/server.ts`          |
+| Tema                           | Default                                                                                      | Dónde se cambia                                |
+| ------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Entrar al equipo               | Código del equipo + nickname, sin contraseña                                                 | —                                              |
+| Volver a entrar                | Mismo código + mismo nickname recupera el lugar                                              | `app/api/participants/route.ts`                |
+| Quién contesta fases y entrega | Cualquier miembro                                                                            | —                                              |
+| Editar una fase concluida      | No se puede                                                                                  | `features/event/server/board.ts`               |
+| Puntos por fase                | 0                                                                                            | `POINTS_PER_PHASE` en `board.ts`               |
+| Rol del juego de rol           | Se puede repetir en el equipo                                                                | `app/api/participants/me/rpg-role/route.ts`    |
+| Duración del evento            | 24 h, timer global                                                                           | `DEFAULT_EVENT_DURATION_MINUTES` en `event.ts` |
+| Archivos                       | PDF, Word, PowerPoint, imágenes; 20 MB; 5 por equipo; 5 links extra                          | `features/submission/server/rules.ts`          |
+| Registro de educadores         | Abierto a cualquiera (revisar en la auditoría)                                               | `app/api/auth/register/route.ts`               |
+| Chat: quién ve qué             | `TEAM` todo el equipo; `PRIVATE` y `NUDGE` solo remitente y destino                          | `features/communication/server/rules.ts`       |
+| Chat: cuándo se puede mandar   | Igual que el tablero (`ACTIVE` y con tiempo); leer, siempre                                  | `app/api/messages/route.ts`                    |
+| Chat: límites                  | 1000 caracteres; 30 mensajes/min; 1 toque cada 30 s a la misma persona                       | `rules.ts` y `route.ts` del chat               |
+| Chat: el educador lee mensajes | No                                                                                           | —                                              |
+| Tiempo real: proveedor         | Supabase Broadcast con canales públicos de nombre firmado; avisos sin datos                  | `lib/realtime/server.ts`, `REALTIME_PROVIDER`  |
+| Tiempo real: refresco          | 60 s conectado, 5 s desconectado                                                             | `POLL_MS` en `lib/realtime/server.ts`          |
+| Mentores: acceso               | Código de mentores del evento + nombre, sin contraseña; máx. 50                              | `features/mentor/server/rubric.ts`             |
+| Mentores: rúbrica              | 5 criterios (problema, solución, impacto, viabilidad, presentación) del 1 al 5               | `RUBRIC` en `rubric.ts` (sin migración)        |
+| Mentores: a quién califican    | A todos los equipos del evento, en cualquier estado                                          | `app/api/mentor/evaluations/[teamId]/route.ts` |
+| Timer de actividad             | 1-180 min; los jugadores lo ven solo si está visible                                         | `features/event/server/controls.ts`            |
+| Carta de reto                  | Una a la vez, para todos los equipos; 500 caracteres                                         | `controls.ts`                                  |
+| Alertas                        | Detenido 60 min; sin entrega a 2 h del final (crítica a 30 min); menos de 2 integrantes      | `features/event/server/alerts.ts`              |
+| Avisos generales               | 1000 caracteres; en cualquier estado; se muestran los últimos 20; 10 por minuto              | `features/event/server/announcements.ts`       |
+| Avisos generales: leídos       | El backend no lleva quién leyó qué (el navegador recuerda el último que mostró)              | —                                              |
+| Interruptores                  | Por evento, los maneja su educador; leer y descargar siguen funcionando                      | `features/event/server/switches.ts`            |
+| Entradas cerradas              | Bloquea equipos e integrantes nuevos; recuperar sesión y entrar mentores, sí                 | `app/api/participants/route.ts`                |
+| Registro de actividad          | Toda acción que cambia algo; sin texto del chat ni respuestas; se escribe antes de responder | `features/activity/server/actions.ts`          |
+| Recuperar contraseña           | Enlace de 60 min, un uso, 3 por cuenta por hora; al cambiarla se cierran las demás sesiones  | `lib/auth/password-reset.ts`                   |
+| Registro: mensajes privados    | Guarda a quién se le escribió (no el texto) ❓                                               | `app/api/messages/route.ts`                    |
 
 ---
 
-## 8. Qué sigue
+## 8. Dónde estamos y qué falta (9 nov)
 
-### Siguientes bloques (avanzar con defaults, sin bloquearse)
+### 8.1 Estado por parte
 
-1. **Prueba de carga:** script de 60 equipos / 300 participantes. Es lo que confirma si alcanza el
-   plan de hosting (sobre todo las conexiones a la base).
-2. **Mentores y calificación:** no existe rol ni modelo todavía.
-3. **Panel del educador pendiente:** timer con presets, carta de reto, alertas y exportar.
-4. Otras propuestas de Eddy (sección 7 de `CONTEXTO-BACKEND.md`): interruptores de emergencia,
-   registro de actividad para la investigación, avisos generales, recuperar contraseña por correo,
-   script de 60 equipos / 300 participantes para pruebas de carga.
+| Parte                      | Estado                                                                   | Quién        |
+| -------------------------- | ------------------------------------------------------------------------ | ------------ |
+| Backend (alcance acordado) | **Hecho y probado** contra Supabase, en PRs abiertos                     | Eddy         |
+| Base de datos              | **Al día** (13 migraciones aplicadas)                                    | Eddy         |
+| Merge del backend a `dev`  | **Pendiente**: #7 → #11 → #12 → #13 → #14 → #15 → #16 → #17              | El equipo    |
+| Frontend conectado         | **Parcial** (ver 8.3)                                                    | JP           |
+| Hosting                    | **Sin decidir ni desplegar**                                             | Brandon / PM |
+| Correos (recuperar clave)  | Código listo; **falta dominio verificado en Resend** y variables         | Brandon      |
+| Prueba de carga real       | Script listo; **falta correrlo contra el hosting**                       | Eddy         |
+| Limpieza de la base        | **Pendiente** (seed y eventos de prueba)                                 | Eddy         |
+| Auditoría de seguridad     | **Pendiente** (al final, con la lista de 8.6)                            | Eddy         |
+| Pruebas (QA)               | Leo tiene pruebas iniciales en `qa` (#5); el QA del 10-11 necesita `dev` | Leo          |
 
-### Decisiones abiertas (ver ❓ en `api.md`)
+### 8.2 Lo más urgente: el merge
+
+Mientras los PRs no entren a `dev`, JP no puede conectar sus pantallas contra el código real y el QA
+del martes no tiene qué probar. Orden: **#7 primero** (los demás se van pasando solos a la base
+correcta). Lo revisa y hace merge alguien del equipo, no Eddy.
+
+### 8.3 Frontend (JP)
+
+En `dev` (#6) ya llaman a la API: login y registro, crear y listar sesiones, iniciar / pausar /
+terminar, el resumen del educador, crear equipo, unirse a equipo y guardar la entrega
+(`PUT /api/submissions`).
+
+Falta (los números son los puntos de la sección 8 de `api.md`):
+
+- `PlayerBoard` completo desde `GET /api/board` y concluir fases (4, 5).
+- Archivos de la entrega en 3 pasos (9).
+- Chat con `POST/GET /api/messages` (10) y tiempo real con `useRealtime` (11).
+- Panel del educador: timer, carta de reto, alertas y exportar (12).
+- Pantalla del mentor (`/[locale]/mentor`) y código de mentores (sección 4 de `api.md`).
+- Avisos generales (13), interruptores de emergencia (14), registro de actividad (15, opcional) y
+  recuperar contraseña (16).
+- Traducir los códigos de error (7) y mandar al login con `401` (8).
+- Revisar los puntos 1-3 (código del evento, `joinCode`, nickname en el link de invitación).
+
+### 8.4 Hosting (Brandon y el PM)
+
+- **Decidir:** Vercel Pro + Supabase Pro (recomendado, ≈45 USD al mes más 10-30 USD de consumo el
+  día del evento; revisar el tope de gasto de Supabase y poner alerta en Vercel) o el **plan B** en
+  una VM de Azure for Students (`next start`, Supabase Free, `REALTIME_PROVIDER=none`). Con
+  Hobby/Free de Vercel **no alcanza** (1 M de llamadas al mes; 200 conexiones de tiempo real).
+- **Variables** (nombres exactos de `.env.example`): `DATABASE_URL`, `AUTH_SECRET`,
+  `NEXT_PUBLIC_APP_URL` (la URL real), `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`; `DATABASE_POOL_MAX` (3-5 en Vercel,
+  10-20 en una VM); `RESEND_API_KEY` y `MAIL_FROM` para los correos. Hoy GitHub (CI) solo tiene
+  `AUTH_SECRET`.
+- **Dominio para los correos:** Resend solo manda a cualquiera desde un dominio verificado. Sin él,
+  recuperar la contraseña responde bien pero no manda nada.
+- **Si eligen Azure,** a Eddy le toca: build `standalone`, `DATABASE_POOL_MAX=10-20` y los pasos
+  escritos (VM, HTTPS, reinicio automático). Medio día de Brandon para montarla.
+
+### 8.5 Pendiente del backend (Eddy)
+
+1. **Preparar la VM de Azure**, solo si se elige ese plan.
+2. **Correr `pnpm load-test --base https://<url> --duration 300`** contra el hosting real en cuanto
+   exista (ver sección 10).
+3. **Limpiar la base antes del 12:** `QATEST` y `seed@tabuleiro.local`, `WDAFL7`, `FVR7SM` y sus
+   equipos. Con un script de Prisma, después del QA.
+4. **Auditoría de seguridad** (8.6).
+5. Lo que salga del QA y de las decisiones abiertas (8.7).
+
+### 8.6 Para la auditoría de seguridad
+
+Pendientes conocidos (Claude lleva la lista completa en su memoria):
+
+- Cambiar la contraseña de la base (se vio en una sesión el 4 nov) y revisar que el `.env`
+  compartido con el equipo no termine en ningún lado público.
+- Registro de educadores abierto a cualquiera (¿lista de correos permitidos?).
+- Aviso del advisor de Supabase sobre `public.rls_auto_enable()`.
+- Límites de intentos en memoria (por instancia; débiles en Vercel).
+- Archivos validados solo por sus primeros bytes (sin antivirus; `.docx`/`.pptx` = cualquier ZIP).
+- Recuperar la sesión del jugador con código del equipo + nickname (cualquiera con el código).
+- Tiempo real por canales públicos de Supabase (nombres firmados y avisos sin datos).
+- Chat sin moderación; avisos generales con texto libre (el frontend los muestra como texto plano).
+- Interruptores solo por evento (no hay administrador de la plataforma).
+- Registro de actividad: guarda nicknames y a quién se escribe en privado; consentimiento y
+  anonimizar antes de compartir el CSV fuera de los organizadores.
+- Recuperar contraseña: no hay "cerrar sesión en todos lados" ni cambiar la contraseña con sesión.
+
+### 8.7 Decisiones abiertas (hay defaults; alguien debería confirmarlas)
 
 - ¿El líder necesita cuenta con correo y contraseña? (el PM dijo "que solo se registre el líder").
-- ¿El educador puede leer el chat de los equipos (moderación)? ¿Cómo califican los mentores
-  (criterios, escala, a qué equipos)?
-- ¿Qué cambia en el modo "personalizado"? ¿Cómo se dan los puntos?
-- Presupuesto de hosting. **Recomendación:** Vercel Pro + Supabase Pro antes del martes 10 (≈45 USD
-  al mes más quizá 10-30 USD de consumo el día del evento). Revisar el tope de gasto de Supabase
-  (activado por defecto en Pro) y poner alerta de gasto en Vercel. Con Hobby/Free **no alcanza**
-  (1 M de llamadas al mes en Vercel; 200 conexiones de tiempo real en Supabase).
-- **Plan B sin dinero:** la app en una máquina virtual (crédito de Azure for Students) con
-  `next start`, la base y Storage en Supabase Free y `REALTIME_PROVIDER=none` (solo refresco; en un
-  servidor propio no se paga por llamada). El código no depende de Vercel. Faltaría: medio día de
-  Brandon (VM, HTTPS, reinicio automático, monitoreo) y bajar el límite de archivos (Free: 1 GB). Si
-  se quisiera tiempo real ahí, el lugar es un proveedor `socketio` en `lib/realtime/server.ts` y
-  `useRealtime.ts` (servidor propio de Next.js con socket.io en el mismo proceso, ~medio día).
-- Dominio para los correos (Resend necesita un dominio verificado para enviar a cualquiera).
+- ¿El registro de actividad debe guardar a quién le escribe cada participante en privado? (hoy sí,
+  sin el texto).
+- ¿El educador puede leer el chat de los equipos (moderación)? (hoy no).
+- ¿La rúbrica de mentores está bien? (5 criterios del 1 al 5, cada mentor califica a todos).
+- ¿Qué cambia en el modo "personalizado" además del texto del escenario? ¿Cómo se dan los puntos?
+  (hoy 0 por fase).
+- ¿El campo `proposta` del mural es la descripción de la entrega o algo aparte?
+- Hosting y dominio para los correos (8.4).
+
+### 8.8 Antes del evento (checklist)
+
+- [ ] Merge de #7 → #17 a `dev` y QA del 10-11 sobre `dev`.
+- [ ] Frontend conectado (8.3).
+- [ ] Hosting desplegado con todas las variables (8.4).
+- [ ] `pnpm load-test --base <url>` contra el hosting real.
+- [ ] **Probar desde el wifi del lugar** (5 min): subir un PDF en la entrega y ver que el chat llegue
+      en vivo. La red de la escuela bloquea la base (puertos 5432/6543), pero eso no afecta a la app
+      hospedada: el navegador solo habla con la app por HTTPS. Lo único que el navegador hace directo
+      con `*.supabase.co` (también HTTPS 443) es **subir archivos** (fallaría si bloquean ese
+      dominio) y **escuchar avisos en vivo** (si falla, la pantalla refresca sola cada 5 s).
+- [ ] Probar recuperar contraseña con el dominio real de Resend.
+- [ ] Limpiar la base (8.5).
+- [ ] Auditoría de seguridad (8.6).
+
+### Historial de bloques de backend propuestos el 8 nov
+
+1. ~~Avisos generales~~ **hecho (#14).**
+2. ~~Interruptores de emergencia~~ **hecho (#15).**
+3. ~~Registro de actividad para la investigación~~ **hecho (#16).**
+4. ~~Recuperar la contraseña del educador por correo~~ **hecho (#17).**
+5. Preparar la VM de Azure: **solo si se elige ese plan** (8.4).
 
 ### Para el resto del equipo
 
-- **JP:** conectar pantallas según la sección 8 de `api.md` (crear evento con el código del backend,
-  crear/unirse a equipo, campo de nickname en el link de invitación, tablero desde `GET /api/board`,
-  estado `bloqueada` y quitar el botón de activar llave, modal de entrega en 3 pasos, traducir
-  códigos de error, mandar al login con `401`), conectar el chat y usar `useRealtime` (puntos 10 y
-  11 de esa sección). Para ver los paneles en local hay que registrarse
-  como educador y crear o unirse a un equipo (por ejemplo en `QATEST`).
-- **Brandon:** variables en GitHub y Vercel con los nombres de `.env.example`
-  (`SUPABASE_SECRET_KEY` es indispensable para archivos y para mandar avisos;
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` para que el navegador escuche).
+- **JP:** sección 8.3. Para ver los paneles en local hay que registrarse como educador y crear o
+  unirse a un equipo (por ejemplo en `QATEST`). `api.md` es el contrato; la sección 8 de `api.md`
+  es la lista de cambios para el frontend.
+- **Brandon:** sección 8.4.
 - **Leo:** `apps/web/jest.config.mjs` transforma `jose` (paquete solo ESM); sin eso, cualquier
-  prueba que importe la sesión falla.
-
-### Antes del evento
-
-- Auditoría completa de seguridad (pedida por Eddy para el final). La lista de pendientes la lleva
-  Claude en su memoria; incluye: cambiar la contraseña de la base, `.env` compartido completo,
-  registro abierto de educadores, aviso del advisor sobre `rls_auto_enable()`, límite de intentos
-  en memoria, archivos validados solo por sus primeros bytes, recuperar sesión con el código del
-  equipo.
-- Quitar el seed (`QATEST` y `seed@tabuleiro.local`).
-- Pruebas de carga.
+  prueba que importe la sesión falla. Hay 115 pruebas unitarias del backend en
+  `apps/web/__tests__/`; las tablas de pruebas en vivo están en la descripción de cada PR.
 
 ---
 
 ## 9. Cómo retomar (checklist)
 
-1. `nvm use` y `git status`: ¿en qué rama estás? ¿Ya se hizo merge del #7, el #9 y el de tiempo real?
-   (`gh pr list --state all`).
-2. Si ya se hizo merge: `git switch dev && git pull`, y crear la rama del siguiente bloque.
+1. **Dónde está lo último:** mientras no se haga merge de #7 → #11 → #12 → #13 → #14 → #15 → #16
+   → #17, el código y esta bitácora al día viven en la rama **`feature/password-reset`**, en la carpeta aparte
+   **`/Users/eduardo/tabuleiro-chat`** (un `git worktree`; su `apps/web/.env` es un enlace al de la
+   carpeta principal). La carpeta principal (`tabuleiro-do-empreendedor`) está en `local/prueba`,
+   una rama solo para probar en local (no se sube) con una **copia vieja** de este documento.
+2. `nvm use` y `gh pr list --state all`: ¿ya se hizo merge de #7, #11, #12, #13, #14, #15, #16 y #17?
+   - Si no: seguir en `../tabuleiro-chat`, crear la rama del siguiente bloque desde
+     `feature/password-reset` y abrir el PR con base `feature/password-reset`.
+   - Si sí: `git switch dev && git pull` y crear la rama desde `dev`.
+   - **Nunca aprobar ni hacer merge de los PRs propios**: los aprueba alguien del equipo.
 3. `pnpm install && pnpm db:generate`.
 4. `pnpm --filter @tdoe/db exec prisma migrate status`: debe decir "Database schema is up to date".
-5. Leer `docs/backend/api.md` (contrato) y la sección 8 de este documento.
+5. Leer la sección 8 de este documento ("Dónde estamos y qué falta") y `docs/backend/api.md`
+   (contrato). Para saber qué conectó JP: buscar llamadas a `/api/` en `apps/web/src` de `dev`
+   (fuera de `app/api` y de `*/server/*`) y comparar con la sección 8.3.
 6. Antes de cada PR: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, prueba en vivo contra
    Supabase (y borrar los datos de prueba) y actualizar `api.md` y este documento.
+
+---
+
+## 10. Prueba de carga (8 nov)
+
+`pnpm load-test` (script en `packages/db/scripts/load-test.ts`) crea un evento propio, mete **60
+equipos y 300 participantes por la API** y simula a todos usando la app a la vez: el chat se
+refresca cada 5 s y el tablero cada 15 s (el peor caso, sin tiempo real), cada quien manda un
+mensaje por minuto, el líder concluye una fase cada 60-120 s y el educador mira el resumen cada
+10 s. Al final borra todo. Opciones: `--base <url>`, `--teams`, `--members`, `--duration`,
+`--messages-every`, `--board-every`, `--keep`.
+
+Corrido desde la casa de Eddy (servidor local en modo producción, base en Supabase us-east-1):
+
+| Corrida                                         | Entradas                                                               | Resultado                                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Pool de 5, espera de transacción de 2 s (antes) | 97 de 300 fallaron ("Unable to start a transaction in the given time") | 6.6 % de errores                                                                    |
+| Pool de 5, espera de 15 s (`INTERACTIVE_TX`)    | 300 / 300                                                              | Entradas bien; la simulación se satura (11 req/s de capacidad contra ~85 pedidas)   |
+| **Pool de 20, espera de 15 s**                  | **300 / 300 en 28 s**                                                  | **0 errores**, 42 req/s, 362 mensajes y 60 fases guardadas                          |
+| Pool de 20 + registro de actividad (#16), 120 s | 300 / 300 en 34 s                                                      | 0 errores, 38.5 req/s; 704 filas en el registro, una por acción, sin perder ninguna |
+
+Conclusiones:
+
+- **Se corrigió un error real:** en la ola de entradas del inicio, crear equipo / unirse fallaba
+  porque Prisma solo espera 2 s por una conexión libre. Ahora espera hasta 15 s.
+- **La capacidad crece en proporción al pool** (5 → 20 conexiones: 11 → 42 req/s): el límite de esta
+  prueba es la distancia casa → Virginia (~70 ms por consulta, 6-8 consultas por petición), no la
+  base. Con el servidor junto a la base (Vercel iad1 o Azure East US, ~1-2 ms) cada petición debería
+  tardar mucho menos; **falta confirmarlo corriendo el script contra el hosting real**.
+- **El tiempo real importa:** con avisos, el chat y el tablero se refrescan cada 60 s en lugar de
+  5-15 s: la carga baja de ~85 a ~15 req/s.
+- **El registro de actividad** agrega una inserción por acción (desde la casa, ~70 ms): la
+  capacidad bajó un poco (42 → 38.5 req/s), sin errores. Junto a la base no debería notarse.
+- **`DATABASE_POOL_MAX`:** en Vercel 3-5 por instancia (el pooler de Supabase acepta ~200 conexiones
+  de cliente en los planes chicos y cada instancia abre las suyas); en una VM, 10-20.

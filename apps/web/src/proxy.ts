@@ -2,8 +2,10 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
+import { getMentorFromToken } from "@/lib/auth/mentor";
 import { getPlayerFromToken } from "@/lib/auth/player";
 import {
+  MENTOR_SESSION_COOKIE,
   PLAYER_SESSION_COOKIE,
   STAFF_SESSION_COOKIE,
 } from "@/lib/auth/session";
@@ -11,13 +13,14 @@ import { getStaffFromToken } from "@/lib/auth/staff";
 
 const intlMiddleware = createMiddleware(routing);
 
-// Any path Next resolves to src/app/[locale]/mestre (educator) or
-// src/app/[locale]/jogador (player), including unsupported locales
+// Any path Next resolves to src/app/[locale]/mestre (educator),
+// src/app/[locale]/jogador (player) or src/app/[locale]/mentor, including unsupported locales
 // (/xx/mestre). Next renders layout and page in parallel, so a layout-level
 // redirect does not stop the page content from shipping in the response: the
 // guard has to live here (same as Maestro-virtual's /admin).
 const STAFF_PATH = /^\/([^/]+)\/mestre(?:\/|$)/i;
 const PLAYER_PATH = /^\/([^/]+)\/jogador(?:\/|$)/i;
+const MENTOR_PATH = /^\/([^/]+)\/mentor(?:\/|$)/i;
 
 function decodePathname(pathname: string): string {
   try {
@@ -59,6 +62,14 @@ export default async function proxy(request: NextRequest) {
       request.cookies.get(PLAYER_SESSION_COOKIE)?.value,
     );
     if (!player) return redirectToLogin(request, playerMatch[1] ?? "");
+  }
+
+  const mentorMatch = pathname.match(MENTOR_PATH);
+  if (mentorMatch) {
+    const mentor = await getMentorFromToken(
+      request.cookies.get(MENTOR_SESSION_COOKIE)?.value,
+    );
+    if (!mentor) return redirectToLogin(request, mentorMatch[1] ?? "");
   }
 
   return intlMiddleware(request);

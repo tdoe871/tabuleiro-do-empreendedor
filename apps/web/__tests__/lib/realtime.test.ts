@@ -80,6 +80,7 @@ describe("isSignal", () => {
   it("accepts only the server signals", () => {
     expect(isSignal("messages")).toBe(true);
     expect(isSignal("overview")).toBe(true);
+    expect(isSignal("announcements")).toBe(true);
     expect(isSignal("refresh")).toBe(false);
     expect(isSignal("anything")).toBe(false);
   });

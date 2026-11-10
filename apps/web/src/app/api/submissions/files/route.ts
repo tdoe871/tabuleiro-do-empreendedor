@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { prisma } from "@tdoe/db";
+import { INTERACTIVE_TX, prisma } from "@tdoe/db";
 
 import { toFileDTO } from "@/features/submission/server/dto";
 import {
@@ -8,6 +8,7 @@ import {
   canSubmit,
   parseUploadRequest,
 } from "@/features/submission/server/rules";
+import { switchGate } from "@/features/event/server/switches";
 import { canPlay } from "@/features/team/server/team";
 import { ApiFailure, apiError, readJsonObject } from "@/lib/api/errors";
 import { getPlayerFromRequest } from "@/lib/auth/player";
@@ -39,6 +40,8 @@ export async function POST(request: NextRequest) {
 
   const gate = canSubmit(canPlay(player.event, new Date()));
   if (gate !== "ok") return apiError(gate);
+  const open = switchGate(player.event, "submissions");
+  if (open !== "ok") return apiError(open);
 
   const teamId = player.team.id;
   try {
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
           uploadedById: player.participant.id,
         },
       });
-    });
+    }, INTERACTIVE_TX);
 
     let uploadUrl: string;
     try {
