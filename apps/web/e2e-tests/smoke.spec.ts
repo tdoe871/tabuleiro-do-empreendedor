@@ -12,7 +12,9 @@ const locales = [
   ["fr", fr],
 ] as const;
 
-test.describe("smoke", () => {
+// @readonly: only reads, so it also runs against the deployed site
+// (E2E_BASE_URL, see playwright.config.ts).
+test.describe("smoke", { tag: "@readonly" }, () => {
   for (const [locale, dict] of locales) {
     test(`/${locale} renders without console errors`, async ({ page }) => {
       const errors: string[] = [];
