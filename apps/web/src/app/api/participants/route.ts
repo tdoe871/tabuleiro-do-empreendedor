@@ -15,7 +15,8 @@ import { clientIp, createRateLimiter } from "@/lib/auth/rate-limit";
 import { notify, staffTopic, teamTopic } from "@/lib/realtime/server";
 
 // Generous on purpose: at the venue hundreds of people share one public IP.
-const isRateLimited = createRateLimiter({ windowMs: 5 * 60 * 1000, max: 300 });
+// Raised from 300 to 500 for the 350-person event (with room for retries).
+const isRateLimited = createRateLimiter({ windowMs: 5 * 60 * 1000, max: 500 });
 
 // POST /api/participants — join a team with the code (or invite link) the
 // leader shared. Body: { teamJoinCode, nickname }. Sets the player session.

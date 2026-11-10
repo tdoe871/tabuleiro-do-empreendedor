@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { GemLogo, StarWatermark } from "@/components/ui/GemLogo";
 import { LangSwitcher } from "@/components/shared/LangSwitcher";
+import { Modal } from "@/components/ui/Modal";
 import { HeroConceitos } from "./HeroConceitos";
 import {
   KEY_IDS,
@@ -13,7 +14,7 @@ import {
 } from "@/features/event/keys";
 import { useToast } from "@/components/providers/ToastProvider";
 
-type LoginTab = "login" | "cadastro" | "codigo";
+type LoginTab = "login" | "cadastro" | "codigo" | "mentor";
 
 async function postJson(url: string, body: unknown) {
   const res = await fetch(url, {
@@ -30,7 +31,11 @@ export function LoginScreen() {
   const tKeys = useTranslations("keys");
   const toast = useToast();
   const router = useRouter();
+  const locale = useLocale();
   const [tab, setTab] = useState<LoginTab>("login");
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginSenha, setLoginSenha] = useState("");
@@ -43,6 +48,9 @@ export function LoginScreen() {
 
   const [jogNome, setJogNome] = useState("");
   const [jogCodigo, setJogCodigo] = useState("");
+
+  const [mentNome, setMentNome] = useState("");
+  const [mentCodigo, setMentCodigo] = useState("");
 
   function authErrorMessage(code: string | undefined, fallback: string) {
     return code && tCommon.has(`errors.${code}`)
@@ -99,6 +107,32 @@ export function LoginScreen() {
       nickname: jogNome.trim(),
     });
     router.push(`/team?${params.toString()}`);
+  }
+
+  async function handleForgot(e: FormEvent) {
+    e.preventDefault();
+    await postJson("/api/auth/password/forgot", {
+      email: forgotEmail,
+      locale,
+    });
+    // 202 always, whether or not the account exists — never reveal which.
+    setForgotSent(true);
+  }
+
+  async function handleMentor(e: FormEvent) {
+    e.preventDefault();
+    const res = await postJson("/api/mentors", {
+      mentorCode: mentCodigo.trim(),
+      name: mentNome.trim(),
+    });
+    if (res.ok) {
+      router.push("/mentor/dashboard");
+      return;
+    }
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    toast("err", authErrorMessage(body?.error, t("toasts.mentorError")));
   }
 
   const footerLines = t("footer").split("\n");
@@ -175,6 +209,12 @@ export function LoginScreen() {
             >
               {t("tabs.codigo")}
             </div>
+            <div
+              className={`login-tab transition-all duration-200 hover:text-white ${tab === "mentor" ? "on" : ""}`}
+              onClick={() => setTab("mentor")}
+            >
+              {t("tabs.mentor")}
+            </div>
           </div>
 
           {tab === "login" && (
@@ -199,6 +239,26 @@ export function LoginScreen() {
                   onChange={(e) => setLoginSenha(e.target.value)}
                   required
                 />
+              </div>
+              <div style={{ textAlign: "right", marginBottom: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotEmail(loginEmail);
+                    setForgotSent(false);
+                    setShowForgot(true);
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--t3)",
+                    fontSize: 11,
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {t("form.esqueceuSenha")}
+                </button>
               </div>
               <button type="submit" className="btn btn-primary w100">
                 {t("form.enter")}
@@ -333,6 +393,39 @@ export function LoginScreen() {
               </div>
             </form>
           )}
+
+          {tab === "mentor" && (
+            <form className="anim-in" onSubmit={handleMentor}>
+              <div className="login-title">{t("form.titleMentor")}</div>
+              <div className="login-sub">{t("form.subMentor")}</div>
+              <div className="field">
+                <label>{t("form.seuNome")}</label>
+                <input
+                  placeholder={t("form.comoChamado")}
+                  value={mentNome}
+                  onChange={(e) => setMentNome(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="field">
+                <label>{t("form.codigoMentores")}</label>
+                <input
+                  placeholder={t("form.codigoPlaceholder")}
+                  style={{
+                    textTransform: "uppercase",
+                    letterSpacing: ".2em",
+                    fontWeight: 700,
+                  }}
+                  value={mentCodigo}
+                  onChange={(e) => setMentCodigo(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w100">
+                {t("form.entrarMentor")}
+              </button>
+            </form>
+          )}
         </div>
       </div>
       <div
@@ -351,6 +444,36 @@ export function LoginScreen() {
           </span>
         ))}
       </div>
+
+      {showForgot && (
+        <Modal onClose={() => setShowForgot(false)} maxWidth={400}>
+          <h3>{t("forgot.titulo")}</h3>
+          {forgotSent ? (
+            <p style={{ fontSize: 12, color: "var(--t2)" }}>
+              {t("forgot.enviado")}
+            </p>
+          ) : (
+            <form onSubmit={handleForgot}>
+              <p style={{ fontSize: 12, color: "var(--t3)" }}>
+                {t("forgot.sub")}
+              </p>
+              <div className="field">
+                <label>{t("form.email")}</label>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w100">
+                {t("forgot.enviar")}
+              </button>
+            </form>
+          )}
+        </Modal>
+      )}
     </>
   );
 }

@@ -1,21 +1,28 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useToast } from "@/components/providers/ToastProvider";
+import { useRealtime } from "@/lib/realtime/useRealtime";
 import {
   KEY_IDS,
   KEY_COLOR_VAR,
+  type KeyId,
   type KeyTranslation,
 } from "@/features/event/keys";
 
-type SimKeyStatus = "concluida" | "disponivel" | "pendente";
+type OverviewKeyStatus = "ativa" | "concluida" | "bloqueada";
 
-interface SimTeam {
-  nome: string;
-  chaves: Record<string, SimKeyStatus>;
-  proposta: string | null;
+interface OverviewTeam {
+  id: string;
+  name: string;
+  keys: Record<KeyId, OverviewKeyStatus>;
+  submission: { description: string | null } | null;
+}
+
+interface Overview {
+  event: { scenario: string | null; name: string };
+  teams: OverviewTeam[];
 }
 
 const AVATAR_GRADIENTS = [
@@ -26,48 +33,57 @@ const AVATAR_GRADIENTS = [
   "linear-gradient(135deg,#0A8C7A,#065C50)",
 ];
 
-function buildSimTeams(count: number): SimTeam[] {
-  return Array.from({ length: count }, (_, i) => {
-    const advancement = Math.max(0, 4 - i); // first teams more advanced, demo only
-    const chaves: Record<string, SimKeyStatus> = {};
-    KEY_IDS.forEach((id, idx) => {
-      chaves[id] =
-        idx < advancement
-          ? "concluida"
-          : idx === advancement
-            ? "disponivel"
-            : "pendente";
-    });
-    return {
-      nome: `Equipe ${i + 1}`,
-      chaves,
-      proposta:
-        advancement >= 2
-          ? "Proposta de intervenção em construção pela equipe..."
-          : null,
-    };
-  });
-}
-
-export function SocializacaoPanel({
-  numEquipes = 5,
-  contexto = "Bairro Novo Horizonte",
-}: {
-  numEquipes?: number;
-  contexto?: string;
-}) {
+export function SocializacaoPanel({ eventId }: { eventId: string }) {
   const t = useTranslations("socializacao");
   const tKeys = useTranslations("keys");
-  const tCommon = useTranslations("common");
-  const toast = useToast();
   const router = useRouter();
+  const [overview, setOverview] = useState<Overview | null>(null);
 
-  const teams = useMemo(() => buildSimTeams(numEquipes), [numEquipes]);
+  useEffect(() => {
+    if (!eventId) return;
+    let cancelled = false;
+    async function load() {
+      const res = await fetch(`/api/events/${eventId}/overview`, {
+        cache: "no-store",
+      });
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as Overview | null;
+      if (!cancelled && res.ok && body) setOverview(body);
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [eventId, router]);
+
+  useRealtime(
+    () => {
+      if (!eventId) return;
+      fetch(`/api/events/${eventId}/overview`, { cache: "no-store" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((body: Overview | null) => {
+          if (body) setOverview(body);
+        })
+        .catch(() => {});
+    },
+    { eventId: eventId || undefined },
+  );
+
+  const teams = overview?.teams ?? [];
+  const contexto = overview?.event.scenario ?? overview?.event.name ?? "";
   const totalChaves = teams.reduce(
     (acc, team) =>
-      acc + Object.values(team.chaves).filter((s) => s === "concluida").length,
+      acc + KEY_IDS.filter((id) => team.keys[id] === "concluida").length,
     0,
   );
+  const mostAdvanced = [...teams].sort(
+    (a, b) =>
+      KEY_IDS.filter((id) => b.keys[id] === "concluida").length -
+      KEY_IDS.filter((id) => a.keys[id] === "concluida").length,
+  )[0];
 
   return (
     <div id="tela-socializacao">
@@ -97,10 +113,6 @@ export function SocializacaoPanel({
       </div>
       <div className="quad-bar" />
       <div className="soc-body">
-        <div style={{ fontSize: 10, color: "var(--t3)", fontStyle: "italic" }}>
-          ⚠ {t("avisoDemo")}
-        </div>
-
         <div className="soc-summary">
           <div className="sum-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime">
             <div className="sum-icon" style={{ background: "var(--prob-bg)" }}>
@@ -133,7 +145,7 @@ export function SocializacaoPanel({
                 className="sum-val"
                 style={{ color: "var(--parc)", fontSize: 14 }}
               >
-                {contexto}
+                {contexto || "—"}
               </div>
               <div className="sum-lbl">{t("resumo.contexto")}</div>
             </div>
@@ -147,7 +159,7 @@ export function SocializacaoPanel({
                 className="sum-val"
                 style={{ color: "var(--gold)", fontSize: 14 }}
               >
-                {teams[0]?.nome ?? "—"}
+                {mostAdvanced?.name ?? "—"}
               </div>
               <div className="sum-lbl">{t("resumo.maisAvancadaLbl")}</div>
             </div>
@@ -156,11 +168,11 @@ export function SocializacaoPanel({
 
         <div className="pitch-grid">
           {teams.map((team, i) => {
-            const probStatus = team.chaves.problema;
+            const probStatus = team.keys.problema;
             return (
               <div
                 className="pitch-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-neon-purple/40 hover:shadow-glow-purple"
-                key={team.nome}
+                key={team.id}
               >
                 <div className="pitch-card-top">
                   <div
@@ -172,10 +184,10 @@ export function SocializacaoPanel({
                     E{i + 1}
                   </div>
                   <div>
-                    <div className="pc-eq-nm">{team.nome}</div>
+                    <div className="pc-eq-nm">{team.name}</div>
                     <div className="pc-ctx">{contexto}</div>
                   </div>
-                  {i === 0 && (
+                  {team.id === mostAdvanced?.id && (
                     <div
                       style={{
                         fontSize: 9,
@@ -200,7 +212,7 @@ export function SocializacaoPanel({
                 </div>
                 <div className="pc-chaves">
                   {KEY_IDS.map((id) => {
-                    const status = team.chaves[id];
+                    const status = team.keys[id];
                     const done = status === "concluida";
                     const keyInfo = tKeys.raw(id) as KeyTranslation;
                     return (
@@ -237,13 +249,13 @@ export function SocializacaoPanel({
                               : "var(--t3)",
                           }}
                         >
-                          {done ? "✓" : status === "disponivel" ? "○" : "—"}
+                          {done ? "✓" : status === "ativa" ? "○" : "—"}
                         </span>
                       </div>
                     );
                   })}
                 </div>
-                {team.proposta ? (
+                {team.submission?.description ? (
                   <div
                     className="pc-prop"
                     style={{
@@ -256,7 +268,7 @@ export function SocializacaoPanel({
                       className="pc-prop-txt"
                       style={{ color: "var(--prob)" }}
                     >
-                      {team.proposta}
+                      {team.submission.description}
                     </div>
                   </div>
                 ) : (
@@ -282,7 +294,7 @@ export function SocializacaoPanel({
                       className="pc-prog-seg"
                       style={{
                         background:
-                          team.chaves[id] === "concluida"
+                          team.keys[id] === "concluida"
                             ? `var(${KEY_COLOR_VAR[id]})`
                             : "rgba(255,255,255,.07)",
                       }}
@@ -307,19 +319,6 @@ export function SocializacaoPanel({
             onClick={() => router.push("/mestre/dashboard")}
           >
             {t("voltarPainel")}
-          </button>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() =>
-              toast(
-                "info",
-                tCommon("toasts.featurePendente", {
-                  feature: t("encerrarSessao"),
-                }),
-              )
-            }
-          >
-            {t("encerrarSessao")}
           </button>
         </div>
       </div>

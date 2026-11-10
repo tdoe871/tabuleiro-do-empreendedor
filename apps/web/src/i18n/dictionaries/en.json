@@ -28,7 +28,17 @@
       "PHASE_LOCKED": "That phase is still locked.",
       "INVALID_STATUS_TRANSITION": "That action isn't allowed in the session's current state.",
       "RATE_LIMITED": "Too many attempts. Wait a bit and try again.",
-      "INTERNAL_ERROR": "Something went wrong on our end. Try again."
+      "INTERNAL_ERROR": "Something went wrong on our end. Try again.",
+      "RESET_TOKEN_INVALID": "That link isn't valid anymore. Ask for a new one.",
+      "RESET_TOKEN_EXPIRED": "That link expired. Ask for a new one.",
+      "FILE_NOT_FOUND": "File not found.",
+      "ANNOUNCEMENT_NOT_FOUND": "That announcement no longer exists.",
+      "FILE_NOT_UPLOADED": "That file hasn't been uploaded yet.",
+      "TOO_MANY_FILES": "Your team already reached the file limit.",
+      "TOO_MANY_MENTORS": "This session already reached the mentor limit.",
+      "CHAT_DISABLED": "The educator turned off chat for now.",
+      "SUBMISSIONS_DISABLED": "The educator turned off submissions for now.",
+      "JOINS_DISABLED": "The educator closed new entries for now."
     }
   },
   "join": {
@@ -43,6 +53,7 @@
     "joinTeam": "Join an existing team",
     "createNameLabel": "Team name",
     "joinCodeLabel": "Team code (or use the link your leader sent you)",
+    "joinNicknameLabel": "Your name",
     "youAreLeader": "You are this team's leader",
     "shareLink": "Share this link with your team",
     "enterBoardPreview": "Enter the board (preview) →",
@@ -70,12 +81,21 @@
     "editar": "✏️ Edit submission",
     "abrir": "📦 Submit project",
     "status": "Submission recorded",
-    "invalidUrl": "The link must start with http:// or https://",
-    "fileHint": "Max 10MB · PDF, PNG, JPG or WEBP",
-    "fileTooLarge": "The file is over the 10MB limit.",
-    "fileInvalidType": "Format not allowed. Use PDF, PNG, JPG or WEBP.",
-    "fileRequired": "Select a file before saving.",
-    "saving": "Saving…"
+    "invalidUrl": "The link must start with https://",
+    "fileHint": "Max 20MB each · PDF, Word, PowerPoint, PNG, JPG or WEBP · up to 5 files",
+    "fileTooLarge": "The file is over the 20MB limit.",
+    "fileInvalidType": "Format not allowed.",
+    "fileRequired": "Upload at least one file before saving.",
+    "saving": "Saving…",
+    "cancelar": "Cancel",
+    "maxArquivos": "Your team already reached the limit of 5 files.",
+    "uploadFalhou": "Couldn't upload the file. Try again.",
+    "arquivoEnviado": "File uploaded",
+    "removerArquivo": "Remove file",
+    "enviando": "Uploading…",
+    "adicionarArquivo": "+ Add file",
+    "linksExtraLabel": "Extra links (optional)",
+    "adicionarLink": "Add link"
   },
   "keys": {
     "problema": {
@@ -108,7 +128,8 @@
     "tabs": {
       "login": "Sign in",
       "cadastro": "Create account",
-      "codigo": "Code"
+      "codigo": "Code",
+      "mentor": "Mentor"
     },
     "form": {
       "titleEdu": "Welcome back",
@@ -130,7 +151,12 @@
       "codigoPlaceholder": "e.g. A7X3K2",
       "entrarJogo": "Join the game →",
       "codeHint1": "Code provided by your educator",
-      "codeHint2": "Ask for the 6-letter code to get started"
+      "codeHint2": "Ask for the 6-letter code to get started",
+      "esqueceuSenha": "Forgot your password?",
+      "titleMentor": "Sign in as a mentor",
+      "subMentor": "Score teams — no sign-up",
+      "codigoMentores": "Mentor code",
+      "entrarMentor": "Sign in →"
     },
     "toasts": {
       "backendPendingLogin": "Educator login: backend under construction — opening the panel in preview mode.",
@@ -138,7 +164,14 @@
       "passwordMismatch": "Passwords don't match",
       "backendPendingRegister": "Educator sign-up: backend under construction — opening the panel in preview mode.",
       "registerError": "Couldn't create the account",
-      "missingFields": "Fill in your name and the code"
+      "missingFields": "Fill in your name and the code",
+      "mentorError": "Couldn't sign in. Check the mentor code."
+    },
+    "forgot": {
+      "titulo": "Reset password",
+      "sub": "We'll send you a link to set a new password.",
+      "enviar": "Send link",
+      "enviado": "If that email is registered, a link is on its way. Check your inbox."
     }
   },
   "educador": {
@@ -163,9 +196,37 @@
       "acoes": "Actions",
       "novaSessao": "New session",
       "verificarAlertas": "Check alerts",
+      "mentores": "View mentor scores",
       "exportar": "Export",
       "relatorio": "Interaction report",
-      "exportarPropostas": "Export proposals"
+      "exportarPropostas": "Export proposals",
+      "exportarAtividade": "Export activity"
+    },
+    "avisos": {
+      "titulo": "Announcements",
+      "placeholder": "Announce to the whole event…",
+      "enviar": "Send",
+      "vazio": "You haven't sent any announcements yet"
+    },
+    "interruptores": {
+      "titulo": "Emergency switches",
+      "chat": "Chat",
+      "submissions": "Submissions",
+      "joins": "New entries"
+    },
+    "mentores": {
+      "titulo": "Mentors",
+      "codigo": "Code",
+      "semCodigo": "You haven't generated a mentor code yet",
+      "gerar": "Generate code",
+      "regenerar": "Generate new code",
+      "mentoresCount": "{count} mentor(s) scoring",
+      "semNota": "Not scored yet"
+    },
+    "alertas": {
+      "NO_SUBMISSION": "{team}: no submission, {minutes} min left",
+      "TEAM_STUCK": "{team}: stuck for {minutes} min",
+      "TEAM_INCOMPLETE": "{team}: missing a member"
     },
     "metrics": {
       "equipesAtivas": "Active teams",
@@ -265,6 +326,21 @@
     "topbarTitulo": "Board",
     "semChaveAtiva": "— no active key —",
     "sair": "Sign out",
+    "carregando": "Loading your team…",
+    "entregaEditar": "✏️ Edit submission",
+    "entregaAbrir": "📦 Submit project",
+    "estado": {
+      "draft": "The session hasn't started yet.",
+      "paused": "The session is paused.",
+      "finished": "The session already ended."
+    },
+    "avisos": {
+      "titulo": "Announcements",
+      "vazio": "No announcements from the educator yet"
+    },
+    "cartaAtiva": {
+      "titulo": "Active challenge card"
+    },
     "score": {
       "label": "Investigation points",
       "unidade": "pts",
@@ -292,15 +368,14 @@
       "enviar": "Send →",
       "paraQuem": "To whom?",
       "semMensagens": "No messages yet",
-      "historico": "Session history · visible to the educator"
+      "historico": "Session history · visible to the educator",
+      "participanteSaiu": "Someone no longer on the team"
     },
     "chave": {
       "concluida": "✓ Done",
       "ativa": "⏱ Active",
-      "disponivel": "▶ Available",
-      "padrao": "○ Available",
-      "iniciar": "Start {nome}",
-      "bloqueadaPorProblema": "🔒 Complete Problem first",
+      "pendente": "○ Coming up",
+      "bloqueadaPorProblema": "🔒 Finish the previous key first",
       "clique": "tap",
       "bloqueada": "🔒"
     },
@@ -417,6 +492,41 @@
       "maisAvancadaLbl": "Most advanced"
     },
     "avisoDemo": "Preview — sample data, still needs to connect to the real backend."
+  },
+  "resetPassword": {
+    "titulo": "New password",
+    "verificando": "Checking the link…",
+    "linkInvalido": "That link isn't valid anymore or expired. Ask for a new one from the login screen.",
+    "voltarLogin": "Back to login",
+    "sub": "Set your new password.",
+    "novaSenha": "New password",
+    "confirmarSenha": "Confirm password",
+    "salvar": "Save password",
+    "senhasDiferentes": "Passwords don't match",
+    "erro": "Couldn't change the password",
+    "sucesso": "Password updated"
+  },
+  "mentor": {
+    "titulo": "Mentor panel",
+    "carregando": "Loading…",
+    "sair": "Sign out",
+    "semEquipes": "No teams in this event yet",
+    "criterios": {
+      "problema": "Problem",
+      "solucao": "Solution",
+      "impacto": "Impact",
+      "viabilidade": "Viability",
+      "apresentacao": "Presentation"
+    },
+    "avaliar": {
+      "chaves": "keys",
+      "editar": "✏️ Edit score",
+      "calificar": "⭐ Score",
+      "comentario": "Comment (optional)",
+      "cancelar": "Cancel",
+      "salvar": "Save score",
+      "salvo": "Score saved"
+    }
   },
   "rpgPapeis": {
     "agente_saude": {

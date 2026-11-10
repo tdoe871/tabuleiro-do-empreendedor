@@ -6,36 +6,39 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
 import { TeamFlowHeader } from "@/components/shared/TeamFlowHeader";
+import { sendJson, readApiError, translateApiError } from "@/lib/api/client";
 
 export default function JoinTeamPage() {
   const t = useTranslations("team");
+  const tCommon = useTranslations("common");
   const toast = useToast();
   const router = useRouter();
   const params = useSearchParams();
-  const nickname = params.get("nickname") ?? "";
+  const nicknameFromLink = params.get("nickname") ?? "";
   const [joinCode, setJoinCode] = useState(params.get("code") ?? "");
+  const [nickname, setNickname] = useState(nicknameFromLink);
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/participants", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ teamJoinCode: joinCode, nickname }),
-    });
-    if (res.status === 501) {
-      toast("info", t("toasts.backendPendingJoin"));
-      router.push(
-        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
-      );
-      return;
+    setSubmitting(true);
+    try {
+      const res = await sendJson("/api/participants", "POST", {
+        teamJoinCode: joinCode,
+        nickname,
+      });
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          translateApiError(tCommon, err?.error, t("toasts.invalidCode")),
+        );
+        return;
+      }
+      router.push("/jogador/dashboard");
+    } finally {
+      setSubmitting(false);
     }
-    if (res.ok) {
-      router.push(
-        `/jogador/dashboard?nickname=${encodeURIComponent(nickname)}`,
-      );
-      return;
-    }
-    toast("err", t("toasts.invalidCode"));
   }
 
   return (
@@ -74,10 +77,25 @@ export default function JoinTeamPage() {
                 fontWeight: 700,
               }}
               required
-              autoFocus
+              autoFocus={!nicknameFromLink}
             />
           </div>
-          <button type="submit" className="btn btn-primary w100">
+          {!nicknameFromLink && (
+            <div className="field">
+              <label>{t("joinNicknameLabel")}</label>
+              <input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+          )}
+          <button
+            type="submit"
+            className="btn btn-primary w100"
+            disabled={submitting}
+          >
             {t("joinTeam")}
           </button>
         </form>
