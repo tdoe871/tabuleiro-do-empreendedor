@@ -201,22 +201,20 @@ export function SubmissionModal({
 
   return (
     <Modal onClose={onClose} maxWidth={560}>
-      <h3>{t("title")}</h3>
+      <h3 className="text-xl font-bold tracking-tight text-white mb-5">
+        {t("title")}
+      </h3>
       {disabled && (
-        <p className="field-error" style={{ marginBottom: 10 }}>
+        <p className="field-error mb-3 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs font-medium text-red-400">
           {tCommon("errors.SUBMISSIONS_DISABLED")}
         </p>
       )}
-      <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label>{t("chooseType")}</label>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 10,
-            }}
-          >
+      <form onSubmit={handleSubmit} className="space-y-4 text-slate-200">
+        <div className="field space-y-2">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            {t("chooseType")}
+          </label>
+          <div className="grid grid-cols-2 gap-2.5">
             {TYPES.map((ty) => {
               const Icon = TYPE_ICON[ty];
               const selected = type === ty;
@@ -224,7 +222,11 @@ export function SubmissionModal({
                 <button
                   key={ty}
                   type="button"
-                  className="option-card"
+                  className={`option-card bg-none flex items-center gap-3 p-3.5 rounded-xl backdrop-blur-xl border text-left transition-all duration-300 ${
+                    selected
+                      ? "bg-[#1C2438] border-[#6366F1]/60 text-white shadow-[0_0_20px_rgba(79,70,229,0.25)]"
+                      : "bg-[#151B2B]/90 border-white/5 text-slate-300 hover:bg-[#1C2438] hover:border-white/10"
+                  } disabled:opacity-50 disabled:pointer-events-none`}
                   aria-pressed={selected}
                   disabled={disabled}
                   onClick={() => {
@@ -232,10 +234,22 @@ export function SubmissionModal({
                     setUrlTouched(false);
                   }}
                 >
-                  <span className="option-card-icon">
+                  <span
+                    className={`option-card-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                      selected
+                        ? "bg-[#4F46E5]/20 border-[#6366F1]/50 text-[#818CF8] shadow-[0_0_12px_rgba(99,102,241,0.35)]"
+                        : "bg-[#0B0F19]/80 border-white/10 text-slate-400"
+                    }`}
+                  >
                     <Icon size={16} />
                   </span>
-                  <span className="option-card-title">{typeLabel[ty]}</span>
+                  <span
+                    className={`option-card-title text-xs font-semibold transition-colors ${
+                      selected ? "text-white" : "text-slate-200"
+                    }`}
+                  >
+                    {typeLabel[ty]}
+                  </span>
                 </button>
               );
             })}
@@ -243,8 +257,10 @@ export function SubmissionModal({
         </div>
 
         {needsUrl && (
-          <div className="field">
-            <label>{t("urlLabel")}</label>
+          <div className="field space-y-1.5">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              {t("urlLabel")}
+            </label>
             <input
               type="url"
               placeholder={t("urlPlaceholder")}
@@ -254,52 +270,43 @@ export function SubmissionModal({
               onChange={(e) => setUrl(e.target.value)}
               onBlur={() => setUrlTouched(true)}
               required
+              className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
             />
             {urlTouched && !urlValid && (
-              <p className="field-error">{t("invalidUrl")}</p>
+              <p className="field-error text-xs font-medium text-red-400 mt-1">
+                {t("invalidUrl")}
+              </p>
             )}
           </div>
         )}
 
-        <div className="field">
-          <label>{t("fileOrImage")}</label>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div className="field space-y-2">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            {t("fileOrImage")}
+          </label>
+          <div className="flex flex-col gap-2">
             {files.map((f) => (
               <div
                 key={f.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  background: "rgba(255,255,255,.04)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  padding: "6px 10px",
-                  fontSize: 11,
-                }}
+                className="flex items-center gap-2.5 bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
               >
                 <a
                   href={f.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  style={{ flex: 1, color: "var(--t1)" }}
+                  className="flex-1 truncate font-medium text-white hover:text-[#818CF8] transition-colors"
                 >
                   {f.fileName}
                 </a>
-                <span style={{ color: "var(--t3)" }}>{formatSize(f.size)}</span>
+                <span className="text-slate-400 tabular-nums">
+                  {formatSize(f.size)}
+                </span>
                 <button
                   type="button"
                   aria-label={t("removerArquivo")}
                   onClick={() => void handleDeleteFile(f.id)}
                   disabled={disabled}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#ef4444",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "flex",
-                  }}
+                  className="flex items-center justify-center rounded-md p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
                 >
                   <X size={14} />
                 </button>
@@ -308,7 +315,7 @@ export function SubmissionModal({
             {files.length < MAX_FILES && (
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center gap-2 self-start rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
                 disabled={disabled || uploading}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -326,6 +333,7 @@ export function SubmissionModal({
               ref={fileInputRef}
               type="file"
               accept={ACCEPT}
+              className="hidden"
               style={{ display: "none" }}
               onChange={(e) => {
                 const selected = e.target.files?.[0];
@@ -334,26 +342,33 @@ export function SubmissionModal({
               }}
             />
             {needsFile && !fileValid && (
-              <p className="field-error">{t("fileRequired")}</p>
+              <p className="field-error text-xs font-medium text-red-400">
+                {t("fileRequired")}
+              </p>
             )}
-            <p className="field-hint">{t("fileHint")}</p>
+            <p className="field-hint text-[11px] text-slate-500">
+              {t("fileHint")}
+            </p>
           </div>
         </div>
 
-        <div className="field">
-          <label>{t("linksExtraLabel")}</label>
+        <div className="field space-y-2">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            {t("linksExtraLabel")}
+          </label>
           {links.map((link, i) => (
-            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+            <div key={i} className="flex items-center gap-2 mb-2">
               <input
                 type="url"
                 placeholder="https://..."
                 value={link}
                 disabled={disabled}
                 onChange={(e) => updateLink(i, e.target.value)}
+                className="flex-1 rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
               />
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 text-slate-300 hover:text-white transition-all disabled:opacity-50"
                 onClick={() => removeLink(i)}
                 disabled={disabled}
               >
@@ -364,7 +379,7 @@ export function SubmissionModal({
           {links.length < MAX_EXTRA_LINKS && (
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm bg-none inline-flex items-center gap-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
               onClick={addLink}
               disabled={disabled}
             >
@@ -373,11 +388,13 @@ export function SubmissionModal({
           )}
         </div>
 
-        <div className="field">
-          <label>{t("descriptionLabel")}</label>
+        <div className="field space-y-1.5">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            {t("descriptionLabel")}
+          </label>
           <textarea
             placeholder={t("descriptionPlaceholder")}
-            style={{ height: 70, resize: "vertical" }}
+            className="w-full min-h-[84px] resize-y rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
             value={description}
             disabled={disabled}
             maxLength={2000}
@@ -385,10 +402,10 @@ export function SubmissionModal({
           />
         </div>
 
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/5">
           <button
             type="button"
-            className="btn btn-ghost"
+            className="btn btn-ghost bg-none rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
             onClick={onClose}
             disabled={saving}
           >
@@ -396,7 +413,7 @@ export function SubmissionModal({
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary bg-none inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg px-5 py-2 text-xs shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
             disabled={disabled || saving}
           >
             {saving ? (

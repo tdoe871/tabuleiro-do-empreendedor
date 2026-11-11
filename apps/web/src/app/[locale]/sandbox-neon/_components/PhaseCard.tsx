@@ -106,9 +106,11 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
   return (
     <button
       type="button"
-      className={`phase-card ${isActive ? "phase-active" : ""} ${
-        phase.status === "locked" ? "phase-locked" : ""
-      }`}
+      className={`phase-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 ${
+        isActive
+          ? "phase-active !bg-[#1C2438] !border-[#6366F1]/50 shadow-[0_0_25px_rgba(79,70,229,0.22)]"
+          : ""
+      } ${phase.status === "locked" ? "phase-locked opacity-65" : ""}`}
       style={
         {
           "--accent": phase.color,
@@ -118,7 +120,9 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
       onClick={() => onSelect(phase)}
     >
       <div className="phase-top">
-        <div className="phase-number">{String(phase.id).padStart(2, "0")}</div>
+        <div className="phase-number text-slate-400">
+          {String(phase.id).padStart(2, "0")}
+        </div>
         <div className="phase-icon">
           <Icon size={22} />
         </div>
@@ -134,24 +138,24 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
         )}
       </div>
 
-      <span className="phase-eyebrow">
+      <span className="phase-eyebrow text-slate-400">
         {phase.eyebrow} • {phase.label}
       </span>
-      <h3>{phase.title}</h3>
-      <p>{phase.description}</p>
+      <h3 className="text-white">{phase.title}</h3>
+      <p className="text-slate-400">{phase.description}</p>
 
       <div className="phase-progress">
-        <div>
+        <div className="bg-[#0B0F19]">
           <i style={{ width: `${phase.progress}%` }} />
         </div>
-        <span>{phase.progress}%</span>
+        <span className="text-slate-400">{phase.progress}%</span>
       </div>
 
-      <div className="phase-footer">
+      <div className="phase-footer border-t border-white/5">
         <span>
           <Zap size={13} fill="currentColor" /> +{phase.xp} XP
         </span>
-        <span className="phase-cta">
+        <span className="phase-cta text-white">
           {ctaLabel}
           <ChevronRight size={15} />
         </span>

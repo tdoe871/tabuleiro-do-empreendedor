@@ -69,22 +69,31 @@ export function TeamChat() {
   }
 
   return (
-    <aside className="chat-panel" id="comunidade">
+    <aside
+      className="chat-panel bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+      id="comunidade"
+    >
       <div className="chat-head">
         <div>
-          <div className="online-badge">
+          <div className="online-badge text-[#65dcd5]">
             <span /> 4 online
           </div>
-          <h2>Base da equipe</h2>
+          <h2 className="text-white">Base da equipe</h2>
         </div>
-        <button type="button" aria-label="Mais opções">
+        <button
+          type="button"
+          className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all"
+          aria-label="Mais opções"
+        >
           <MoreHorizontal size={19} />
         </button>
       </div>
 
       <div className="messages">
         <div className="date-divider">
-          <span>HOJE</span>
+          <span className="bg-[#0B0F19]/80 border border-white/5 text-slate-500">
+            HOJE
+          </span>
         </div>
         {messages.map((item) => (
           <div
@@ -96,17 +105,32 @@ export function TeamChat() {
             </div>
             <div>
               <div className="message-info">
-                <strong>{item.author}</strong>
-                <span>{item.time}</span>
+                <strong className="text-white">{item.author}</strong>
+                <span className="text-slate-500">{item.time}</span>
               </div>
-              <p>{item.text}</p>
+              <p
+                className={
+                  item.own
+                    ? "bg-[#4F46E5]/20 border border-[#6366F1]/35 text-white"
+                    : "bg-[#0B0F19]/80 border border-white/5 text-slate-200"
+                }
+              >
+                {item.text}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
-      <form className="chat-form" onSubmit={handleSubmit}>
-        <button type="button" aria-label="Anexar arquivo">
+      <form
+        className="chat-form bg-[#0B0F19] border border-white/10 rounded-xl focus-within:border-[#6366F1]/60 transition-all"
+        onSubmit={handleSubmit}
+      >
+        <button
+          type="button"
+          className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+          aria-label="Anexar arquivo"
+        >
           <Paperclip size={17} />
         </button>
         <input
@@ -114,9 +138,10 @@ export function TeamChat() {
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Mensagem para a equipe..."
           aria-label="Mensagem para a equipe"
+          className="text-white placeholder:text-slate-500"
         />
         <button
-          className="send-button"
+          className="send-button bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
           type="submit"
           aria-label="Enviar mensagem"
         >
