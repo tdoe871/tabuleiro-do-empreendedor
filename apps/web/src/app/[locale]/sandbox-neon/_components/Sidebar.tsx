@@ -85,7 +85,7 @@ export function Sidebar({
   return (
     <>
       <aside
-        className={`sidebar bg-none bg-[#151B2B]/90 backdrop-blur-xl border-r border-white/5 text-slate-200 ${
+        className={`sidebar bg-none bg-[#1E1B4B] border-r border-indigo-950 text-slate-200 ${
           isOpen ? "sidebar-open" : ""
         }`}
       >
@@ -93,11 +93,11 @@ export function Sidebar({
           <LogoMark />
           <div>
             <strong className="text-white">TABULEIRO</strong>
-            <span className="text-slate-400">DO EMPREENDEDOR</span>
+            <span className="text-indigo-200/70">DO EMPREENDEDOR</span>
           </div>
           <button
             type="button"
-            className="mobile-close bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
+            className="mobile-close bg-indigo-950/60 border border-indigo-800/50 text-slate-200 transition-all"
             onClick={onClose}
             aria-label="Fechar menu"
           >
@@ -113,10 +113,10 @@ export function Sidebar({
               <Link
                 key={item.id}
                 href={item.href}
-                className={`nav-item bg-none rounded-xl transition-all duration-300 ${
+                className={`nav-item bg-none rounded-lg transition-all duration-200 ${
                   isActive
-                    ? "active bg-[#1C2438] border border-white/10 text-white shadow-[0_0_15px_rgba(79,70,229,0.2)]"
-                    : "text-slate-400 hover:bg-[#1C2438] hover:border-white/10 hover:text-white"
+                    ? "active bg-indigo-900/70 border border-indigo-400/30 text-white"
+                    : "text-indigo-200/70 hover:bg-indigo-900/40 hover:text-white"
                 }`}
                 onClick={() => {
                   setActiveNav(item.id);
@@ -126,20 +126,16 @@ export function Sidebar({
                 <Icon size={18} />
                 <span>{item.label}</span>
                 {item.badge !== undefined && (
-                  <em className="bg-[#4F46E5]/20 border border-[#6366F1]/40 text-[#818CF8]">
-                    {item.badge}
-                  </em>
+                  <em className="bg-[#6366F1] text-white">{item.badge}</em>
                 )}
-                {isActive && (
-                  <i className="bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
-                )}
+                {isActive && <i className="bg-indigo-300" />}
               </Link>
             );
           })}
         </nav>
 
         <div className="sidebar-section">
-          <div className="section-heading text-slate-500">
+          <div className="section-heading text-indigo-200/70">
             <span>SEU PAPEL RPG</span>
             <HelpCircle size={14} />
           </div>
@@ -151,10 +147,10 @@ export function Sidebar({
                 <button
                   key={role.name}
                   type="button"
-                  className={`role bg-none rounded-xl backdrop-blur-xl border transition-all duration-300 ${
+                  className={`role bg-none rounded-lg border transition-all duration-200 ${
                     isSelected
-                      ? "selected bg-[#1C2438] border-white/15 text-white shadow-[0_0_15px_rgba(79,70,229,0.18)]"
-                      : "bg-[#151B2B]/90 border-white/5 text-slate-300 hover:bg-[#1C2438] hover:border-white/10"
+                      ? "selected bg-indigo-900/70 border-indigo-400/50 text-white"
+                      : "bg-transparent border-transparent text-slate-200 hover:bg-indigo-900/40"
                   }`}
                   style={{ "--role-color": role.color } as CSSProperties}
                   onClick={() => onSelectRole(role.name)}
@@ -164,7 +160,9 @@ export function Sidebar({
                   </span>
                   <span>
                     <strong className="text-white">{role.name}</strong>
-                    <small className="text-slate-400">Nível {role.level}</small>
+                    <small className="text-indigo-200/70">
+                      Nível {role.level}
+                    </small>
                   </span>
                   {isSelected && <Check size={14} />}
                 </button>
@@ -175,36 +173,36 @@ export function Sidebar({
 
         <div className="sidebar-spacer" />
 
-        <div className="upgrade-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
-          <div className="gem-orbit bg-[#4F46E5]/20 border border-[#6366F1]/30 text-[#818CF8]">
+        <div className="upgrade-card bg-none bg-indigo-950/80 border border-indigo-800/60 rounded-xl">
+          <div className="gem-orbit bg-indigo-900/80 border border-indigo-400/30 text-indigo-200">
             <Gem size={19} />
           </div>
-          <span className="text-[#818CF8]">DESBLOQUEIE SEU POTENCIAL</span>
+          <span className="text-indigo-200/70">DESBLOQUEIE SEU POTENCIAL</span>
           <strong className="text-white">Suba para o modo Pro</strong>
-          <p className="text-slate-400">
+          <p className="text-indigo-200/70">
             Mentorias exclusivas e missões avançadas.
           </p>
           <button
             type="button"
-            className="bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+            className="bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
             onClick={() => onNotify("Plano Pro adicionado à sua lista")}
           >
             Conhecer o Pro <ChevronRight size={15} />
           </button>
         </div>
 
-        <div className="profile bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
-          <div className="avatar avatar-main bg-none bg-[#4F46E5] text-white shadow-[0_0_12px_rgba(79,70,229,0.4)]">
+        <div className="profile bg-indigo-950/60 border border-indigo-800/50 rounded-xl">
+          <div className="avatar avatar-main bg-none bg-[#6366F1] text-white">
             AC
             <span />
           </div>
           <div>
             <strong className="text-white">Alex Costa</strong>
-            <span className="text-slate-400">Fundador • Nível 7</span>
+            <span className="text-indigo-200/70">Fundador • Nível 7</span>
           </div>
           <button
             type="button"
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-indigo-200/70 hover:text-white transition-colors"
             aria-label="Opções do perfil"
           >
             <MoreHorizontal size={18} />
@@ -215,7 +213,7 @@ export function Sidebar({
       {isOpen && (
         <button
           type="button"
-          className="sidebar-backdrop bg-[#0B0F19]/80 backdrop-blur-sm"
+          className="sidebar-backdrop bg-slate-900/40"
           onClick={onClose}
           aria-label="Fechar menu"
         />

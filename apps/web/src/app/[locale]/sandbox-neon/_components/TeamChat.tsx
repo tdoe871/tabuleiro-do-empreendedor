@@ -70,19 +70,19 @@ export function TeamChat() {
 
   return (
     <aside
-      className="chat-panel bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+      className="chat-panel bg-none bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
       id="comunidade"
     >
       <div className="chat-head">
         <div>
-          <div className="online-badge text-[#65dcd5]">
+          <div className="online-badge text-emerald-600">
             <span /> 4 online
           </div>
-          <h2 className="text-white">Base da equipe</h2>
+          <h2 className="text-slate-900">Base da equipe</h2>
         </div>
         <button
           type="button"
-          className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all"
+          className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900 transition-all"
           aria-label="Mais opções"
         >
           <MoreHorizontal size={19} />
@@ -91,7 +91,7 @@ export function TeamChat() {
 
       <div className="messages">
         <div className="date-divider">
-          <span className="bg-[#0B0F19]/80 border border-white/5 text-slate-500">
+          <span className="bg-slate-100 border border-slate-200 text-slate-500">
             HOJE
           </span>
         </div>
@@ -105,14 +105,14 @@ export function TeamChat() {
             </div>
             <div>
               <div className="message-info">
-                <strong className="text-white">{item.author}</strong>
+                <strong className="text-slate-900">{item.author}</strong>
                 <span className="text-slate-500">{item.time}</span>
               </div>
               <p
                 className={
                   item.own
-                    ? "bg-[#4F46E5]/20 border border-[#6366F1]/35 text-white"
-                    : "bg-[#0B0F19]/80 border border-white/5 text-slate-200"
+                    ? "bg-indigo-50 border border-indigo-200 text-slate-900"
+                    : "bg-slate-50 border border-slate-200 text-slate-600"
                 }
               >
                 {item.text}
@@ -123,12 +123,12 @@ export function TeamChat() {
       </div>
 
       <form
-        className="chat-form bg-[#0B0F19] border border-white/10 rounded-xl focus-within:border-[#6366F1]/60 transition-all"
+        className="chat-form bg-slate-50 border border-slate-200 rounded-xl focus-within:border-[#6366F1] transition-all"
         onSubmit={handleSubmit}
       >
         <button
           type="button"
-          className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+          className="bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900 rounded-lg transition-all"
           aria-label="Anexar arquivo"
         >
           <Paperclip size={17} />
@@ -138,10 +138,10 @@ export function TeamChat() {
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Mensagem para a equipe..."
           aria-label="Mensagem para a equipe"
-          className="text-white placeholder:text-slate-500"
+          className="text-slate-900 placeholder:text-slate-500"
         />
         <button
-          className="send-button bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+          className="send-button bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
           type="submit"
           aria-label="Enviar mensagem"
         >

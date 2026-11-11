@@ -440,21 +440,21 @@ export function PlayerBoard() {
   return (
     <div
       id="tela-jogadores"
-      className="min-h-screen bg-[#0B0F19] text-slate-200"
+      className="min-h-screen bg-slate-50 text-slate-900"
     >
-      <div className="topbar bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/5">
+      <div className="topbar bg-white border-b border-slate-200">
         <div className="tb-logo">
-          <div className="tb-gem bg-[#151B2B]/90 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+          <div className="tb-gem bg-indigo-50 border border-indigo-200 transition-all duration-300 shadow-sm">
             <GemLogo size={14} />
           </div>
           <span
-            className="text-white"
+            className="text-slate-900"
             style={{ fontSize: 12, fontWeight: 700 }}
           >
             {t("topbarTitulo")}
           </span>
         </div>
-        <div className="tb-sep bg-white/10" />
+        <div className="tb-sep bg-slate-200" />
         <div className="tb-right" style={{ marginLeft: "auto" }}>
           {activitySeconds !== null && board.event.activityTimer?.visible && (
             <div
@@ -513,7 +513,7 @@ export function PlayerBoard() {
           </div>
           <LangSwitcher />
           <button
-            className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+            className="btn btn-ghost btn-sm bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-lg shadow-sm transition-all"
             onClick={() => router.push("/")}
           >
             {t("sair")}
@@ -521,24 +521,24 @@ export function PlayerBoard() {
         </div>
       </div>
 
-      <div className="score-strip bg-[#151B2B]/90 backdrop-blur-xl border-b border-white/5">
+      <div className="score-strip bg-white border-b border-slate-200">
         <div>
-          <div className="score-label text-slate-400">{t("score.label")}</div>
+          <div className="score-label text-slate-500">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-            <div className="score-val text-white">{board.team.score}</div>
-            <div className="score-pts text-slate-400">{t("score.unidade")}</div>
+            <div className="score-val text-slate-900">{board.team.score}</div>
+            <div className="score-pts text-slate-500">{t("score.unidade")}</div>
           </div>
         </div>
         <div style={{ flex: 1 }} />
         <button
-          className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+          className="btn btn-ghost btn-sm bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-lg shadow-sm transition-all"
           onClick={() => setShowSubmission(true)}
         >
           {board.submission ? t("entregaEditar") : t("entregaAbrir")}
         </button>
         {allDone && (
           <button
-            className="btn btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+            className="btn btn-sm bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
             onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
@@ -563,20 +563,20 @@ export function PlayerBoard() {
 
       {board.cartaAtiva && (
         <div
-          className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+          className="bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
           style={{
             margin: "10px 20px 0",
             padding: "10px 14px",
           }}
         >
           <div
-            className="text-[#818CF8]"
+            className="text-[#6366F1]"
             style={{ fontSize: 10, fontWeight: 800 }}
           >
             🃏 {t("cartaAtiva.titulo")}
           </div>
           <div
-            className="text-slate-300"
+            className="text-slate-500"
             style={{ fontSize: 12, marginTop: 2 }}
           >
             {board.cartaAtiva.text}
@@ -584,19 +584,19 @@ export function PlayerBoard() {
         </div>
       )}
 
-      <div className="jog-layout bg-[#0B0F19]">
+      <div className="jog-layout bg-slate-50 text-slate-900">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+          <div className="cenario-card bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5">
             <div className="cen-icon">⌖</div>
             <div>
               <div
-                className="text-white"
+                className="text-slate-900"
                 style={{ fontSize: 13, fontWeight: 700 }}
               >
                 {t("cenario.titulo")}
               </div>
               <div
-                className="text-slate-400"
+                className="text-slate-500"
                 style={{ fontSize: 11, marginTop: 2 }}
               >
                 {board.team.name} · {board.event.name}
@@ -606,7 +606,7 @@ export function PlayerBoard() {
 
           <div>
             <div
-              className="text-slate-400"
+              className="text-slate-500"
               style={{
                 fontSize: 9,
                 fontWeight: 700,
@@ -625,7 +625,7 @@ export function PlayerBoard() {
                 return (
                   <div
                     key={member.id}
-                    className={`membro-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 hover:-translate-y-0.5 ${member.isMe ? "ativo !border-[#6366F1]/50 shadow-[0_0_20px_rgba(79,70,229,0.2)]" : ""}`}
+                    className={`membro-card bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5 ${member.isMe ? "ativo !border-[#6366F1] ring-2 ring-[#6366F1]/15" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {!member.isMe && (
@@ -642,25 +642,25 @@ export function PlayerBoard() {
                       style={{
                         background: member.rpgRole
                           ? RPG_ROLE_COLOR[member.rpgRole]
-                          : "linear-gradient(135deg,#4F46E5,#6366F1)",
+                          : "#6366F1",
                       }}
                     >
                       {member.rpgRole
                         ? RPG_ROLE_ICON[member.rpgRole]
                         : member.nickname.slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="membro-nm text-white">
+                    <div className="membro-nm text-slate-900">
                       {member.nickname}
                     </div>
                     <div
-                      className="membro-st text-slate-400"
-                      style={member.isMe ? { color: "#818CF8" } : undefined}
+                      className="membro-st text-slate-500"
+                      style={member.isMe ? { color: "#6366F1" } : undefined}
                     >
                       {roleInfo ? roleInfo.nome : `● ${t("membros.ativo")}`}
                     </div>
                     {member.isMe && (
                       <div
-                        className="text-[#818CF8]"
+                        className="text-[#6366F1]"
                         style={{
                           fontSize: 8,
                           marginTop: 3,
@@ -681,22 +681,22 @@ export function PlayerBoard() {
             </div>
           </div>
 
-          <div className="card card-pad bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
+          <div className="card card-pad bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5">
             <div className="comm-tabs">
               <div
-                className={`comm-tab ${commTab === "equipe" ? "on text-white" : "text-slate-400"}`}
+                className={`comm-tab ${commTab === "equipe" ? "on text-slate-900" : "text-slate-500"}`}
                 onClick={() => setCommTab("equipe")}
               >
                 📢 {t("comm.equipe")}
               </div>
               <div
-                className={`comm-tab ${commTab === "individual" ? "on text-white" : "text-slate-400"}`}
+                className={`comm-tab ${commTab === "individual" ? "on text-slate-900" : "text-slate-500"}`}
                 onClick={() => setCommTab("individual")}
               >
                 💬 {t("comm.individual")}
               </div>
               <div
-                className={`comm-tab ${commTab === "registro" ? "on text-white" : "text-slate-400"}`}
+                className={`comm-tab ${commTab === "registro" ? "on text-slate-900" : "text-slate-500"}`}
                 onClick={() => setCommTab("registro")}
               >
                 📋 {t("comm.registro")}
@@ -716,16 +716,16 @@ export function PlayerBoard() {
                       key={m.id}
                       className={`balao ${m.mine ? "balao-proprio" : "balao-outro"}`}
                     >
-                      <div className="balao-nm text-white">
+                      <div className="balao-nm text-slate-900">
                         {m.from?.nickname ?? t("comm.participanteSaiu")}
                       </div>
-                      <div className="balao-txt text-slate-200">{m.text}</div>
+                      <div className="balao-txt text-slate-700">{m.text}</div>
                     </div>
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
-                    className="flex-1 rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
+                    className="flex-1 rounded-lg bg-slate-50 border border-slate-200 px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none transition-all"
                     placeholder={t("comm.placeholderEquipe")}
                     value={balaoInput}
                     disabled={!board.event.switches.chat}
@@ -735,7 +735,7 @@ export function PlayerBoard() {
                     }}
                   />
                   <button
-                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                    className="btn btn-primary btn-sm bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
                     disabled={!board.event.switches.chat}
                     onClick={() => void enviarBalao()}
                   >
@@ -756,7 +756,7 @@ export function PlayerBoard() {
             {commTab === "individual" && (
               <div className="comm-content on">
                 <div
-                  className="text-slate-400"
+                  className="text-slate-500"
                   style={{
                     fontSize: 9,
                     textTransform: "uppercase",
@@ -770,7 +770,7 @@ export function PlayerBoard() {
                   {board.members.map((member) => (
                     <div
                       key={member.id}
-                      className={`mchip ${sussurroTo === member.id ? "sel !bg-[#4F46E5]/20 !border-[#6366F1]/50 !text-white" : "bg-white/5 border border-white/10 text-slate-300"}`}
+                      className={`mchip ${sussurroTo === member.id ? "sel !bg-[#6366F1] !border-[#6366F1] !text-white" : "bg-slate-50 border border-slate-200 text-slate-700"}`}
                       onClick={() => setSussurroTo(member.id)}
                     >
                       {member.nickname}
@@ -778,7 +778,7 @@ export function PlayerBoard() {
                   ))}
                 </div>
                 <textarea
-                  className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all resize-none"
+                  className="w-full rounded-lg bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none transition-all resize-none"
                   style={{
                     height: 70,
                   }}
@@ -799,7 +799,7 @@ export function PlayerBoard() {
                     {t("comm.soDestinatario")}
                   </div>
                   <button
-                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                    className="btn btn-primary btn-sm bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
                     onClick={() => void enviarSussurro()}
                     disabled={!sussurroTo || !board.event.switches.chat}
                   >
@@ -837,10 +837,10 @@ export function PlayerBoard() {
                         key={m.id}
                         className={`chat-msg chat-${m.type === "TEAM" ? "balao" : m.type === "PRIVATE" ? "sussurro" : "cutucar"}`}
                       >
-                        <div className="chat-bubble bg-[#0B0F19]/80 border border-white/5 rounded-lg">
-                          <div className="chat-nm text-white">{label}</div>
+                        <div className="chat-bubble bg-slate-50 border border-slate-200 rounded-lg">
+                          <div className="chat-nm text-slate-900">{label}</div>
                           {m.text && (
-                            <div className="chat-txt text-slate-300">
+                            <div className="chat-txt text-slate-600">
                               {m.text}
                             </div>
                           )}
@@ -854,7 +854,7 @@ export function PlayerBoard() {
                   style={{
                     fontSize: 9,
                     paddingTop: 6,
-                    borderTop: ".5px solid var(--border)",
+                    borderTop: "1px solid #e2e8f0",
                   }}
                 >
                   {t("comm.historico")}
@@ -866,7 +866,7 @@ export function PlayerBoard() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div className="chaves-grid">
-            {KEY_IDS.map((id) => {
+            {KEY_IDS.map((id, idx) => {
               const key = board.keys[id];
               const keyInfo = tKeys.raw(id) as KeyTranslation;
               const colorVar = `var(${KEY_COLOR_VAR[id]})`;
@@ -886,20 +886,12 @@ export function PlayerBoard() {
                   100,
               );
 
-              const hoverGlowClass =
-                id === "problema"
-                  ? "hover:shadow-[0_12px_32px_-10px_rgba(249,202,74,0.3)] hover:border-white/10"
-                  : id === "solucao"
-                    ? "hover:shadow-[0_12px_32px_-10px_rgba(183,255,90,0.32)] hover:border-white/10"
-                    : id === "parcerias"
-                      ? "hover:shadow-[0_12px_32px_-10px_rgba(79,70,229,0.35)] hover:border-white/10"
-                      : "hover:shadow-[0_12px_32px_-10px_rgba(80,221,255,0.3)] hover:border-white/10";
-
               return (
                 <div
                   key={id}
-                  className={`chave-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:-translate-y-0.5 ${hoverGlowClass}`}
+                  className="chave-card bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5 bg-no-repeat bg-[length:114px_96px] bg-[right_10px_top_10px]"
                   style={{
+                    backgroundImage: `url('/isometric/stage-${idx + 1}.png')`,
                     borderColor:
                       concluida || ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bd)`
@@ -914,12 +906,9 @@ export function PlayerBoard() {
                       {keyInfo.icon}
                     </div>
                     <div
-                      className="cc-name"
+                      className="cc-name text-slate-900"
                       style={{
-                        color:
-                          concluida || ativa
-                            ? colorVar
-                            : "rgba(255,255,255,.55)",
+                        color: concluida || ativa ? colorVar : undefined,
                       }}
                     >
                       {keyInfo.name}
@@ -932,17 +921,17 @@ export function PlayerBoard() {
                           ? `var(${KEY_COLOR_VAR[id]}-bg)`
                           : ativa
                             ? "var(--gold-bg)"
-                            : "rgba(255,255,255,.05)",
+                            : "#f8fafc",
                         color: concluida
                           ? colorVar
                           : ativa
                             ? "var(--gold)"
-                            : "var(--t3)",
+                            : "#64748b",
                         borderColor: concluida
                           ? `var(${KEY_COLOR_VAR[id]}-bd)`
                           : ativa
                             ? "var(--gold-bd)"
-                            : "var(--border)",
+                            : "#e2e8f0",
                       }}
                     >
                       {badgeTxt}
@@ -960,7 +949,7 @@ export function PlayerBoard() {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase bg-[#0B0F19]/75 border border-white/5 rounded-lg backdrop-blur-sm transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase bg-white/95 border border-slate-200 rounded-lg shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }
@@ -975,12 +964,12 @@ export function PlayerBoard() {
                                 ? colorVar
                                 : active
                                   ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                                  : "rgba(255,255,255,.08)",
+                                  : "#f1f5f9",
                               color: done
                                 ? "#fff"
                                 : active
                                   ? colorVar
-                                  : "var(--t3)",
+                                  : "#64748b",
                             }}
                           >
                             {done ? "✓" : numero}
@@ -988,15 +977,15 @@ export function PlayerBoard() {
                           <div
                             className={`cc-fnm ${
                               done
-                                ? "text-slate-300"
+                                ? "text-slate-700"
                                 : active
-                                  ? "text-white"
+                                  ? "text-slate-900"
                                   : "text-slate-500"
                             }`}
                           >
                             {nome}
                           </div>
-                          <div className="cc-ftxt text-slate-400">
+                          <div className="cc-ftxt text-slate-500">
                             {done
                               ? "✓"
                               : active
@@ -1007,7 +996,7 @@ export function PlayerBoard() {
                       );
                     })}
                   </div>
-                  <div className="cc-prog-bar bg-[#0B0F19]">
+                  <div className="cc-prog-bar bg-slate-100">
                     <div
                       className="cc-prog-fill"
                       style={{ width: `${pct}%`, background: colorVar }}
@@ -1015,7 +1004,7 @@ export function PlayerBoard() {
                   </div>
                   {bloqueada && (
                     <div
-                      className="text-slate-500 bg-[#0B0F19]/60 border border-dashed border-white/10 rounded-lg"
+                      className="text-slate-500 bg-slate-50 border border-dashed border-slate-200 rounded-lg"
                       style={{
                         marginTop: 8,
                         fontSize: 10,
@@ -1035,20 +1024,20 @@ export function PlayerBoard() {
 
       {openPhase && (
         <Modal onClose={() => setOpenPhase(null)} maxWidth={560}>
-          <h3 className="text-white">
+          <h3 className="text-slate-900">
             {t("fase.tituloModal", {
               numero: openPhase.numero,
               nome: openPhase.nome,
             })}
           </h3>
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             {t(`fases.${openPhase.keyId}.${openPhase.numero - 1}.pergunta`)}
           </p>
           <form onSubmit={concluirFase}>
             <div className="field">
-              <label className="text-slate-400">{t("fase.label")}</label>
+              <label className="text-slate-500">{t("fase.label")}</label>
               <textarea
-                className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
+                className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none transition-all"
                 style={{ height: 100, resize: "vertical" }}
                 placeholder={t("fase.placeholder")}
                 value={phaseContent}
@@ -1062,7 +1051,7 @@ export function PlayerBoard() {
             >
               <button
                 type="button"
-                className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+                className="btn btn-ghost bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-lg shadow-sm transition-all"
                 onClick={() => setOpenPhase(null)}
                 disabled={savingPhase}
               >
@@ -1070,7 +1059,7 @@ export function PlayerBoard() {
               </button>
               <button
                 type="submit"
-                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                className="btn btn-primary bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
                 disabled={savingPhase}
               >
                 {t("fase.concluir")}
@@ -1081,22 +1070,24 @@ export function PlayerBoard() {
       )}
 
       {congrats && (
-        <div id="overlay-congrats" className="bg-[#0B0F19]/80 backdrop-blur-md">
-          <div className="congrats-box bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl">
+        <div id="overlay-congrats" className="bg-slate-900/40 backdrop-blur-sm">
+          <div className="congrats-box bg-white border border-slate-200 rounded-xl shadow-xl">
             <div className="congrats-stars">
               <span className="congrats-star">⭐</span>
               <span className="congrats-star">🌟</span>
               <span className="congrats-star">⭐</span>
             </div>
-            <div className="congrats-title text-white">{congrats.titulo}</div>
-            <div className="congrats-sub text-slate-400">{congrats.sub}</div>
+            <div className="congrats-title text-slate-900">
+              {congrats.titulo}
+            </div>
+            <div className="congrats-sub text-slate-500">{congrats.sub}</div>
             {congrats.pontos !== null && (
               <div className="congrats-pts-badge">
                 +{congrats.pontos} {t("congrats.pontos")}
               </div>
             )}
             <button
-              className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+              className="btn btn-primary bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
               style={{ width: "100%" }}
               onClick={() => setCongrats(null)}
             >
@@ -1108,9 +1099,9 @@ export function PlayerBoard() {
 
       {showAvisos && (
         <Modal onClose={() => setShowAvisos(false)} maxWidth={440}>
-          <h3 className="text-white">🔔 {t("avisos.titulo")}</h3>
+          <h3 className="text-slate-900">🔔 {t("avisos.titulo")}</h3>
           {board.announcements.length === 0 ? (
-            <p className="text-slate-400" style={{ fontSize: 12 }}>
+            <p className="text-slate-500" style={{ fontSize: 12 }}>
               {t("avisos.vazio")}
             </p>
           ) : (
@@ -1118,7 +1109,7 @@ export function PlayerBoard() {
               {board.announcements.map((a) => (
                 <div
                   key={a.id}
-                  className="bg-[#0B0F19]/80 border border-white/5 rounded-xl text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                  className="bg-white border border-slate-200 rounded-xl shadow-sm text-slate-700 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
                   style={{
                     padding: "9px 11px",
                     fontSize: 12,
@@ -1135,10 +1126,10 @@ export function PlayerBoard() {
       {showEncerramento && (
         <div
           id="overlay-encerramento"
-          className="bg-[#0B0F19]/80 backdrop-blur-md"
+          className="bg-slate-900/40 backdrop-blur-sm"
         >
           <div
-            className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl text-slate-200"
+            className="bg-white border border-slate-200 rounded-xl shadow-xl text-slate-900"
             style={{
               padding: "28px 28px 24px",
               maxWidth: 520,
@@ -1151,7 +1142,7 @@ export function PlayerBoard() {
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
               <div
-                className="text-white"
+                className="text-slate-900"
                 style={{
                   fontSize: 22,
                   fontWeight: 900,
@@ -1161,7 +1152,7 @@ export function PlayerBoard() {
                 {t("encerramento.titulo")}
               </div>
               <div
-                className="text-slate-400"
+                className="text-slate-500"
                 style={{ fontSize: 13, marginTop: 4 }}
               >
                 {t("encerramento.subTpl", {
@@ -1191,7 +1182,7 @@ export function PlayerBoard() {
                 return (
                   <div
                     key={id}
-                    className="enc-chave-card bg-[#0B0F19]/80 border border-white/5 rounded-xl"
+                    className="enc-chave-card bg-slate-50 border border-slate-200 rounded-xl"
                   >
                     <div
                       className="enc-chave-titulo"
@@ -1216,7 +1207,7 @@ export function PlayerBoard() {
                           >
                             {f.nome}
                           </div>
-                          <div className="enc-fase-conteudo text-slate-300">
+                          <div className="enc-fase-conteudo text-slate-700">
                             {f.conteudo}
                           </div>
                         </div>
@@ -1228,14 +1219,14 @@ export function PlayerBoard() {
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button
-                className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+                className="btn btn-ghost bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-lg shadow-sm transition-all"
                 style={{ flex: 1 }}
                 onClick={() => setShowEncerramento(false)}
               >
                 {t("encerramento.revisar")}
               </button>
               <button
-                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                className="btn btn-primary bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
                 style={{ flex: 1 }}
                 onClick={() => {
                   setShowEncerramento(false);

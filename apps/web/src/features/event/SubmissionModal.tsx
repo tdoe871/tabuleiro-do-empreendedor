@@ -201,17 +201,17 @@ export function SubmissionModal({
 
   return (
     <Modal onClose={onClose} maxWidth={560}>
-      <h3 className="text-xl font-bold tracking-tight text-white mb-5">
+      <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-5">
         {t("title")}
       </h3>
       {disabled && (
-        <p className="field-error mb-3 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs font-medium text-red-400">
+        <p className="field-error mb-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs font-medium text-red-600">
           {tCommon("errors.SUBMISSIONS_DISABLED")}
         </p>
       )}
-      <form onSubmit={handleSubmit} className="space-y-4 text-slate-200">
+      <form onSubmit={handleSubmit} className="space-y-4 text-slate-900">
         <div className="field space-y-2">
-          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             {t("chooseType")}
           </label>
           <div className="grid grid-cols-2 gap-2.5">
@@ -222,10 +222,10 @@ export function SubmissionModal({
                 <button
                   key={ty}
                   type="button"
-                  className={`option-card bg-none flex items-center gap-3 p-3.5 rounded-xl backdrop-blur-xl border text-left transition-all duration-300 ${
+                  className={`option-card bg-none flex items-center gap-3 p-3.5 bg-white border rounded-xl shadow-sm text-left transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5 ${
                     selected
-                      ? "bg-[#1C2438] border-[#6366F1]/60 text-white shadow-[0_0_20px_rgba(79,70,229,0.25)]"
-                      : "bg-[#151B2B]/90 border-white/5 text-slate-300 hover:bg-[#1C2438] hover:border-white/10"
+                      ? "border-[#6366F1] ring-2 ring-[#6366F1]/15 text-slate-900"
+                      : "border-slate-200 text-slate-700"
                   } disabled:opacity-50 disabled:pointer-events-none`}
                   aria-pressed={selected}
                   disabled={disabled}
@@ -237,15 +237,15 @@ export function SubmissionModal({
                   <span
                     className={`option-card-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
                       selected
-                        ? "bg-[#4F46E5]/20 border-[#6366F1]/50 text-[#818CF8] shadow-[0_0_12px_rgba(99,102,241,0.35)]"
-                        : "bg-[#0B0F19]/80 border-white/10 text-slate-400"
+                        ? "bg-indigo-50 border-indigo-200 text-[#6366F1]"
+                        : "bg-slate-50 border-slate-200 text-slate-500"
                     }`}
                   >
                     <Icon size={16} />
                   </span>
                   <span
                     className={`option-card-title text-xs font-semibold transition-colors ${
-                      selected ? "text-white" : "text-slate-200"
+                      selected ? "text-slate-900" : "text-slate-700"
                     }`}
                   >
                     {typeLabel[ty]}
@@ -258,7 +258,7 @@ export function SubmissionModal({
 
         {needsUrl && (
           <div className="field space-y-1.5">
-            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               {t("urlLabel")}
             </label>
             <input
@@ -270,10 +270,10 @@ export function SubmissionModal({
               onChange={(e) => setUrl(e.target.value)}
               onBlur={() => setUrlTouched(true)}
               required
-              className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
+              className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all disabled:opacity-50"
             />
             {urlTouched && !urlValid && (
-              <p className="field-error text-xs font-medium text-red-400 mt-1">
+              <p className="field-error text-xs font-medium text-red-600 mt-1">
                 {t("invalidUrl")}
               </p>
             )}
@@ -281,24 +281,24 @@ export function SubmissionModal({
         )}
 
         <div className="field space-y-2">
-          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             {t("fileOrImage")}
           </label>
           <div className="flex flex-col gap-2">
             {files.map((f) => (
               <div
                 key={f.id}
-                className="flex items-center gap-2.5 bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-xl shadow-sm px-3.5 py-2.5 text-xs transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
               >
                 <a
                   href={f.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 truncate font-medium text-white hover:text-[#818CF8] transition-colors"
+                  className="flex-1 truncate font-medium text-slate-900 hover:text-[#6366F1] transition-colors"
                 >
                   {f.fileName}
                 </a>
-                <span className="text-slate-400 tabular-nums">
+                <span className="text-slate-500 tabular-nums">
                   {formatSize(f.size)}
                 </span>
                 <button
@@ -306,7 +306,7 @@ export function SubmissionModal({
                   aria-label={t("removerArquivo")}
                   onClick={() => void handleDeleteFile(f.id)}
                   disabled={disabled}
-                  className="flex items-center justify-center rounded-md p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                  className="flex items-center justify-center rounded-md p-1 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all disabled:opacity-50"
                 >
                   <X size={14} />
                 </button>
@@ -315,7 +315,7 @@ export function SubmissionModal({
             {files.length < MAX_FILES && (
               <button
                 type="button"
-                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center gap-2 self-start rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
+                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center gap-2 self-start rounded-lg bg-white hover:bg-slate-50 border border-slate-200 px-3.5 py-2 text-xs font-medium text-slate-700 hover:text-slate-900 shadow-sm transition-all disabled:opacity-50"
                 disabled={disabled || uploading}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -342,7 +342,7 @@ export function SubmissionModal({
               }}
             />
             {needsFile && !fileValid && (
-              <p className="field-error text-xs font-medium text-red-400">
+              <p className="field-error text-xs font-medium text-red-600">
                 {t("fileRequired")}
               </p>
             )}
@@ -353,7 +353,7 @@ export function SubmissionModal({
         </div>
 
         <div className="field space-y-2">
-          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             {t("linksExtraLabel")}
           </label>
           {links.map((link, i) => (
@@ -364,11 +364,11 @@ export function SubmissionModal({
                 value={link}
                 disabled={disabled}
                 onChange={(e) => updateLink(i, e.target.value)}
-                className="flex-1 rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
+                className="flex-1 rounded-lg bg-white border border-slate-200 px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all disabled:opacity-50"
               />
               <button
                 type="button"
-                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 text-slate-300 hover:text-white transition-all disabled:opacity-50"
+                className="btn btn-ghost btn-sm bg-none inline-flex items-center justify-center rounded-lg bg-white hover:bg-slate-50 border border-slate-200 p-2.5 text-slate-600 hover:text-slate-900 shadow-sm transition-all disabled:opacity-50"
                 onClick={() => removeLink(i)}
                 disabled={disabled}
               >
@@ -379,7 +379,7 @@ export function SubmissionModal({
           {links.length < MAX_EXTRA_LINKS && (
             <button
               type="button"
-              className="btn btn-ghost btn-sm bg-none inline-flex items-center gap-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
+              className="btn btn-ghost btn-sm bg-none inline-flex items-center gap-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 px-3.5 py-2 text-xs font-medium text-slate-700 hover:text-slate-900 shadow-sm transition-all disabled:opacity-50"
               onClick={addLink}
               disabled={disabled}
             >
@@ -389,12 +389,12 @@ export function SubmissionModal({
         </div>
 
         <div className="field space-y-1.5">
-          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             {t("descriptionLabel")}
           </label>
           <textarea
             placeholder={t("descriptionPlaceholder")}
-            className="w-full min-h-[84px] resize-y rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 transition-all disabled:opacity-50"
+            className="w-full min-h-[84px] resize-y rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all disabled:opacity-50"
             value={description}
             disabled={disabled}
             maxLength={2000}
@@ -402,10 +402,10 @@ export function SubmissionModal({
           />
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/5">
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
           <button
             type="button"
-            className="btn btn-ghost bg-none rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 text-xs font-medium text-slate-300 hover:text-white transition-all disabled:opacity-50"
+            className="btn btn-ghost bg-none rounded-lg bg-white hover:bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 shadow-sm transition-all disabled:opacity-50"
             onClick={onClose}
             disabled={saving}
           >
@@ -413,7 +413,7 @@ export function SubmissionModal({
           </button>
           <button
             type="submit"
-            className="btn btn-primary bg-none inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg px-5 py-2 text-xs shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
+            className="btn btn-primary bg-none inline-flex items-center gap-2 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg px-5 py-2 text-xs shadow-sm active:scale-95 transition-all disabled:opacity-50"
             disabled={disabled || saving}
           >
             {saving ? (

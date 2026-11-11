@@ -112,19 +112,20 @@ const NEXT_STATUS: Partial<
   pausada: { next: "ativa", actionKey: "retomar" },
 };
 
-// Dark Navy Premium / Dark Glass palette, scoped via Tailwind classes.
-const AVATAR_COLORS = ["#4F46E5", "#6366F1", "#65dcd5", "#a79aff", "#ebc589"];
+// Light & Clean + Isometric palette, scoped via Tailwind classes.
+const AVATAR_COLORS = ["#6366F1", "#4F46E5", "#0EA5E9", "#8B5CF6", "#F59E0B"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
-const AG_SIDEBAR = "bg-[#151B2B]/90 backdrop-blur-xl";
-const AG_BORDER = "border-white/5";
-const AG_SURFACE = "bg-[#151B2B]/90";
-const AG_SURFACE_SOLID = "bg-[#0B0F19]/90";
-const AG_SURFACE_FEATURED = "bg-[#151B2B]/90";
-const AG_HOVER = "hover:bg-[#1C2438] hover:border-white/10";
-const AG_TEXT = "text-slate-200";
-const AG_CARD = `${AG_SURFACE} backdrop-blur-xl border ${AG_BORDER} rounded-xl transition-all duration-300 ${AG_HOVER}`;
+const AG_SIDEBAR = "bg-[#1E1B4B] text-slate-200";
+const AG_BORDER = "border-slate-200";
+const AG_SURFACE = "bg-white";
+const AG_SURFACE_SOLID = "bg-white";
+const AG_SURFACE_FEATURED = "bg-white";
+const AG_HOVER =
+  "hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5";
+const AG_TEXT = "text-slate-900";
+const AG_CARD = `${AG_SURFACE} border ${AG_BORDER} rounded-xl shadow-sm transition-all duration-300 ${AG_HOVER}`;
 const AG_START_BTN =
-  "bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all";
+  "bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all";
 
 // Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
 // roadmap list, not a backend-driven feature.
@@ -456,23 +457,21 @@ export function EducadorPanel() {
   const canResume = selected?.status === "pausada";
 
   return (
-    <div id="tela-educador" className={`min-h-screen bg-[#0B0F19] ${AG_TEXT}`}>
-      <div
-        className={`topbar bg-[#0B0F19]/90 backdrop-blur-xl border-b ${AG_BORDER}`}
-      >
+    <div id="tela-educador" className={`min-h-screen bg-slate-50 ${AG_TEXT}`}>
+      <div className="topbar bg-white border-b border-slate-200 text-slate-900">
         <div className="tb-logo">
-          <div className="tb-gem bg-[#151B2B]/90 border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+          <div className="tb-gem bg-indigo-50 border border-indigo-200 transition-all duration-300 shadow-sm">
             <GemLogo size={14} />
           </div>
           <span
-            className="text-white"
+            className="text-slate-900"
             style={{ fontSize: 12, fontWeight: 700 }}
           >
             TdoE
           </span>
         </div>
-        <div className="tb-sep bg-white/10" />
-        <span className="tb-sub text-slate-400">
+        <div className="tb-sep bg-slate-200" />
+        <span className="tb-sub text-slate-500">
           {selected ? selected.titulo : t("painelTitulo")}
         </span>
         <div className="tb-right">
@@ -490,7 +489,7 @@ export function EducadorPanel() {
           )}
           <LangSwitcher />
           <button
-            className="btn btn-gold btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-[#ebc589] rounded-lg transition-all"
+            className="btn btn-gold btn-sm bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg shadow-sm transition-all"
             onClick={() => setShowExtensoes(true)}
           >
             ☕ {t("extensoes")}
@@ -510,7 +509,7 @@ export function EducadorPanel() {
             ↗ {t("socializar")}
           </button>
           <button
-            className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+            className="btn btn-ghost btn-sm bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg shadow-sm transition-all"
             onClick={() => router.push("/")}
           >
             {t("sair")}
@@ -518,17 +517,15 @@ export function EducadorPanel() {
         </div>
       </div>
 
-      <div className="edu-layout bg-[#0B0F19]">
-        <div
-          className={`sidebar ${AG_SIDEBAR} border-r ${AG_BORDER} text-slate-200`}
-        >
-          <div className="sidebar-sec text-slate-500">
+      <div className="edu-layout bg-slate-50 text-slate-900">
+        <div className={`sidebar ${AG_SIDEBAR} border-r border-indigo-950`}>
+          <div className="sidebar-sec text-indigo-200/70">
             {t("sidebar.sessoes")}
           </div>
           <div>
             {sessions.length === 0 && (
               <div
-                className="text-slate-400"
+                className="text-indigo-200/70"
                 style={{
                   fontSize: 11,
                   padding: "6px 14px",
@@ -540,10 +537,10 @@ export function EducadorPanel() {
             {sessions.map((s, i) => (
               <div
                 key={s.id}
-                className={`eq-item rounded-lg mx-1.5 my-0.5 transition-all duration-300 ${AG_HOVER} hover:translate-x-1 ${
+                className={`eq-item rounded-lg mx-1.5 my-0.5 transition-all duration-200 hover:bg-indigo-900/50 hover:translate-x-1 ${
                   s.id === selectedId
-                    ? "on bg-[#1C2438] border-l-2 border-[#6366F1] text-white"
-                    : "text-slate-300"
+                    ? "on bg-indigo-900/80 border-l-2 border-[#6366F1] text-white"
+                    : "text-slate-200"
                 }`}
                 onClick={() => selectSession(s.id)}
               >
@@ -557,74 +554,74 @@ export function EducadorPanel() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="eq-nm text-white">{s.titulo}</div>
-                  <div className="eq-st text-slate-400">
+                  <div className="eq-st text-indigo-200/70">
                     {t(`status.${s.status}`)} · {s.codigo}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="sidebar-divider bg-white/5" />
-          <div className="sidebar-sec text-slate-500">{t("sidebar.acoes")}</div>
+          <div className="sidebar-divider bg-indigo-800/40" />
+          <div className="sidebar-sec text-indigo-200/70">
+            {t("sidebar.acoes")}
+          </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => setShowCreate(true)}
           >
             ＋ {t("sidebar.novaSessao")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={handleVerificarAlertas}
           >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => void abrirEvaluacoes()}
           >
             🎓 {t("sidebar.mentores")}
           </div>
-          <div className="sidebar-divider bg-white/5" />
-          <div className="sidebar-sec text-slate-500">
+          <div className="sidebar-divider bg-indigo-800/40" />
+          <div className="sidebar-sec text-indigo-200/70">
             {t("sidebar.exportar")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("report")}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("proposals")}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("activity")}
           >
             🗒 {t("sidebar.exportarAtividade")}
           </div>
           <div
-            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
+            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => router.push("/")}
           >
             ← {t("sair")}
           </div>
         </div>
 
-        <div className="edu-main bg-[#0B0F19]">
+        <div className="edu-main bg-slate-50 text-slate-900">
           <div className="metrics">
-            <div
-              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
-            >
+            <div className={`metric-card ${AG_CARD}`}>
               <div
                 style={{
                   position: "absolute",
@@ -638,13 +635,11 @@ export function EducadorPanel() {
               <div className="m-val" style={{ color: "var(--prob)" }}>
                 {selected ? (overview?.metrics.activeTeams ?? "…") : "—"}
               </div>
-              <div className="m-lbl text-slate-400">
+              <div className="m-lbl text-slate-500">
                 {t("metrics.equipesAtivas")}
               </div>
             </div>
-            <div
-              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
-            >
+            <div className={`metric-card ${AG_CARD}`}>
               <div
                 style={{
                   position: "absolute",
@@ -655,16 +650,14 @@ export function EducadorPanel() {
                   background: "var(--sol)",
                 }}
               />
-              <div className="m-val text-white">
+              <div className="m-val text-slate-900">
                 {selected ? (overview?.metrics.participants ?? "…") : "0"}
               </div>
-              <div className="m-lbl text-slate-400">
+              <div className="m-lbl text-slate-500">
                 {t("metrics.participantes")}
               </div>
             </div>
-            <div
-              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
-            >
+            <div className={`metric-card ${AG_CARD}`}>
               <div
                 style={{
                   position: "absolute",
@@ -678,13 +671,11 @@ export function EducadorPanel() {
               <div className="m-val" style={{ color: "var(--sol)" }}>
                 {selected ? (overview?.metrics.keysCompleted ?? "…") : "0"}
               </div>
-              <div className="m-lbl text-slate-400">
+              <div className="m-lbl text-slate-500">
                 {t("metrics.chavesConcluidas")}
               </div>
             </div>
-            <div
-              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
-            >
+            <div className={`metric-card ${AG_CARD}`}>
               <div
                 style={{
                   position: "absolute",
@@ -695,13 +686,10 @@ export function EducadorPanel() {
                   background: "var(--opor)",
                 }}
               />
-              <div
-                className="m-val"
-                style={{ color: "var(--gold)", fontSize: 20 }}
-              >
+              <div className="m-val text-[#6366F1]" style={{ fontSize: 20 }}>
                 {selected ? selected.codigo : "—"}
               </div>
-              <div className="m-lbl text-slate-400">
+              <div className="m-lbl text-slate-500">
                 {t("metrics.codigoAcesso")}
               </div>
             </div>
@@ -719,7 +707,15 @@ export function EducadorPanel() {
                 : 0;
               return (
                 <div
-                  className={`prog-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_10px_28px_-6px_rgba(79,70,229,0.25)]`}
+                  className={`prog-card ${AG_CARD} bg-no-repeat bg-[right_8px_center] bg-[length:48px_40px] ${
+                    id === "problema"
+                      ? "bg-[url('/isometric/stage-1.png')]"
+                      : id === "solucao"
+                        ? "bg-[url('/isometric/stage-2.png')]"
+                        : id === "parcerias"
+                          ? "bg-[url('/isometric/stage-3.png')]"
+                          : "bg-[url('/isometric/stage-4.png')]"
+                  }`}
                   key={id}
                 >
                   <div className="pc-head">
@@ -735,11 +731,11 @@ export function EducadorPanel() {
                     >
                       {key.name}
                     </div>
-                    <div className="pc-ct text-slate-400">
+                    <div className="pc-ct text-slate-500">
                       {completed}/{teams.length}
                     </div>
                   </div>
-                  <div className="pc-bar bg-[#0B0F19]">
+                  <div className="pc-bar bg-slate-200">
                     <div
                       className="pc-fill"
                       style={{
@@ -755,7 +751,7 @@ export function EducadorPanel() {
 
           <div className="equipes-grid">
             {!selected && (
-              <div className="text-slate-400" style={{ fontSize: 11 }}>
+              <div className="text-slate-500" style={{ fontSize: 11 }}>
                 {t("toasts.selecioneSessao")}
               </div>
             )}
@@ -769,7 +765,7 @@ export function EducadorPanel() {
                 }}
               >
                 <div style={{ fontSize: 24, marginBottom: 6 }}>👥</div>
-                <div className="text-slate-400" style={{ fontSize: 12 }}>
+                <div className="text-slate-500" style={{ fontSize: 12 }}>
                   {t("equipesVazio", { codigo: selected.codigo })}
                 </div>
               </div>
@@ -785,10 +781,7 @@ export function EducadorPanel() {
                 ).length;
                 const pct = Math.round((completed / KEY_IDS.length) * 100);
                 return (
-                  <div
-                    className={`eq-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
-                    key={team.id}
-                  >
+                  <div className={`eq-card ${AG_CARD}`} key={team.id}>
                     <div className="eq-card-head">
                       <div
                         className="eq-card-av"
@@ -799,8 +792,10 @@ export function EducadorPanel() {
                         E{i + 1}
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <div className="eq-card-nm text-white">{team.name}</div>
-                        <div className="eq-card-st text-slate-400">
+                        <div className="eq-card-nm text-slate-900">
+                          {team.name}
+                        </div>
+                        <div className="eq-card-st text-slate-500">
                           {activeKey
                             ? (tKeys.raw(activeKey) as KeyTranslation).name
                             : t("equipeCard.semChaveAtiva")}
@@ -828,14 +823,14 @@ export function EducadorPanel() {
                         );
                       })}
                     </div>
-                    <div className="eq-prog-bar bg-[#0B0F19]">
+                    <div className="eq-prog-bar bg-slate-200">
                       <div
                         className="eq-prog-fill"
                         style={{
                           width: `${pct}%`,
                           background: activeKey
                             ? `var(${KEY_COLOR_VAR[activeKey]})`
-                            : "var(--t3)",
+                            : "#94a3b8",
                         }}
                       />
                     </div>
@@ -847,10 +842,10 @@ export function EducadorPanel() {
                         flexWrap: "wrap",
                       }}
                     >
-                      <div className="badge tiny bg-white/5 border border-white/10 text-slate-300">
+                      <div className="badge tiny bg-slate-100 border border-slate-200 text-slate-600">
                         {completed}/4 {t("equipeCard.chaves")}
                       </div>
-                      <div className="badge tiny bg-white/5 border border-white/10 text-slate-300">
+                      <div className="badge tiny bg-slate-100 border border-slate-200 text-slate-600">
                         👤 {team.memberCount}
                       </div>
                       {team.submission && (
@@ -872,8 +867,8 @@ export function EducadorPanel() {
           </div>
         </div>
 
-        <div className={`edu-right ${AG_SIDEBAR} border-l ${AG_BORDER}`}>
-          <div className="panel-title text-slate-400">
+        <div className="edu-right bg-slate-50 border-l border-slate-200 text-slate-900">
+          <div className="panel-title text-slate-500">
             {t("right.alertasMediacao")}
           </div>
           {!overview || overview.alerts.length === 0 ? (
@@ -885,9 +880,9 @@ export function EducadorPanel() {
               {overview.alerts.map((alert) => {
                 const color =
                   alert.severity === "CRITICAL"
-                    ? "var(--ag-color-warning, #fbbf24)"
+                    ? "#d97706"
                     : alert.severity === "WARNING"
-                      ? "var(--gold)"
+                      ? "#d97706"
                       : "var(--opor)";
                 const bg =
                   alert.severity === "CRITICAL"
@@ -910,7 +905,7 @@ export function EducadorPanel() {
                 return (
                   <div
                     key={alert.id}
-                    className="alert-card rounded-xl backdrop-blur-xl transition-all duration-300"
+                    className="alert-card rounded-xl shadow-sm transition-all duration-300"
                     style={{ background: bg, border: bd }}
                   >
                     <div
@@ -929,8 +924,8 @@ export function EducadorPanel() {
               })}
             </div>
           )}
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             {t("right.controlesSessao")}
           </div>
           <div className="ctrl-grid">
@@ -941,31 +936,31 @@ export function EducadorPanel() {
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className={`ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className={`ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
             <div
-              className="ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all"
+              className="ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all"
               onClick={handleVerificarAlertas}
             >
               🔔 {t("right.alertas")}
             </div>
           </div>
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             ⏱ {t("timer.titulo")}
           </div>
           <div className={`timer-edu-block ${AG_CARD} p-3.5 my-2`}>
             <div
-              className="text-slate-400"
+              className="text-slate-500"
               style={{ fontSize: 10, marginBottom: 4 }}
             >
               {t("timer.duracao")}
@@ -976,8 +971,8 @@ export function EducadorPanel() {
                   key={min}
                   className={`timer-preset-btn rounded-lg transition-all ${
                     activityMinutes === min
-                      ? "sel !bg-[#4F46E5]/20 !border-[#6366F1]/50 !text-white shadow-[0_0_12px_rgba(79,70,229,0.25)]"
-                      : "bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300"
+                      ? "sel !bg-[#6366F1] !border-[#6366F1] !text-white shadow-sm"
+                      : "bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600"
                   }`}
                   onClick={() => setActivityMinutes(min)}
                 >
@@ -986,7 +981,7 @@ export function EducadorPanel() {
               ))}
             </div>
             <div
-              className="text-white"
+              className="text-slate-900"
               style={{
                 fontSize: 26,
                 fontWeight: 900,
@@ -1008,14 +1003,14 @@ export function EducadorPanel() {
                 ▶ {t("timer.iniciar")}
               </button>
               <button
-                className="timer-ctrl-btn timer-stop bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-medium rounded-lg transition-all"
+                className="timer-ctrl-btn timer-stop bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-medium rounded-lg transition-all"
                 onClick={() => void pararTimer()}
               >
                 ⏹ {t("timer.parar")}
               </button>
             </div>
-            <div className="timer-toggle-row bg-[#0B0F19]/80 border border-white/10 rounded-lg">
-              <span className="timer-toggle-lbl text-slate-300">
+            <div className="timer-toggle-row bg-slate-50 border border-slate-200 rounded-lg">
+              <span className="timer-toggle-lbl text-slate-600">
                 {t("timer.mostrarEstudantes")}
               </span>
               <label className="toggle-sw">
@@ -1029,8 +1024,8 @@ export function EducadorPanel() {
               </label>
             </div>
           </div>
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             🃏 {t("carta.titulo")}
           </div>
           <div className="carta-launcher">
@@ -1039,11 +1034,7 @@ export function EducadorPanel() {
               return (
                 <button
                   key={id}
-                  className={`carta-launcher-btn ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(79,70,229,0.25)]`}
-                  style={{
-                    borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
-                    background: `var(${KEY_COLOR_VAR[id]}-bg)`,
-                  }}
+                  className={`carta-launcher-btn ${AG_CARD}`}
                   onClick={() => openCartaPreview(id)}
                 >
                   <div
@@ -1053,10 +1044,10 @@ export function EducadorPanel() {
                     {key.icon}
                   </div>
                   <div>
-                    <div className="carta-launcher-nm text-white">
+                    <div className="carta-launcher-nm text-slate-900">
                       {key.name}
                     </div>
-                    <div className="carta-launcher-sub text-slate-400">
+                    <div className="carta-launcher-sub text-slate-500">
                       {t(`carta.launcherSub.${id}`)}
                     </div>
                   </div>
@@ -1070,7 +1061,7 @@ export function EducadorPanel() {
               style={{ marginTop: 8, padding: "10px 12px" }}
             >
               <div
-                className="text-[#818CF8]"
+                className="text-[#6366F1]"
                 style={{
                   fontSize: 10,
                   fontWeight: 700,
@@ -1079,7 +1070,7 @@ export function EducadorPanel() {
               >
                 🃏 {t("carta.ativa")}
               </div>
-              <div className="text-slate-300" style={{ fontSize: 11 }}>
+              <div className="text-slate-600" style={{ fontSize: 11 }}>
                 {event.challengeCard.text}
               </div>
               <button
@@ -1098,13 +1089,13 @@ export function EducadorPanel() {
               </button>
             </div>
           )}
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             📢 {t("avisos.titulo")}
           </div>
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
             <input
-              className="bg-[#0B0F19] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
+              className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none shadow-sm transition-all"
               style={{ flex: 1 }}
               placeholder={t("avisos.placeholder")}
               value={announcementInput}
@@ -1138,7 +1129,7 @@ export function EducadorPanel() {
             {(overview?.announcements ?? []).map((a) => (
               <div
                 key={a.id}
-                className="bg-[#0B0F19]/80 border border-white/5 rounded-lg text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                className="bg-white border border-slate-200 rounded-xl shadow-sm text-slate-700 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
                 style={{
                   display: "flex",
                   gap: 6,
@@ -1163,8 +1154,8 @@ export function EducadorPanel() {
               </div>
             ))}
           </div>
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             🚨 {t("interruptores.titulo")}
           </div>
           {(["chat", "submissions", "joins"] as const).map((name) => (
@@ -1173,7 +1164,7 @@ export function EducadorPanel() {
               className={`timer-toggle-row ${AG_CARD}`}
               style={{ marginBottom: 6 }}
             >
-              <span className="timer-toggle-lbl text-slate-300">
+              <span className="timer-toggle-lbl text-slate-700">
                 {t(`interruptores.${name}`)}
               </span>
               <label className="toggle-sw">
@@ -1187,25 +1178,25 @@ export function EducadorPanel() {
               </label>
             </div>
           ))}
-          <div className="sidebar-divider bg-white/5" />
-          <div className="panel-title text-slate-400">
+          <div className="sidebar-divider bg-slate-200" />
+          <div className="panel-title text-slate-500">
             🎓 {t("mentores.titulo")}
           </div>
           <div
-            className="text-slate-400"
+            className="text-slate-500"
             style={{ fontSize: 11, marginBottom: 6 }}
           >
             {event?.mentorCode ? (
               <>
                 {t("mentores.codigo")}:{" "}
-                <strong className="text-[#818CF8]">{event.mentorCode}</strong>
+                <strong className="text-[#6366F1]">{event.mentorCode}</strong>
               </>
             ) : (
               t("mentores.semCodigo")
             )}
           </div>
           <button
-            className="btn btn-sm w100 bg-none bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all"
+            className="btn btn-sm w100 bg-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all"
             onClick={() => void gerarCodigoMentores()}
           >
             {event?.mentorCode ? t("mentores.regenerar") : t("mentores.gerar")}
@@ -1251,7 +1242,7 @@ export function EducadorPanel() {
             </div>
             <div>
               <div
-                className="text-slate-400"
+                className="text-slate-500"
                 style={{
                   fontSize: 10,
                   fontWeight: 800,
@@ -1262,7 +1253,7 @@ export function EducadorPanel() {
                 {t("carta.titulo")}
               </div>
               <div
-                className="text-white"
+                className="text-slate-900"
                 style={{ fontSize: 17, fontWeight: 800 }}
               >
                 {(tKeys.raw(previewKey) as KeyTranslation).name}
@@ -1270,9 +1261,9 @@ export function EducadorPanel() {
             </div>
           </div>
           <div className="field">
-            <label className="text-slate-400">{t("carta.titulo")}</label>
+            <label className="text-slate-500">{t("carta.titulo")}</label>
             <textarea
-              className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
+              className="w-full rounded-lg bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
               style={{ height: 90, resize: "vertical" }}
               value={previewText}
               maxLength={500}
@@ -1288,7 +1279,7 @@ export function EducadorPanel() {
             }}
           >
             <button
-              className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+              className="btn btn-ghost bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg shadow-sm transition-all"
               onClick={() => setPreviewKey(null)}
             >
               {t("modalSessao.cancelar")}
@@ -1305,8 +1296,8 @@ export function EducadorPanel() {
 
       {showMentores && evaluations && (
         <Modal onClose={() => setShowMentores(false)} maxWidth={520}>
-          <h3 className="text-white">🎓 {t("mentores.titulo")}</h3>
-          <p className="text-slate-400" style={{ fontSize: 11 }}>
+          <h3 className="text-slate-900">🎓 {t("mentores.titulo")}</h3>
+          <p className="text-slate-500" style={{ fontSize: 11 }}>
             {t("mentores.mentoresCount", { count: evaluations.mentors.length })}
           </p>
           <div
@@ -1321,7 +1312,7 @@ export function EducadorPanel() {
             {evaluations.teams.map((team) => (
               <div
                 key={team.id}
-                className="bg-[#0B0F19]/80 border border-white/5 rounded-xl text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                className="bg-white border border-slate-200 rounded-xl shadow-sm text-slate-700 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -1329,8 +1320,8 @@ export function EducadorPanel() {
                   fontSize: 12,
                 }}
               >
-                <span className="text-white">{team.name}</span>
-                <span className="text-[#818CF8] font-bold">
+                <span className="text-slate-900">{team.name}</span>
+                <span className="text-[#6366F1] font-bold">
                   {team.summary.average !== null
                     ? `${team.summary.average.toFixed(1)} (${team.summary.count})`
                     : t("mentores.semNota")}
@@ -1343,17 +1334,17 @@ export function EducadorPanel() {
 
       {showExtensoes && (
         <Modal onClose={() => setShowExtensoes(false)} maxWidth={440}>
-          <h3 className="text-white">☕ {t("extensoes")}</h3>
-          <p className="text-slate-400">{t("extensoesModal.subtitulo")}</p>
+          <h3 className="text-slate-900">☕ {t("extensoes")}</h3>
+          <p className="text-slate-500">{t("extensoesModal.subtitulo")}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {(["desafiosExtras", "coringas", "cartasPedagogicas"] as const).map(
               (id) => (
                 <div
                   key={id}
-                  className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl p-3 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
+                  className="bg-white border border-slate-200 rounded-xl shadow-sm p-3 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
                 >
                   <div
-                    className="text-white"
+                    className="text-slate-900"
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
@@ -1362,13 +1353,13 @@ export function EducadorPanel() {
                     {EXTENSOES_ICON[id]} {t(`extensoesModal.items.${id}.nome`)}
                   </div>
                   <div
-                    className="text-slate-400"
+                    className="text-slate-500"
                     style={{ fontSize: 10, marginTop: 3 }}
                   >
                     {t(`extensoesModal.items.${id}.descricao`)}
                   </div>
                   <div
-                    className="text-[#818CF8]"
+                    className="text-[#6366F1]"
                     style={{
                       fontSize: 8,
                       marginTop: 4,
@@ -1383,7 +1374,7 @@ export function EducadorPanel() {
             )}
           </div>
           <button
-            className="btn btn-ghost w100 bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
+            className="btn btn-ghost w100 bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg shadow-sm transition-all"
             style={{ marginTop: 20 }}
             onClick={() => setShowExtensoes(false)}
           >

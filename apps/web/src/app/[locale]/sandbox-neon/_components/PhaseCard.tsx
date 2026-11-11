@@ -106,11 +106,11 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
   return (
     <button
       type="button"
-      className={`phase-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 ${
+      className={`phase-card relative overflow-hidden bg-none bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5 ${
         isActive
-          ? "phase-active !bg-[#1C2438] !border-[#6366F1]/50 shadow-[0_0_25px_rgba(79,70,229,0.22)]"
+          ? "phase-active !border-[#6366F1] ring-2 ring-[#6366F1]/15"
           : ""
-      } ${phase.status === "locked" ? "phase-locked opacity-65" : ""}`}
+      } ${phase.status === "locked" ? "phase-locked opacity-75" : ""}`}
       style={
         {
           "--accent": phase.color,
@@ -119,11 +119,17 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
       }
       onClick={() => onSelect(phase)}
     >
+      <img
+        src={`/isometric/stage-${phase.id}.png`}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute right-2 top-7 h-[96px] w-[114px] object-contain select-none"
+      />
       <div className="phase-top">
-        <div className="phase-number text-slate-400">
+        <div className="phase-number text-slate-500">
           {String(phase.id).padStart(2, "0")}
         </div>
-        <div className="phase-icon">
+        <div className="phase-icon bg-slate-100 border border-slate-200 text-[#6366F1]">
           <Icon size={22} />
         </div>
         {phase.status === "completed" && (
@@ -132,30 +138,39 @@ export function PhaseCard({ phase, isActive, onSelect }: PhaseCardProps) {
           </span>
         )}
         {phase.status === "locked" && (
-          <span className="status-icon">
+          <span className="status-icon text-slate-400">
             <LockKeyhole size={14} />
           </span>
         )}
       </div>
 
-      <span className="phase-eyebrow text-slate-400">
+      <span className="phase-eyebrow text-slate-500">
         {phase.eyebrow} • {phase.label}
       </span>
-      <h3 className="text-white">{phase.title}</h3>
-      <p className="text-slate-400">{phase.description}</p>
+      <h3 className="text-slate-900">{phase.title}</h3>
+      <p className="text-slate-500 pr-20">{phase.description}</p>
 
       <div className="phase-progress">
-        <div className="bg-[#0B0F19]">
-          <i style={{ width: `${phase.progress}%` }} />
+        <div className="bg-slate-200">
+          <i
+            className="bg-none bg-[#6366F1]"
+            style={{ width: `${phase.progress}%` }}
+          />
         </div>
-        <span className="text-slate-400">{phase.progress}%</span>
+        <span className="text-slate-500">{phase.progress}%</span>
       </div>
 
-      <div className="phase-footer border-t border-white/5">
-        <span>
+      <div className="phase-footer border-t border-slate-200">
+        <span className="text-slate-500">
           <Zap size={13} fill="currentColor" /> +{phase.xp} XP
         </span>
-        <span className="phase-cta text-white">
+        <span
+          className={`phase-cta ${
+            isActive
+              ? "bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg px-3 py-1.5 shadow-sm active:scale-95 transition-all"
+              : "text-slate-900 font-semibold"
+          }`}
+        >
           {ctaLabel}
           <ChevronRight size={15} />
         </span>

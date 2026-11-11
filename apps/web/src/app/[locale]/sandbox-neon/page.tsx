@@ -76,9 +76,9 @@ export default function SandboxNeonPage() {
   }, [notify, selectedPhase]);
 
   return (
-    <div className="app-shell bg-none bg-[#0B0F19] text-slate-200">
-      <div className="ambient ambient-one bg-[#4F46E5]/20" />
-      <div className="ambient ambient-two bg-[#65dcd5]/15" />
+    <div className="app-shell bg-none bg-slate-50 text-slate-900">
+      <div className="ambient ambient-one hidden" />
+      <div className="ambient ambient-two hidden" />
 
       <Sidebar
         isOpen={sidebarOpen}
@@ -88,55 +88,54 @@ export default function SandboxNeonPage() {
         onNotify={notify}
       />
 
-      <main className="workspace bg-[#0B0F19]" id="inicio">
+      <main className="workspace bg-slate-50 text-slate-900" id="inicio">
         <TopNav
           onOpenSidebar={() => setSidebarOpen(true)}
           onExport={exportProgress}
           onNotify={notify}
         />
 
-        <div className="content text-slate-200">
+        <div className="content text-slate-900">
           <section className="hero" id="jornada">
             <div className="hero-copy">
-              <div className="eyebrow bg-white/5 border border-white/10 text-[#818CF8] shadow-[0_0_15px_rgba(79,70,229,0.2)]">
+              <div className="eyebrow bg-indigo-50 border border-indigo-200 text-[#6366F1]">
                 <Sparkles size={14} /> CAPÍTULO 2 • EM PROGRESSO
               </div>
-              <h1 className="text-white">
+              <h1 className="text-slate-900">
                 Construa algo que
                 <br />
-                <span className="bg-gradient-to-r from-[#818CF8] via-[#65dcd5] to-[#a79aff] bg-clip-text text-transparent">
-                  o mundo precisa.
-                </span>
+                <span className="bg-none text-[#6366F1]">o mundo precisa.</span>
               </h1>
-              <p className="text-slate-400">
+              <p className="text-slate-500">
                 Explore desafios, conquiste habilidades e transforme sua ideia
                 em um negócio de impacto.
               </p>
             </div>
 
             <div
-              className="level-card bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl p-6 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 shadow-[0_0_30px_rgba(11,15,25,0.6)]"
+              className="level-card bg-none bg-white border border-slate-200 rounded-xl shadow-sm p-6 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
               id="ranking"
             >
               <div className="level-top">
-                <div className="level-badge bg-none bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]">
+                <div className="level-badge bg-none bg-[#6366F1] text-white shadow-sm">
                   <Crown size={18} /> 07
                 </div>
                 <div>
-                  <span className="text-slate-400">NÍVEL ATUAL</span>
-                  <strong className="text-white">Fundador Audaz</strong>
+                  <span className="text-slate-500">NÍVEL ATUAL</span>
+                  <strong className="text-slate-900">Fundador Audaz</strong>
                 </div>
-                <Sparkles className="level-spark text-[#818CF8]" size={22} />
+                <Sparkles className="level-spark text-[#6366F1]" size={22} />
               </div>
-              <div className="xp-row text-slate-400">
-                <span className="text-white font-semibold">2.840 XP</span>
-                <span className="text-slate-400">3.500 XP</span>
+              <div className="xp-row text-slate-500">
+                <span className="text-slate-900 font-semibold">2.840 XP</span>
+                <span className="text-slate-500">3.500 XP</span>
               </div>
-              <div className="xp-track bg-[#0B0F19]/90 border border-white/10">
-                <span className="bg-none bg-gradient-to-r from-[#4F46E5] via-[#6366F1] to-[#65dcd5] shadow-[0_0_12px_rgba(99,102,241,0.5)]" />
+              <div className="xp-track bg-slate-200 border border-slate-200">
+                <span className="bg-none bg-[#6366F1]" />
               </div>
-              <small className="text-slate-400">
-                Mais <b className="text-white">660 XP</b> para o próximo nível
+              <small className="text-slate-500">
+                Mais <b className="text-slate-900">660 XP</b> para o próximo
+                nível
               </small>
             </div>
           </section>
@@ -144,16 +143,16 @@ export default function SandboxNeonPage() {
           <section className="board-section">
             <div className="title-row">
               <div>
-                <span className="section-kicker text-[#818CF8]">
+                <span className="section-kicker text-[#6366F1]">
                   MAPA DA JORNADA
                 </span>
-                <h2 className="text-white">Escolha sua próxima missão</h2>
+                <h2 className="text-slate-900">Escolha sua próxima missão</h2>
               </div>
-              <div className="progress-summary bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
-                <span className="text-slate-400">Progresso geral</span>
-                <strong className="text-white">48%</strong>
-                <div className="bg-[#0B0F19]">
-                  <i className="bg-none bg-gradient-to-r from-[#4F46E5] to-[#65dcd5]" />
+              <div className="progress-summary bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5">
+                <span className="text-slate-500">Progresso geral</span>
+                <strong className="text-slate-900">48%</strong>
+                <div className="bg-slate-200">
+                  <i className="bg-none bg-[#6366F1]" />
                 </div>
               </div>
             </div>
@@ -178,20 +177,20 @@ export default function SandboxNeonPage() {
             <TeamChat />
           </section>
 
-          <footer className="border-t border-white/5 text-slate-500">
+          <footer className="border-t border-slate-200 text-slate-500">
             <span className="text-slate-500">
               Tabuleiro do Empreendedor © 2025
             </span>
             <div>
               <Link
                 href="#ajuda"
-                className="text-slate-400 hover:text-white transition-colors"
+                className="text-slate-500 hover:text-slate-900 transition-colors"
               >
                 Central de ajuda
               </Link>
               <Link
                 href="#feedback"
-                className="text-slate-400 hover:text-white transition-colors"
+                className="text-slate-500 hover:text-slate-900 transition-colors"
               >
                 Enviar feedback
               </Link>
@@ -201,7 +200,7 @@ export default function SandboxNeonPage() {
       </main>
 
       {toast && (
-        <div className="toast bg-none bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl text-white shadow-[0_0_25px_rgba(79,70,229,0.35)]">
+        <div className="toast bg-none bg-white border border-slate-200 rounded-xl text-slate-900 shadow-md">
           <Check size={17} /> {toast}
         </div>
       )}
