@@ -438,17 +438,23 @@ export function PlayerBoard() {
   }
 
   return (
-    <div id="tela-jogadores">
-      <div className="topbar bg-neon-bg/80 backdrop-blur-xl border-b border-white/10">
+    <div
+      id="tela-jogadores"
+      className="min-h-screen bg-[#0B0F19] text-slate-200"
+    >
+      <div className="topbar bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/5">
         <div className="tb-logo">
-          <div className="tb-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+          <div className="tb-gem bg-[#151B2B]/90 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
             <GemLogo size={14} />
           </div>
-          <span style={{ fontSize: 12, fontWeight: 700 }}>
+          <span
+            className="text-white"
+            style={{ fontSize: 12, fontWeight: 700 }}
+          >
             {t("topbarTitulo")}
           </span>
         </div>
-        <div className="tb-sep" />
+        <div className="tb-sep bg-white/10" />
         <div className="tb-right" style={{ marginLeft: "auto" }}>
           {activitySeconds !== null && board.event.activityTimer?.visible && (
             <div
@@ -507,7 +513,7 @@ export function PlayerBoard() {
           </div>
           <LangSwitcher />
           <button
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
             onClick={() => router.push("/")}
           >
             {t("sair")}
@@ -515,29 +521,24 @@ export function PlayerBoard() {
         </div>
       </div>
 
-      <div className="score-strip bg-white/[0.03] backdrop-blur-md border-b border-white/10">
+      <div className="score-strip bg-[#151B2B]/90 backdrop-blur-xl border-b border-white/5">
         <div>
-          <div className="score-label">{t("score.label")}</div>
+          <div className="score-label text-slate-400">{t("score.label")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-            <div className="score-val">{board.team.score}</div>
-            <div className="score-pts">{t("score.unidade")}</div>
+            <div className="score-val text-white">{board.team.score}</div>
+            <div className="score-pts text-slate-400">{t("score.unidade")}</div>
           </div>
         </div>
         <div style={{ flex: 1 }} />
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
           onClick={() => setShowSubmission(true)}
         >
           {board.submission ? t("entregaEditar") : t("entregaAbrir")}
         </button>
         {allDone && (
           <button
-            className="btn btn-sm"
-            style={{
-              background: "rgba(255,215,0,.15)",
-              color: "var(--gold)",
-              border: "1px solid rgba(255,215,0,.35)",
-            }}
+            className="btn btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
             onClick={() => setShowEncerramento(true)}
           >
             🏆 {t("score.verResumo")}
@@ -562,32 +563,42 @@ export function PlayerBoard() {
 
       {board.cartaAtiva && (
         <div
+          className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
           style={{
             margin: "10px 20px 0",
-            background: "var(--gold-bg)",
-            border: "1px solid var(--gold-bd)",
-            borderRadius: 10,
             padding: "10px 14px",
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 800, color: "var(--gold)" }}>
+          <div
+            className="text-[#818CF8]"
+            style={{ fontSize: 10, fontWeight: 800 }}
+          >
             🃏 {t("cartaAtiva.titulo")}
           </div>
-          <div style={{ fontSize: 12, color: "var(--t2)", marginTop: 2 }}>
+          <div
+            className="text-slate-300"
+            style={{ fontSize: 12, marginTop: 2 }}
+          >
             {board.cartaAtiva.text}
           </div>
         </div>
       )}
 
-      <div className="jog-layout">
+      <div className="jog-layout bg-[#0B0F19]">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="cenario-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-glow-cyan">
+          <div className="cenario-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
             <div className="cen-icon">⌖</div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>
+              <div
+                className="text-white"
+                style={{ fontSize: 13, fontWeight: 700 }}
+              >
                 {t("cenario.titulo")}
               </div>
-              <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
+              <div
+                className="text-slate-400"
+                style={{ fontSize: 11, marginTop: 2 }}
+              >
                 {board.team.name} · {board.event.name}
               </div>
             </div>
@@ -595,12 +606,12 @@ export function PlayerBoard() {
 
           <div>
             <div
+              className="text-slate-400"
               style={{
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: ".07em",
                 textTransform: "uppercase",
-                color: "var(--t3)",
                 marginBottom: 8,
               }}
             >
@@ -614,7 +625,7 @@ export function PlayerBoard() {
                 return (
                   <div
                     key={member.id}
-                    className={`membro-card bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-neon-lime/40 hover:shadow-glow-lime ${member.isMe ? "ativo" : ""}`}
+                    className={`membro-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 hover:-translate-y-0.5 ${member.isMe ? "ativo !border-[#6366F1]/50 shadow-[0_0_20px_rgba(79,70,229,0.2)]" : ""}`}
                     style={{ position: "relative" }}
                   >
                     {!member.isMe && (
@@ -631,25 +642,27 @@ export function PlayerBoard() {
                       style={{
                         background: member.rpgRole
                           ? RPG_ROLE_COLOR[member.rpgRole]
-                          : "linear-gradient(135deg,#1A9055,#0F5E38)",
+                          : "linear-gradient(135deg,#4F46E5,#6366F1)",
                       }}
                     >
                       {member.rpgRole
                         ? RPG_ROLE_ICON[member.rpgRole]
                         : member.nickname.slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="membro-nm">{member.nickname}</div>
+                    <div className="membro-nm text-white">
+                      {member.nickname}
+                    </div>
                     <div
-                      className="membro-st"
-                      style={member.isMe ? { color: "var(--parc)" } : undefined}
+                      className="membro-st text-slate-400"
+                      style={member.isMe ? { color: "#818CF8" } : undefined}
                     >
                       {roleInfo ? roleInfo.nome : `● ${t("membros.ativo")}`}
                     </div>
                     {member.isMe && (
                       <div
+                        className="text-[#818CF8]"
                         style={{
                           fontSize: 8,
-                          color: "var(--parc)",
                           marginTop: 3,
                           fontWeight: 600,
                           cursor: "pointer",
@@ -668,22 +681,22 @@ export function PlayerBoard() {
             </div>
           </div>
 
-          <div className="card card-pad bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/20">
+          <div className="card card-pad bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10">
             <div className="comm-tabs">
               <div
-                className={`comm-tab ${commTab === "equipe" ? "on" : ""}`}
+                className={`comm-tab ${commTab === "equipe" ? "on text-white" : "text-slate-400"}`}
                 onClick={() => setCommTab("equipe")}
               >
                 📢 {t("comm.equipe")}
               </div>
               <div
-                className={`comm-tab ${commTab === "individual" ? "on" : ""}`}
+                className={`comm-tab ${commTab === "individual" ? "on text-white" : "text-slate-400"}`}
                 onClick={() => setCommTab("individual")}
               >
                 💬 {t("comm.individual")}
               </div>
               <div
-                className={`comm-tab ${commTab === "registro" ? "on" : ""}`}
+                className={`comm-tab ${commTab === "registro" ? "on text-white" : "text-slate-400"}`}
                 onClick={() => setCommTab("registro")}
               >
                 📋 {t("comm.registro")}
@@ -694,7 +707,7 @@ export function PlayerBoard() {
               <div className="comm-content on">
                 <div className="baloes-lista">
                   {teamMessages.length === 0 && (
-                    <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                    <div className="text-slate-500" style={{ fontSize: 11 }}>
                       {t("comm.semMensagens")}
                     </div>
                   )}
@@ -703,24 +716,16 @@ export function PlayerBoard() {
                       key={m.id}
                       className={`balao ${m.mine ? "balao-proprio" : "balao-outro"}`}
                     >
-                      <div className="balao-nm">
+                      <div className="balao-nm text-white">
                         {m.from?.nickname ?? t("comm.participanteSaiu")}
                       </div>
-                      <div className="balao-txt">{m.text}</div>
+                      <div className="balao-txt text-slate-200">{m.text}</div>
                     </div>
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
-                    style={{
-                      flex: 1,
-                      background: "rgba(255,255,255,.05)",
-                      border: "1.5px solid var(--border)",
-                      borderRadius: 9,
-                      padding: "9px 13px",
-                      fontSize: 12,
-                      color: "var(--t1)",
-                    }}
+                    className="flex-1 rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
                     placeholder={t("comm.placeholderEquipe")}
                     value={balaoInput}
                     disabled={!board.event.switches.chat}
@@ -730,7 +735,7 @@ export function PlayerBoard() {
                     }}
                   />
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                     disabled={!board.event.switches.chat}
                     onClick={() => void enviarBalao()}
                   >
@@ -739,7 +744,8 @@ export function PlayerBoard() {
                 </div>
                 {!board.event.switches.chat && (
                   <div
-                    style={{ fontSize: 10, color: "var(--t3)", marginTop: 4 }}
+                    className="text-slate-500"
+                    style={{ fontSize: 10, marginTop: 4 }}
                   >
                     {tCommon("errors.CHAT_DISABLED")}
                   </div>
@@ -750,9 +756,9 @@ export function PlayerBoard() {
             {commTab === "individual" && (
               <div className="comm-content on">
                 <div
+                  className="text-slate-400"
                   style={{
                     fontSize: 9,
-                    color: "var(--t3)",
                     textTransform: "uppercase",
                     letterSpacing: ".07em",
                     fontWeight: 700,
@@ -764,7 +770,7 @@ export function PlayerBoard() {
                   {board.members.map((member) => (
                     <div
                       key={member.id}
-                      className={`mchip ${sussurroTo === member.id ? "sel" : ""}`}
+                      className={`mchip ${sussurroTo === member.id ? "sel !bg-[#4F46E5]/20 !border-[#6366F1]/50 !text-white" : "bg-white/5 border border-white/10 text-slate-300"}`}
                       onClick={() => setSussurroTo(member.id)}
                     >
                       {member.nickname}
@@ -772,16 +778,9 @@ export function PlayerBoard() {
                   ))}
                 </div>
                 <textarea
+                  className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all resize-none"
                   style={{
-                    background: "rgba(255,255,255,.05)",
-                    border: "1.5px solid var(--border)",
-                    borderRadius: 10,
-                    padding: "10px 13px",
-                    fontSize: 12,
-                    color: "var(--t1)",
-                    resize: "none",
                     height: 70,
-                    width: "100%",
                   }}
                   placeholder={t("comm.placeholderIndividual")}
                   value={sussurroInput}
@@ -790,9 +789,9 @@ export function PlayerBoard() {
                 />
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div
+                    className="text-slate-500"
                     style={{
                       fontSize: 10,
-                      color: "var(--t3)",
                       flex: 1,
                       fontStyle: "italic",
                     }}
@@ -800,7 +799,7 @@ export function PlayerBoard() {
                     {t("comm.soDestinatario")}
                   </div>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                     onClick={() => void enviarSussurro()}
                     disabled={!sussurroTo || !board.event.switches.chat}
                   >
@@ -814,7 +813,7 @@ export function PlayerBoard() {
               <div className="comm-content on">
                 <div className="chat-body">
                   {historyMessages.length === 0 && (
-                    <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                    <div className="text-slate-500" style={{ fontSize: 11 }}>
                       {t("comm.semMensagens")}
                     </div>
                   )}
@@ -838,18 +837,22 @@ export function PlayerBoard() {
                         key={m.id}
                         className={`chat-msg chat-${m.type === "TEAM" ? "balao" : m.type === "PRIVATE" ? "sussurro" : "cutucar"}`}
                       >
-                        <div className="chat-bubble">
-                          <div className="chat-nm">{label}</div>
-                          {m.text && <div className="chat-txt">{m.text}</div>}
+                        <div className="chat-bubble bg-[#0B0F19]/80 border border-white/5 rounded-lg">
+                          <div className="chat-nm text-white">{label}</div>
+                          {m.text && (
+                            <div className="chat-txt text-slate-300">
+                              {m.text}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
                 <div
+                  className="text-slate-500"
                   style={{
                     fontSize: 9,
-                    color: "var(--t3)",
                     paddingTop: 6,
                     borderTop: ".5px solid var(--border)",
                   }}
@@ -885,26 +888,22 @@ export function PlayerBoard() {
 
               const hoverGlowClass =
                 id === "problema"
-                  ? "hover:shadow-glow-amber hover:ring-1 hover:ring-neon-amber/40"
+                  ? "hover:shadow-[0_12px_32px_-10px_rgba(249,202,74,0.3)] hover:border-white/10"
                   : id === "solucao"
-                    ? "hover:shadow-glow-lime hover:ring-1 hover:ring-neon-lime/40"
+                    ? "hover:shadow-[0_12px_32px_-10px_rgba(183,255,90,0.32)] hover:border-white/10"
                     : id === "parcerias"
-                      ? "hover:shadow-glow-purple hover:ring-1 hover:ring-neon-purple/40"
-                      : "hover:shadow-glow-cyan hover:ring-1 hover:ring-neon-cyan/40";
+                      ? "hover:shadow-[0_12px_32px_-10px_rgba(79,70,229,0.35)] hover:border-white/10"
+                      : "hover:shadow-[0_12px_32px_-10px_rgba(80,221,255,0.3)] hover:border-white/10";
 
               return (
                 <div
                   key={id}
-                  className={`chave-card bg-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${hoverGlowClass}`}
+                  className={`chave-card bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl transition-all duration-300 hover:bg-[#1C2438] hover:-translate-y-0.5 ${hoverGlowClass}`}
                   style={{
-                    background:
-                      concluida || ativa
-                        ? `var(${KEY_COLOR_VAR[id]}-bg)`
-                        : "rgba(255,255,255,.04)",
                     borderColor:
                       concluida || ativa
                         ? `var(${KEY_COLOR_VAR[id]}-bd)`
-                        : "rgba(255,255,255,.1)",
+                        : undefined,
                   }}
                 >
                   <div className="cc-head">
@@ -920,7 +919,7 @@ export function PlayerBoard() {
                         color:
                           concluida || ativa
                             ? colorVar
-                            : "rgba(255,255,255,.4)",
+                            : "rgba(255,255,255,.55)",
                       }}
                     >
                       {keyInfo.name}
@@ -961,7 +960,7 @@ export function PlayerBoard() {
                       return (
                         <div
                           key={numero}
-                          className={`cc-fase backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
+                          className={`cc-fase bg-[#0B0F19]/75 border border-white/5 rounded-lg backdrop-blur-sm transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10 hover:translate-x-0.5 ${done ? "done" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}`}
                           style={
                             active
                               ? { borderColor: `var(${KEY_COLOR_VAR[id]}-bd)` }
@@ -987,18 +986,17 @@ export function PlayerBoard() {
                             {done ? "✓" : numero}
                           </div>
                           <div
-                            className="cc-fnm"
-                            style={{
-                              color: done
-                                ? "var(--t2)"
+                            className={`cc-fnm ${
+                              done
+                                ? "text-slate-300"
                                 : active
-                                  ? "var(--t1)"
-                                  : "var(--t3)",
-                            }}
+                                  ? "text-white"
+                                  : "text-slate-500"
+                            }`}
                           >
                             {nome}
                           </div>
-                          <div className="cc-ftxt">
+                          <div className="cc-ftxt text-slate-400">
                             {done
                               ? "✓"
                               : active
@@ -1009,7 +1007,7 @@ export function PlayerBoard() {
                       );
                     })}
                   </div>
-                  <div className="cc-prog-bar">
+                  <div className="cc-prog-bar bg-[#0B0F19]">
                     <div
                       className="cc-prog-fill"
                       style={{ width: `${pct}%`, background: colorVar }}
@@ -1017,15 +1015,12 @@ export function PlayerBoard() {
                   </div>
                   {bloqueada && (
                     <div
+                      className="text-slate-500 bg-[#0B0F19]/60 border border-dashed border-white/10 rounded-lg"
                       style={{
                         marginTop: 8,
                         fontSize: 10,
-                        color: "var(--t3)",
                         textAlign: "center",
                         padding: 6,
-                        background: "rgba(255,255,255,.03)",
-                        borderRadius: 6,
-                        border: "1px dashed rgba(255,255,255,.08)",
                       }}
                     >
                       {t("chave.bloqueadaPorProblema")}
@@ -1040,19 +1035,20 @@ export function PlayerBoard() {
 
       {openPhase && (
         <Modal onClose={() => setOpenPhase(null)} maxWidth={560}>
-          <h3>
+          <h3 className="text-white">
             {t("fase.tituloModal", {
               numero: openPhase.numero,
               nome: openPhase.nome,
             })}
           </h3>
-          <p>
+          <p className="text-slate-400">
             {t(`fases.${openPhase.keyId}.${openPhase.numero - 1}.pergunta`)}
           </p>
           <form onSubmit={concluirFase}>
             <div className="field">
-              <label>{t("fase.label")}</label>
+              <label className="text-slate-400">{t("fase.label")}</label>
               <textarea
+                className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
                 style={{ height: 100, resize: "vertical" }}
                 placeholder={t("fase.placeholder")}
                 value={phaseContent}
@@ -1066,7 +1062,7 @@ export function PlayerBoard() {
             >
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
                 onClick={() => setOpenPhase(null)}
                 disabled={savingPhase}
               >
@@ -1074,7 +1070,7 @@ export function PlayerBoard() {
               </button>
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                 disabled={savingPhase}
               >
                 {t("fase.concluir")}
@@ -1085,22 +1081,22 @@ export function PlayerBoard() {
       )}
 
       {congrats && (
-        <div id="overlay-congrats">
-          <div className="congrats-box">
+        <div id="overlay-congrats" className="bg-[#0B0F19]/80 backdrop-blur-md">
+          <div className="congrats-box bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl">
             <div className="congrats-stars">
               <span className="congrats-star">⭐</span>
               <span className="congrats-star">🌟</span>
               <span className="congrats-star">⭐</span>
             </div>
-            <div className="congrats-title">{congrats.titulo}</div>
-            <div className="congrats-sub">{congrats.sub}</div>
+            <div className="congrats-title text-white">{congrats.titulo}</div>
+            <div className="congrats-sub text-slate-400">{congrats.sub}</div>
             {congrats.pontos !== null && (
               <div className="congrats-pts-badge">
                 +{congrats.pontos} {t("congrats.pontos")}
               </div>
             )}
             <button
-              className="btn btn-primary"
+              className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
               style={{ width: "100%" }}
               onClick={() => setCongrats(null)}
             >
@@ -1112,9 +1108,9 @@ export function PlayerBoard() {
 
       {showAvisos && (
         <Modal onClose={() => setShowAvisos(false)} maxWidth={440}>
-          <h3>🔔 {t("avisos.titulo")}</h3>
+          <h3 className="text-white">🔔 {t("avisos.titulo")}</h3>
           {board.announcements.length === 0 ? (
-            <p style={{ fontSize: 12, color: "var(--t3)" }}>
+            <p className="text-slate-400" style={{ fontSize: 12 }}>
               {t("avisos.vazio")}
             </p>
           ) : (
@@ -1122,10 +1118,8 @@ export function PlayerBoard() {
               {board.announcements.map((a) => (
                 <div
                   key={a.id}
+                  className="bg-[#0B0F19]/80 border border-white/5 rounded-xl text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                   style={{
-                    background: "var(--sol-bg)",
-                    border: "1px solid var(--sol-bd)",
-                    borderRadius: 9,
                     padding: "9px 11px",
                     fontSize: 12,
                   }}
@@ -1139,12 +1133,13 @@ export function PlayerBoard() {
       )}
 
       {showEncerramento && (
-        <div id="overlay-encerramento">
+        <div
+          id="overlay-encerramento"
+          className="bg-[#0B0F19]/80 backdrop-blur-md"
+        >
           <div
+            className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/10 rounded-xl text-slate-200"
             style={{
-              background: "var(--bg2)",
-              borderRadius: 22,
-              border: ".5px solid var(--border2)",
               padding: "28px 28px 24px",
               maxWidth: 520,
               width: "100%",
@@ -1156,6 +1151,7 @@ export function PlayerBoard() {
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
               <div
+                className="text-white"
                 style={{
                   fontSize: 22,
                   fontWeight: 900,
@@ -1164,7 +1160,10 @@ export function PlayerBoard() {
               >
                 {t("encerramento.titulo")}
               </div>
-              <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+              <div
+                className="text-slate-400"
+                style={{ fontSize: 13, marginTop: 4 }}
+              >
                 {t("encerramento.subTpl", {
                   equipe: board.team.name,
                   pontos: board.team.score,
@@ -1190,7 +1189,10 @@ export function PlayerBoard() {
                   }))
                   .filter((f) => f.conteudo);
                 return (
-                  <div key={id} className="enc-chave-card">
+                  <div
+                    key={id}
+                    className="enc-chave-card bg-[#0B0F19]/80 border border-white/5 rounded-xl"
+                  >
                     <div
                       className="enc-chave-titulo"
                       style={{
@@ -1202,7 +1204,7 @@ export function PlayerBoard() {
                       {keyInfo.icon} {keyInfo.name}
                     </div>
                     {fasesComConteudo.length === 0 ? (
-                      <div style={{ fontSize: 11, color: "var(--t3)" }}>
+                      <div className="text-slate-500" style={{ fontSize: 11 }}>
                         {t("encerramento.semFases")}
                       </div>
                     ) : (
@@ -1214,7 +1216,9 @@ export function PlayerBoard() {
                           >
                             {f.nome}
                           </div>
-                          <div className="enc-fase-conteudo">{f.conteudo}</div>
+                          <div className="enc-fase-conteudo text-slate-300">
+                            {f.conteudo}
+                          </div>
                         </div>
                       ))
                     )}
@@ -1224,14 +1228,14 @@ export function PlayerBoard() {
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button
-                className="btn btn-ghost"
+                className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
                 style={{ flex: 1 }}
                 onClick={() => setShowEncerramento(false)}
               >
                 {t("encerramento.revisar")}
               </button>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                 style={{ flex: 1 }}
                 onClick={() => {
                   setShowEncerramento(false);

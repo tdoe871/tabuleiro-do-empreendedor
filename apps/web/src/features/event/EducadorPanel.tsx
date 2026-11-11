@@ -112,24 +112,19 @@ const NEXT_STATUS: Partial<
   pausada: { next: "ativa", actionKey: "retomar" },
 };
 
-// Modern Interactive Turquoise palette (docs/backend/themes-info/theme.md),
-// scoped to this screen only via inline Tailwind arbitrary values — no
-// global theme bridge, so the player/mentor/login screens keep their own
-// look untouched.
-const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
+// Dark Navy Premium / Dark Glass palette, scoped via Tailwind classes.
+const AVATAR_COLORS = ["#4F46E5", "#6366F1", "#65dcd5", "#a79aff", "#ebc589"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
-const AG_SIDEBAR = "bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))]";
-const AG_BORDER = "border-[var(--ag-color-border,rgba(45,212,191,0.24))]";
-const AG_SURFACE = "bg-[var(--ag-color-surface,rgba(10,38,54,0.78))]";
-const AG_SURFACE_SOLID = "bg-[var(--ag-color-surface-solid,#0c2d40)]";
-const AG_SURFACE_FEATURED =
-  "bg-[var(--ag-color-surface-featured,rgba(14,48,66,0.88))]";
-const AG_HOVER =
-  "hover:bg-[var(--ag-color-surface-hover,rgba(0,245,212,0.12))]";
-const AG_TEXT = "text-[var(--ag-color-text,#ecfeff)]";
-const AG_CARD = `${AG_SURFACE} backdrop-blur-2xl border ${AG_BORDER} rounded-[20px]`;
+const AG_SIDEBAR = "bg-[#151B2B]/90 backdrop-blur-xl";
+const AG_BORDER = "border-white/5";
+const AG_SURFACE = "bg-[#151B2B]/90";
+const AG_SURFACE_SOLID = "bg-[#0B0F19]/90";
+const AG_SURFACE_FEATURED = "bg-[#151B2B]/90";
+const AG_HOVER = "hover:bg-[#1C2438] hover:border-white/10";
+const AG_TEXT = "text-slate-200";
+const AG_CARD = `${AG_SURFACE} backdrop-blur-xl border ${AG_BORDER} rounded-xl transition-all duration-300 ${AG_HOVER}`;
 const AG_START_BTN =
-  "bg-gradient-to-r from-[#00F5D4] to-[#00BBF9] text-[#031924] font-extrabold uppercase border-none shadow-[0_0_24px_-4px_rgba(0,245,212,0.5)] rounded-[12px] transition-all duration-200 hover:shadow-[0_0_30px_0px_rgba(0,245,212,0.75)] hover:scale-[1.02] active:scale-[0.98]";
+  "bg-none bg-[#4F46E5] hover:bg-[#6366F1] text-white font-medium rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-95 transition-all";
 
 // Ported from tdoe/tdoe_app.py GET /novas-funcoes — a static "coming soon"
 // roadmap list, not a backend-driven feature.
@@ -461,21 +456,23 @@ export function EducadorPanel() {
   const canResume = selected?.status === "pausada";
 
   return (
-    <div
-      id="tela-educador"
-      className={`min-h-screen bg-[var(--ag-color-background,#04151f)] ${AG_TEXT}`}
-    >
+    <div id="tela-educador" className={`min-h-screen bg-[#0B0F19] ${AG_TEXT}`}>
       <div
-        className={`topbar ${AG_SIDEBAR} backdrop-blur-2xl border-b ${AG_BORDER}`}
+        className={`topbar bg-[#0B0F19]/90 backdrop-blur-xl border-b ${AG_BORDER}`}
       >
         <div className="tb-logo">
-          <div className="tb-gem transition-all duration-300 shadow-[0_0_16px_-3px_rgba(0,245,212,0.4)]">
+          <div className="tb-gem bg-[#151B2B]/90 border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
             <GemLogo size={14} />
           </div>
-          <span style={{ fontSize: 12, fontWeight: 700 }}>TdoE</span>
+          <span
+            className="text-white"
+            style={{ fontSize: 12, fontWeight: 700 }}
+          >
+            TdoE
+          </span>
         </div>
-        <div className="tb-sep" />
-        <span className="tb-sub">
+        <div className="tb-sep bg-white/10" />
+        <span className="tb-sub text-slate-400">
           {selected ? selected.titulo : t("painelTitulo")}
         </span>
         <div className="tb-right">
@@ -493,7 +490,7 @@ export function EducadorPanel() {
           )}
           <LangSwitcher />
           <button
-            className="btn btn-gold btn-sm"
+            className="btn btn-gold btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-[#ebc589] rounded-lg transition-all"
             onClick={() => setShowExtensoes(true)}
           >
             ☕ {t("extensoes")}
@@ -507,17 +504,13 @@ export function EducadorPanel() {
             </button>
           )}
           <button
-            className="btn btn-sm"
-            style={{
-              background: "var(--ag-color-accent, #00f5d4)",
-              color: "var(--ag-color-on-accent, #031924)",
-            }}
+            className={`btn btn-sm ${AG_START_BTN}`}
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </button>
           <button
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
             onClick={() => router.push("/")}
           >
             {t("sair")}
@@ -525,17 +518,19 @@ export function EducadorPanel() {
         </div>
       </div>
 
-      <div className="edu-layout">
+      <div className="edu-layout bg-[#0B0F19]">
         <div
-          className={`sidebar ${AG_SIDEBAR} backdrop-blur-2xl border-r ${AG_BORDER}`}
+          className={`sidebar ${AG_SIDEBAR} border-r ${AG_BORDER} text-slate-200`}
         >
-          <div className="sidebar-sec">{t("sidebar.sessoes")}</div>
+          <div className="sidebar-sec text-slate-500">
+            {t("sidebar.sessoes")}
+          </div>
           <div>
             {sessions.length === 0 && (
               <div
+                className="text-slate-400"
                 style={{
                   fontSize: 11,
-                  color: "var(--t3)",
                   padding: "6px 14px",
                 }}
               >
@@ -545,7 +540,11 @@ export function EducadorPanel() {
             {sessions.map((s, i) => (
               <div
                 key={s.id}
-                className={`eq-item transition-all duration-200 ${AG_HOVER} hover:translate-x-1 ${s.id === selectedId ? "on" : ""}`}
+                className={`eq-item rounded-lg mx-1.5 my-0.5 transition-all duration-300 ${AG_HOVER} hover:translate-x-1 ${
+                  s.id === selectedId
+                    ? "on bg-[#1C2438] border-l-2 border-[#6366F1] text-white"
+                    : "text-slate-300"
+                }`}
                 onClick={() => selectSession(s.id)}
               >
                 <div
@@ -557,72 +556,74 @@ export function EducadorPanel() {
                   S{i + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="eq-nm">{s.titulo}</div>
-                  <div className="eq-st">
+                  <div className="eq-nm text-white">{s.titulo}</div>
+                  <div className="eq-st text-slate-400">
                     {t(`status.${s.status}`)} · {s.codigo}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="sidebar-divider" />
-          <div className="sidebar-sec">{t("sidebar.acoes")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="sidebar-sec text-slate-500">{t("sidebar.acoes")}</div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => setShowCreate(true)}
           >
             ＋ {t("sidebar.novaSessao")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={handleVerificarAlertas}
           >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => void abrirEvaluacoes()}
           >
             🎓 {t("sidebar.mentores")}
           </div>
-          <div className="sidebar-divider" />
-          <div className="sidebar-sec">{t("sidebar.exportar")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="sidebar-sec text-slate-500">
+            {t("sidebar.exportar")}
+          </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => exportar("report")}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => exportar("proposals")}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => exportar("activity")}
           >
             🗒 {t("sidebar.exportarAtividade")}
           </div>
           <div
-            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            className={`sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-300 ${AG_HOVER} hover:text-white hover:translate-x-0.5`}
             onClick={() => router.push("/")}
           >
             ← {t("sair")}
           </div>
         </div>
 
-        <div className="edu-main">
+        <div className="edu-main bg-[#0B0F19]">
           <div className="metrics">
             <div
-              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#2DD4BF]/50 hover:shadow-[0_12px_32px_-8px_rgba(45,212,191,0.28)]`}
+              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
             >
               <div
                 style={{
@@ -637,10 +638,12 @@ export function EducadorPanel() {
               <div className="m-val" style={{ color: "var(--prob)" }}>
                 {selected ? (overview?.metrics.activeTeams ?? "…") : "—"}
               </div>
-              <div className="m-lbl">{t("metrics.equipesAtivas")}</div>
+              <div className="m-lbl text-slate-400">
+                {t("metrics.equipesAtivas")}
+              </div>
             </div>
             <div
-              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]`}
+              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
             >
               <div
                 style={{
@@ -652,13 +655,15 @@ export function EducadorPanel() {
                   background: "var(--sol)",
                 }}
               />
-              <div className="m-val">
+              <div className="m-val text-white">
                 {selected ? (overview?.metrics.participants ?? "…") : "0"}
               </div>
-              <div className="m-lbl">{t("metrics.participantes")}</div>
+              <div className="m-lbl text-slate-400">
+                {t("metrics.participantes")}
+              </div>
             </div>
             <div
-              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]/50 hover:shadow-[0_12px_32px_-8px_rgba(56,189,248,0.28)]`}
+              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
             >
               <div
                 style={{
@@ -673,10 +678,12 @@ export function EducadorPanel() {
               <div className="m-val" style={{ color: "var(--sol)" }}>
                 {selected ? (overview?.metrics.keysCompleted ?? "…") : "0"}
               </div>
-              <div className="m-lbl">{t("metrics.chavesConcluidas")}</div>
+              <div className="m-lbl text-slate-400">
+                {t("metrics.chavesConcluidas")}
+              </div>
             </div>
             <div
-              className={`metric-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00BBF9]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,187,249,0.28)]`}
+              className={`metric-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
             >
               <div
                 style={{
@@ -694,7 +701,9 @@ export function EducadorPanel() {
               >
                 {selected ? selected.codigo : "—"}
               </div>
-              <div className="m-lbl">{t("metrics.codigoAcesso")}</div>
+              <div className="m-lbl text-slate-400">
+                {t("metrics.codigoAcesso")}
+              </div>
             </div>
           </div>
 
@@ -710,7 +719,7 @@ export function EducadorPanel() {
                 : 0;
               return (
                 <div
-                  className={`prog-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_10px_28px_-6px_rgba(0,245,212,0.25)]`}
+                  className={`prog-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_10px_28px_-6px_rgba(79,70,229,0.25)]`}
                   key={id}
                 >
                   <div className="pc-head">
@@ -726,11 +735,11 @@ export function EducadorPanel() {
                     >
                       {key.name}
                     </div>
-                    <div className="pc-ct">
+                    <div className="pc-ct text-slate-400">
                       {completed}/{teams.length}
                     </div>
                   </div>
-                  <div className="pc-bar">
+                  <div className="pc-bar bg-[#0B0F19]">
                     <div
                       className="pc-fill"
                       style={{
@@ -746,7 +755,7 @@ export function EducadorPanel() {
 
           <div className="equipes-grid">
             {!selected && (
-              <div style={{ fontSize: 11, color: "var(--t3)" }}>
+              <div className="text-slate-400" style={{ fontSize: 11 }}>
                 {t("toasts.selecioneSessao")}
               </div>
             )}
@@ -760,7 +769,7 @@ export function EducadorPanel() {
                 }}
               >
                 <div style={{ fontSize: 24, marginBottom: 6 }}>👥</div>
-                <div style={{ fontSize: 12, color: "var(--t2)" }}>
+                <div className="text-slate-400" style={{ fontSize: 12 }}>
                   {t("equipesVazio", { codigo: selected.codigo })}
                 </div>
               </div>
@@ -777,7 +786,7 @@ export function EducadorPanel() {
                 const pct = Math.round((completed / KEY_IDS.length) * 100);
                 return (
                   <div
-                    className={`eq-card ${AG_CARD} transition-all duration-300 hover:-translate-y-1 hover:border-[#00F5D4]/50 hover:shadow-[0_12px_32px_-8px_rgba(0,245,212,0.28)]`}
+                    className={`eq-card ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(79,70,229,0.28)]`}
                     key={team.id}
                   >
                     <div className="eq-card-head">
@@ -790,8 +799,8 @@ export function EducadorPanel() {
                         E{i + 1}
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <div className="eq-card-nm">{team.name}</div>
-                        <div className="eq-card-st">
+                        <div className="eq-card-nm text-white">{team.name}</div>
+                        <div className="eq-card-st text-slate-400">
                           {activeKey
                             ? (tKeys.raw(activeKey) as KeyTranslation).name
                             : t("equipeCard.semChaveAtiva")}
@@ -819,7 +828,7 @@ export function EducadorPanel() {
                         );
                       })}
                     </div>
-                    <div className="eq-prog-bar">
+                    <div className="eq-prog-bar bg-[#0B0F19]">
                       <div
                         className="eq-prog-fill"
                         style={{
@@ -838,24 +847,10 @@ export function EducadorPanel() {
                         flexWrap: "wrap",
                       }}
                     >
-                      <div
-                        className="badge tiny"
-                        style={{
-                          background: "var(--ag-color-surface-solid, #0c2d40)",
-                          color: "var(--t3)",
-                          borderColor: "var(--border)",
-                        }}
-                      >
+                      <div className="badge tiny bg-white/5 border border-white/10 text-slate-300">
                         {completed}/4 {t("equipeCard.chaves")}
                       </div>
-                      <div
-                        className="badge tiny"
-                        style={{
-                          background: "var(--ag-color-surface-solid, #0c2d40)",
-                          color: "var(--t3)",
-                          borderColor: "var(--border)",
-                        }}
-                      >
+                      <div className="badge tiny bg-white/5 border border-white/10 text-slate-300">
                         👤 {team.memberCount}
                       </div>
                       {team.submission && (
@@ -877,12 +872,12 @@ export function EducadorPanel() {
           </div>
         </div>
 
-        <div
-          className={`edu-right ${AG_SIDEBAR} backdrop-blur-2xl border-l ${AG_BORDER}`}
-        >
-          <div className="panel-title">{t("right.alertasMediacao")}</div>
+        <div className={`edu-right ${AG_SIDEBAR} border-l ${AG_BORDER}`}>
+          <div className="panel-title text-slate-400">
+            {t("right.alertasMediacao")}
+          </div>
           {!overview || overview.alerts.length === 0 ? (
-            <div style={{ fontSize: 11, color: "var(--t3)" }}>
+            <div className="text-slate-500" style={{ fontSize: 11 }}>
               {t("right.nenhumAlerta")}
             </div>
           ) : (
@@ -915,7 +910,7 @@ export function EducadorPanel() {
                 return (
                   <div
                     key={alert.id}
-                    className="alert-card rounded-[20px]"
+                    className="alert-card rounded-xl backdrop-blur-xl transition-all duration-300"
                     style={{ background: bg, border: bd }}
                   >
                     <div
@@ -934,8 +929,10 @@ export function EducadorPanel() {
               })}
             </div>
           )}
-          <div className="sidebar-divider" />
-          <div className="panel-title">{t("right.controlesSessao")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            {t("right.controlesSessao")}
+          </div>
           <div className="ctrl-grid">
             <div
               className={`ctrl-btn ${AG_START_BTN} ${!canStart ? "opacity-45 pointer-events-none" : ""}`}
@@ -944,37 +941,44 @@ export function EducadorPanel() {
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50 ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50 ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
               onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
             <div
-              className={`ctrl-btn ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} transition-all duration-200 ${AG_HOVER} hover:border-[#00F5D4]/50`}
+              className="ctrl-btn bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all"
               onClick={handleVerificarAlertas}
             >
               🔔 {t("right.alertas")}
             </div>
           </div>
-          <div className="sidebar-divider" />
-          <div className="panel-title">⏱ {t("timer.titulo")}</div>
-          <div
-            className={`timer-edu-block ${AG_SURFACE_FEATURED} backdrop-blur-xl border ${AG_BORDER} rounded-[20px] p-3 my-2`}
-          >
-            <div style={{ fontSize: 10, color: "var(--t3)", marginBottom: 4 }}>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            ⏱ {t("timer.titulo")}
+          </div>
+          <div className={`timer-edu-block ${AG_CARD} p-3.5 my-2`}>
+            <div
+              className="text-slate-400"
+              style={{ fontSize: 10, marginBottom: 4 }}
+            >
               {t("timer.duracao")}
             </div>
             <div className="timer-presets">
               {ACTIVITY_PRESETS.map((min) => (
                 <button
                   key={min}
-                  className={`timer-preset-btn ${activityMinutes === min ? "sel" : ""}`}
+                  className={`timer-preset-btn rounded-lg transition-all ${
+                    activityMinutes === min
+                      ? "sel !bg-[#4F46E5]/20 !border-[#6366F1]/50 !text-white shadow-[0_0_12px_rgba(79,70,229,0.25)]"
+                      : "bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300"
+                  }`}
                   onClick={() => setActivityMinutes(min)}
                 >
                   {min} min
@@ -982,10 +986,10 @@ export function EducadorPanel() {
               ))}
             </div>
             <div
+              className="text-white"
               style={{
                 fontSize: 26,
                 fontWeight: 900,
-                color: "var(--t1)",
                 letterSpacing: "-.5px",
                 textAlign: "center",
                 margin: "6px 0 4px",
@@ -1004,16 +1008,14 @@ export function EducadorPanel() {
                 ▶ {t("timer.iniciar")}
               </button>
               <button
-                className="timer-ctrl-btn timer-stop bg-[#EF4444]/12 border border-[#EF4444]/35 text-[#EF4444] font-bold rounded-[12px] hover:bg-[#EF4444]/20 shadow-[0_0_15px_-5px_rgba(239,68,68,0.25)] transition-all"
+                className="timer-ctrl-btn timer-stop bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-medium rounded-lg transition-all"
                 onClick={() => void pararTimer()}
               >
                 ⏹ {t("timer.parar")}
               </button>
             </div>
-            <div
-              className={`timer-toggle-row ${AG_SIDEBAR} border ${AG_BORDER} rounded-[12px]`}
-            >
-              <span className="timer-toggle-lbl">
+            <div className="timer-toggle-row bg-[#0B0F19]/80 border border-white/10 rounded-lg">
+              <span className="timer-toggle-lbl text-slate-300">
                 {t("timer.mostrarEstudantes")}
               </span>
               <label className="toggle-sw">
@@ -1027,15 +1029,17 @@ export function EducadorPanel() {
               </label>
             </div>
           </div>
-          <div className="sidebar-divider" />
-          <div className="panel-title">🃏 {t("carta.titulo")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            🃏 {t("carta.titulo")}
+          </div>
           <div className="carta-launcher">
             {KEY_IDS.map((id) => {
               const key = tKeys.raw(id) as KeyTranslation;
               return (
                 <button
                   key={id}
-                  className={`carta-launcher-btn ${AG_SURFACE} backdrop-blur-2xl border ${AG_BORDER} rounded-[20px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(0,245,212,0.25)]`}
+                  className={`carta-launcher-btn ${AG_CARD} hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-6px_rgba(79,70,229,0.25)]`}
                   style={{
                     borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
                     background: `var(${KEY_COLOR_VAR[id]}-bg)`,
@@ -1049,8 +1053,10 @@ export function EducadorPanel() {
                     {key.icon}
                   </div>
                   <div>
-                    <div className="carta-launcher-nm">{key.name}</div>
-                    <div className="carta-launcher-sub">
+                    <div className="carta-launcher-nm text-white">
+                      {key.name}
+                    </div>
+                    <div className="carta-launcher-sub text-slate-400">
                       {t(`carta.launcherSub.${id}`)}
                     </div>
                   </div>
@@ -1060,20 +1066,20 @@ export function EducadorPanel() {
           </div>
           {event?.challengeCard && (
             <div
-              className={`${AG_SURFACE_FEATURED} border ${AG_BORDER} rounded-[20px]`}
+              className={`${AG_CARD}`}
               style={{ marginTop: 8, padding: "10px 12px" }}
             >
               <div
+                className="text-[#818CF8]"
                 style={{
                   fontSize: 10,
                   fontWeight: 700,
-                  color: "var(--ag-color-accent,#00f5d4)",
                   marginBottom: 4,
                 }}
               >
                 🃏 {t("carta.ativa")}
               </div>
-              <div style={{ fontSize: 11, color: "var(--t2)" }}>
+              <div className="text-slate-300" style={{ fontSize: 11 }}>
                 {event.challengeCard.text}
               </div>
               <button
@@ -1092,11 +1098,13 @@ export function EducadorPanel() {
               </button>
             </div>
           )}
-          <div className="sidebar-divider" />
-          <div className="panel-title">📢 {t("avisos.titulo")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            📢 {t("avisos.titulo")}
+          </div>
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
             <input
-              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT}`}
+              className="bg-[#0B0F19] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
               style={{ flex: 1 }}
               placeholder={t("avisos.placeholder")}
               value={announcementInput}
@@ -1123,14 +1131,14 @@ export function EducadorPanel() {
             }}
           >
             {(overview?.announcements ?? []).length === 0 && (
-              <div style={{ fontSize: 11, color: "var(--t3)" }}>
+              <div className="text-slate-500" style={{ fontSize: 11 }}>
                 {t("avisos.vazio")}
               </div>
             )}
             {(overview?.announcements ?? []).map((a) => (
               <div
                 key={a.id}
-                className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px]`}
+                className="bg-[#0B0F19]/80 border border-white/5 rounded-lg text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                 style={{
                   display: "flex",
                   gap: 6,
@@ -1155,15 +1163,17 @@ export function EducadorPanel() {
               </div>
             ))}
           </div>
-          <div className="sidebar-divider" />
-          <div className="panel-title">🚨 {t("interruptores.titulo")}</div>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            🚨 {t("interruptores.titulo")}
+          </div>
           {(["chat", "submissions", "joins"] as const).map((name) => (
             <div
               key={name}
-              className={`timer-toggle-row ${AG_SIDEBAR} border ${AG_BORDER} rounded-[12px]`}
+              className={`timer-toggle-row ${AG_CARD}`}
               style={{ marginBottom: 6 }}
             >
-              <span className="timer-toggle-lbl">
+              <span className="timer-toggle-lbl text-slate-300">
                 {t(`interruptores.${name}`)}
               </span>
               <label className="toggle-sw">
@@ -1177,22 +1187,25 @@ export function EducadorPanel() {
               </label>
             </div>
           ))}
-          <div className="sidebar-divider" />
-          <div className="panel-title">🎓 {t("mentores.titulo")}</div>
-          <div style={{ fontSize: 11, color: "var(--t3)", marginBottom: 6 }}>
+          <div className="sidebar-divider bg-white/5" />
+          <div className="panel-title text-slate-400">
+            🎓 {t("mentores.titulo")}
+          </div>
+          <div
+            className="text-slate-400"
+            style={{ fontSize: 11, marginBottom: 6 }}
+          >
             {event?.mentorCode ? (
               <>
                 {t("mentores.codigo")}:{" "}
-                <strong style={{ color: "var(--ag-color-accent,#00f5d4)" }}>
-                  {event.mentorCode}
-                </strong>
+                <strong className="text-[#818CF8]">{event.mentorCode}</strong>
               </>
             ) : (
               t("mentores.semCodigo")
             )}
           </div>
           <button
-            className={`btn btn-sm w100 ${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] ${AG_TEXT} ${AG_HOVER} hover:border-[#00F5D4]/50`}
+            className="btn btn-sm w100 bg-none bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all"
             onClick={() => void gerarCodigoMentores()}
           >
             {event?.mentorCode ? t("mentores.regenerar") : t("mentores.gerar")}
@@ -1238,24 +1251,28 @@ export function EducadorPanel() {
             </div>
             <div>
               <div
+                className="text-slate-400"
                 style={{
                   fontSize: 10,
                   fontWeight: 800,
                   textTransform: "uppercase",
                   letterSpacing: ".08em",
-                  opacity: 0.6,
                 }}
               >
                 {t("carta.titulo")}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 800 }}>
+              <div
+                className="text-white"
+                style={{ fontSize: 17, fontWeight: 800 }}
+              >
                 {(tKeys.raw(previewKey) as KeyTranslation).name}
               </div>
             </div>
           </div>
           <div className="field">
-            <label>{t("carta.titulo")}</label>
+            <label className="text-slate-400">{t("carta.titulo")}</label>
             <textarea
+              className="w-full rounded-lg bg-[#0B0F19] border border-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#6366F1] focus:outline-none transition-all"
               style={{ height: 90, resize: "vertical" }}
               value={previewText}
               maxLength={500}
@@ -1271,7 +1288,7 @@ export function EducadorPanel() {
             }}
           >
             <button
-              className="btn btn-ghost"
+              className="btn btn-ghost bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
               onClick={() => setPreviewKey(null)}
             >
               {t("modalSessao.cancelar")}
@@ -1288,8 +1305,8 @@ export function EducadorPanel() {
 
       {showMentores && evaluations && (
         <Modal onClose={() => setShowMentores(false)} maxWidth={520}>
-          <h3>🎓 {t("mentores.titulo")}</h3>
-          <p style={{ fontSize: 11, color: "var(--t3)" }}>
+          <h3 className="text-white">🎓 {t("mentores.titulo")}</h3>
+          <p className="text-slate-400" style={{ fontSize: 11 }}>
             {t("mentores.mentoresCount", { count: evaluations.mentors.length })}
           </p>
           <div
@@ -1304,7 +1321,7 @@ export function EducadorPanel() {
             {evaluations.teams.map((team) => (
               <div
                 key={team.id}
-                className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px]`}
+                className="bg-[#0B0F19]/80 border border-white/5 rounded-xl text-slate-200 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -1312,13 +1329,8 @@ export function EducadorPanel() {
                   fontSize: 12,
                 }}
               >
-                <span>{team.name}</span>
-                <span
-                  style={{
-                    color: "var(--ag-color-accent,#00f5d4)",
-                    fontWeight: 700,
-                  }}
-                >
+                <span className="text-white">{team.name}</span>
+                <span className="text-[#818CF8] font-bold">
                   {team.summary.average !== null
                     ? `${team.summary.average.toFixed(1)} (${team.summary.count})`
                     : t("mentores.semNota")}
@@ -1331,38 +1343,34 @@ export function EducadorPanel() {
 
       {showExtensoes && (
         <Modal onClose={() => setShowExtensoes(false)} maxWidth={440}>
-          <h3>☕ {t("extensoes")}</h3>
-          <p>{t("extensoesModal.subtitulo")}</p>
+          <h3 className="text-white">☕ {t("extensoes")}</h3>
+          <p className="text-slate-400">{t("extensoesModal.subtitulo")}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {(["desafiosExtras", "coringas", "cartasPedagogicas"] as const).map(
               (id) => (
                 <div
                   key={id}
-                  style={{
-                    background: "var(--gold-bg)",
-                    border: "1px solid var(--gold-bd)",
-                    borderRadius: 9,
-                    padding: "9px 11px",
-                  }}
+                  className="bg-[#151B2B]/90 backdrop-blur-xl border border-white/5 rounded-xl p-3 transition-all duration-300 hover:bg-[#1C2438] hover:border-white/10"
                 >
                   <div
+                    className="text-white"
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "var(--gold)",
                     }}
                   >
                     {EXTENSOES_ICON[id]} {t(`extensoesModal.items.${id}.nome`)}
                   </div>
                   <div
-                    style={{ fontSize: 10, color: "var(--t3)", marginTop: 3 }}
+                    className="text-slate-400"
+                    style={{ fontSize: 10, marginTop: 3 }}
                   >
                     {t(`extensoesModal.items.${id}.descricao`)}
                   </div>
                   <div
+                    className="text-[#818CF8]"
                     style={{
                       fontSize: 8,
-                      color: "rgba(240,188,64,.5)",
                       marginTop: 4,
                       textTransform: "uppercase",
                       letterSpacing: ".06em",
@@ -1375,7 +1383,7 @@ export function EducadorPanel() {
             )}
           </div>
           <button
-            className="btn btn-ghost w100"
+            className="btn btn-ghost w100 bg-none bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-lg transition-all"
             style={{ marginTop: 20 }}
             onClick={() => setShowExtensoes(false)}
           >
