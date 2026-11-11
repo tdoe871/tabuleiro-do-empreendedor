@@ -56,6 +56,8 @@
     "joinNicknameLabel": "Your name",
     "youAreLeader": "You are this team's leader",
     "shareLink": "Share this link with your team",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
     "enterBoardPreview": "Enter the board (preview) →",
     "toasts": {
       "backendPendingCreate": "Create team: backend under construction — local preview.",
@@ -77,7 +79,7 @@
     "descriptionLabel": "Description (optional)",
     "descriptionPlaceholder": "Briefly describe the project…",
     "submit": "Save submission →",
-    "saved": "Submission saved locally — still needs to connect to the backend.",
+    "saved": "Submission saved.",
     "editar": "✏️ Edit submission",
     "abrir": "📦 Submit project",
     "status": "Submission recorded",
