@@ -56,6 +56,8 @@
     "joinNicknameLabel": "Seu nome",
     "youAreLeader": "Você é o líder desta equipe",
     "shareLink": "Compartilhe este link com sua equipe",
+    "copyLink": "Copiar link",
+    "linkCopied": "Link copiado",
     "enterBoardPreview": "Entrar no tabuleiro (prévia) →",
     "toasts": {
       "backendPendingCreate": "Criar equipe: backend em construção — prévia local.",
@@ -77,7 +79,7 @@
     "descriptionLabel": "Descrição (opcional)",
     "descriptionPlaceholder": "Conte brevemente sobre o projeto…",
     "submit": "Salvar entrega →",
-    "saved": "Entrega salva localmente — falta conectar ao backend.",
+    "saved": "Entrega salva.",
     "editar": "✏️ Editar entrega",
     "abrir": "📦 Entregar projeto",
     "status": "Entrega registrada",
