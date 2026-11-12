@@ -1392,7 +1392,7 @@ export function EducadorPanel() {
               letterSpacing: ".04em",
             }}
           >
-            {t("resumo.equipes")}
+            {t("mentores.equiposTitulo")}
           </p>
           <div
             style={{

@@ -229,7 +229,8 @@
       "nenhumMentor": "Nadie se ha unido todavía.",
       "remover": "Quitar",
       "removerConfirmar": "¿Seguro? Quitar",
-      "removido": "Mentor eliminado. Sus calificaciones ya no cuentan."
+      "removido": "Mentor eliminado. Sus calificaciones ya no cuentan.",
+      "equiposTitulo": "Equipos"
     },
     "alertas": {
       "NO_SUBMISSION": "{team}: sin entrega y faltan {minutes} min",

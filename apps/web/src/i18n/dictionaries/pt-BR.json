@@ -229,7 +229,8 @@
       "nenhumMentor": "Ninguém entrou ainda.",
       "remover": "Remover",
       "removerConfirmar": "Tem certeza? Remover",
-      "removido": "Mentor removido. As notas dele não contam mais."
+      "removido": "Mentor removido. As notas dele não contam mais.",
+      "equiposTitulo": "Equipes"
     },
     "alertas": {
       "NO_SUBMISSION": "{team}: sem entrega e faltam {minutes} min",

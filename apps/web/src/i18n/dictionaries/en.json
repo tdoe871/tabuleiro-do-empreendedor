@@ -229,7 +229,8 @@
       "nenhumMentor": "No one has joined yet.",
       "remover": "Remove",
       "removerConfirmar": "Sure? Remove",
-      "removido": "Mentor removed. Their scores no longer count."
+      "removido": "Mentor removed. Their scores no longer count.",
+      "equiposTitulo": "Teams"
     },
     "alertas": {
       "NO_SUBMISSION": "{team}: no submission, {minutes} min left",
