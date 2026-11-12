@@ -333,7 +333,12 @@
       "semChaveAtiva": "Aucune clé active",
       "chaves": "clés",
       "entregou": "Soumis",
-      "codigoEquipeTitle": "Code d'équipe — donnez-le à un élève déconnecté"
+      "codigoEquipeTitle": "Code d'équipe — donnez-le à un élève déconnecté",
+      "editarNome": "Modifier le nom de l'équipe",
+      "salvar": "Enregistrer",
+      "cancelar": "Annuler",
+      "nomeAtualizado": "Nom de l'équipe mis à jour.",
+      "nomeObrigatorio": "Saisissez un nom pour l'équipe."
     }
   },
   "jogador": {

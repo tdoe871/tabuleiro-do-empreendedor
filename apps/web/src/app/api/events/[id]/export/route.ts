@@ -4,6 +4,7 @@ import { BOARD_KEYS, PHASES_PER_KEY, prisma } from "@tdoe/db";
 import {
   ACTIVITY_CSV_HEADER,
   toActivityCsvRow,
+  withCurrentTeamName,
 } from "@/features/activity/server/actions";
 import {
   computeKeyStatuses,
@@ -117,6 +118,11 @@ async function activityRows(event: {
   startedAt: Date | null;
 }): Promise<unknown[][]> {
   const rows: unknown[][] = [ACTIVITY_CSV_HEADER];
+  const teams = await prisma.team.findMany({
+    where: { eventId: event.id },
+    select: { id: true, name: true },
+  });
+  const currentNames = new Map(teams.map((t) => [t.id, t.name]));
   let after = 0;
   for (;;) {
     const batch = await prisma.activityLog.findMany({
@@ -124,7 +130,14 @@ async function activityRows(event: {
       orderBy: { id: "asc" },
       take: ACTIVITY_BATCH,
     });
-    for (const row of batch) rows.push(toActivityCsvRow(row, event.startedAt));
+    for (const row of batch) {
+      rows.push(
+        toActivityCsvRow(
+          withCurrentTeamName(row, currentNames),
+          event.startedAt,
+        ),
+      );
+    }
     if (batch.length < ACTIVITY_BATCH) return rows;
     after = batch[batch.length - 1]!.id;
   }

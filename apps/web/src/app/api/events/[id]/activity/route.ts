@@ -5,6 +5,7 @@ import {
   ACTIVITY_PAGE_SIZE,
   parseActivityQuery,
   toActivityDTO,
+  withCurrentTeamName,
 } from "@/features/activity/server/actions";
 import { loadOwnedEvent } from "@/features/event/server/owned-event";
 import { apiError } from "@/lib/api/errors";
@@ -25,20 +26,29 @@ export async function GET(
   const { before, teamId } = query.data;
 
   try {
-    const rows = await prisma.activityLog.findMany({
-      where: {
-        eventId: event.id,
-        ...(teamId ? { teamId } : {}),
-        ...(before ? { id: { lt: before } } : {}),
-      },
-      orderBy: { id: "desc" },
-      take: ACTIVITY_PAGE_SIZE + 1,
-    });
+    const [rows, teams] = await Promise.all([
+      prisma.activityLog.findMany({
+        where: {
+          eventId: event.id,
+          ...(teamId ? { teamId } : {}),
+          ...(before ? { id: { lt: before } } : {}),
+        },
+        orderBy: { id: "desc" },
+        take: ACTIVITY_PAGE_SIZE + 1,
+      }),
+      prisma.team.findMany({
+        where: { eventId: event.id },
+        select: { id: true, name: true },
+      }),
+    ]);
+    const currentNames = new Map(teams.map((t) => [t.id, t.name]));
     const page = rows.slice(0, ACTIVITY_PAGE_SIZE);
     const hasMore = rows.length > ACTIVITY_PAGE_SIZE;
     return NextResponse.json({
       serverNow: new Date().toISOString(),
-      activity: page.map((row) => toActivityDTO(row, event.startedAt)),
+      activity: page.map((row) =>
+        toActivityDTO(withCurrentTeamName(row, currentNames), event.startedAt),
+      ),
       hasMore,
       // Pass as ?before= for the next page.
       cursor: hasMore ? page[page.length - 1]!.id : null,

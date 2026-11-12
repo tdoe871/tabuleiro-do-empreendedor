@@ -333,7 +333,12 @@
       "semChaveAtiva": "No active key",
       "chaves": "keys",
       "entregou": "Submitted",
-      "codigoEquipeTitle": "Team join code — give it to a student who got logged out"
+      "codigoEquipeTitle": "Team join code — give it to a student who got logged out",
+      "editarNome": "Edit team name",
+      "salvar": "Save",
+      "cancelar": "Cancel",
+      "nomeAtualizado": "Team name updated.",
+      "nomeObrigatorio": "Type a name for the team."
     }
   },
   "jogador": {

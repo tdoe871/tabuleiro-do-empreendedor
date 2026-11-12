@@ -121,6 +121,8 @@ const NEXT_STATUS: Partial<
 // look untouched.
 const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
+// Same limit as the API (MAX_TEAM_NAME_LENGTH in features/team/server/team).
+const TEAM_NAME_MAX_LENGTH = 40;
 const AG_SIDEBAR = "bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))]";
 const AG_BORDER = "border-[var(--ag-color-border,rgba(45,212,191,0.24))]";
 const AG_SURFACE = "bg-[var(--ag-color-surface,rgba(10,38,54,0.78))]";
@@ -163,6 +165,11 @@ export function EducadorPanel() {
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
   const [showMentores, setShowMentores] = useState(false);
+  // The team whose name the educator is editing, and the draft name.
+  const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const [savingName, setSavingName] = useState(false);
   const [confirmingMentorId, setConfirmingMentorId] = useState<string | null>(
     null,
   );
@@ -255,6 +262,7 @@ export function EducadorPanel() {
   function selectSession(id: string) {
     setSelectedId(id);
     setConfirmingFinish(false);
+    setRenaming(null);
   }
 
   function handleFinish() {
@@ -460,6 +468,40 @@ export function EducadorPanel() {
       return;
     }
     void loadOverview();
+  }
+
+  async function salvarNomeEquipe() {
+    if (!selected || !renaming || savingName) return;
+    const name = renaming.name.trim();
+    if (!name) {
+      toast("err", t("equipeCard.nomeObrigatorio"));
+      return;
+    }
+    setSavingName(true);
+    try {
+      const res = await sendJson(
+        `/api/events/${selected.id}/teams/${renaming.id}`,
+        "PATCH",
+        { name },
+      );
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")),
+        );
+        return;
+      }
+      setRenaming(null);
+      toast("ok", t("equipeCard.nomeAtualizado"));
+      void loadOverview();
+    } finally {
+      setSavingName(false);
+    }
   }
 
   async function removerMentor(mentorId: string) {
@@ -868,8 +910,78 @@ export function EducadorPanel() {
                       >
                         E{i + 1}
                       </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div className="eq-card-nm">{team.name}</div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        {renaming?.id === team.id ? (
+                          <form
+                            style={{ display: "flex", gap: 4 }}
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              void salvarNomeEquipe();
+                            }}
+                          >
+                            <input
+                              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[8px] ${AG_TEXT}`}
+                              autoFocus
+                              value={renaming.name}
+                              maxLength={TEAM_NAME_MAX_LENGTH}
+                              aria-label={t("equipeCard.editarNome")}
+                              onChange={(e) =>
+                                setRenaming({
+                                  id: team.id,
+                                  name: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Escape") setRenaming(null);
+                              }}
+                              style={{
+                                flex: 1,
+                                minWidth: 0,
+                                fontSize: 14,
+                                padding: "2px 8px",
+                              }}
+                            />
+                            <button
+                              type="submit"
+                              className="btn btn-sm"
+                              disabled={savingName}
+                              title={t("equipeCard.salvar")}
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => setRenaming(null)}
+                              title={t("equipeCard.cancelar")}
+                            >
+                              ✕
+                            </button>
+                          </form>
+                        ) : (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              minWidth: 0,
+                            }}
+                          >
+                            <div className="eq-card-nm">{team.name}</div>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              style={{ padding: "0 4px", flexShrink: 0 }}
+                              onClick={() =>
+                                setRenaming({ id: team.id, name: team.name })
+                              }
+                              title={t("equipeCard.editarNome")}
+                              aria-label={t("equipeCard.editarNome")}
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                        )}
                         <div className="eq-card-st">
                           {activeKey
                             ? (tKeys.raw(activeKey) as KeyTranslation).name
