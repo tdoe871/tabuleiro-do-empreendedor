@@ -184,7 +184,8 @@ type EventDTO = {
 - **Cambio en el frontend:** hoy `CreateSessionModal` inventa el código con `randomCode()`. Tiene
   que usar `event.code` de la respuesta, porque es el que existe en la base.
 - Mapeo de estados con `EduSession.status`: `aguardando` = `DRAFT`, `ativa` = `ACTIVE`,
-  `pausada` = `PAUSED`. Falta `FINISHED` (el botón "terminar sesión" del mural).
+  `pausada` = `PAUSED`, `finalizada` = `FINISHED` (botón "Terminar partida" del panel, con
+  doble clic de confirmación: no se puede deshacer).
 - `modo` y `cenario` se guardan en `Event.mode` / `Event.scenario`. ❓ ¿Qué cambia en el juego con
   modo "personalizado" además de guardar el texto?
 
@@ -679,8 +680,10 @@ en `EventDTO.mentorCode` (`null` hasta crearlo). Errores: `UNAUTHORIZED`, `EVENT
 `DELETE /api/events/:id/mentors/:mentorId` — saca a un mentor del evento (se unió con el nombre
 equivocado, o alguien que no debía tener el código). Borra la fila del mentor: su sesión muere en
 su siguiente petición (`GET /api/mentor` responde `UNAUTHORIZED`) y, por cascada, se borran todas
-sus calificaciones — su nota deja de contar en el promedio de cada equipo. `204`. Errores:
-`UNAUTHORIZED`, `EVENT_NOT_FOUND`, `MENTOR_NOT_FOUND`.
+sus calificaciones — su nota deja de contar en el promedio de cada equipo. En la misma
+transacción **cambia el código de mentores**: el mentor quitado ya no puede volver a entrar con
+él (los que ya están dentro siguen dentro). `204`. Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`,
+`MENTOR_NOT_FOUND`.
 
 `GET /api/events/:id/evaluations` — calificaciones para el educador, **ordenadas de mayor a menor
 promedio** (los equipos sin calificar al final).

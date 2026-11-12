@@ -35,6 +35,7 @@ interface MentorTeam {
   submission: {
     type: string;
     url: string | null;
+    links: string[];
     description: string | null;
   } | null;
   files: MentorFile[];
@@ -263,6 +264,27 @@ export function MentorPanel() {
                   {team.submission.description}
                 </p>
               )}
+              {/* The delivery's links (https only, checked by the API). */}
+              {team.submission &&
+                [team.submission.url, ...(team.submission.links ?? [])]
+                  .filter((link): link is string => Boolean(link))
+                  .map((link, i) => (
+                    <a
+                      key={`${i}-${link}`}
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "block",
+                        fontSize: 11,
+                        color: "var(--parc)",
+                        marginTop: 6,
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      🔗 {link}
+                    </a>
+                  ))}
               {team.files.length > 0 && (
                 <div
                   style={{
