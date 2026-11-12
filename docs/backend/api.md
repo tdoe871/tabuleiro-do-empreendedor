@@ -676,6 +676,12 @@ agregada (sin N+1). **Implementado.**
 mentores que ya entraron siguen dentro). `200 { "mentorCode": "K7XM2Q" }`. El código también llega
 en `EventDTO.mentorCode` (`null` hasta crearlo). Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`.
 
+`DELETE /api/events/:id/mentors/:mentorId` — saca a un mentor del evento (se unió con el nombre
+equivocado, o alguien que no debía tener el código). Borra la fila del mentor: su sesión muere en
+su siguiente petición (`GET /api/mentor` responde `UNAUTHORIZED`) y, por cascada, se borran todas
+sus calificaciones — su nota deja de contar en el promedio de cada equipo. `204`. Errores:
+`UNAUTHORIZED`, `EVENT_NOT_FOUND`, `MENTOR_NOT_FOUND`.
+
 `GET /api/events/:id/evaluations` — calificaciones para el educador, **ordenadas de mayor a menor
 promedio** (los equipos sin calificar al final).
 
@@ -949,6 +955,7 @@ respuestas de las fases (esas están en "Exportar propuestas"), solo que pasaron
 | `ANNOUNCEMENT_SENT` / `_DELETED`     | Educador     | `announcementId`                                |
 | `SWITCHES_CHANGED`                   | Educador     | Los que cambió (`chat`, `submissions`, `joins`) |
 | `MENTOR_CODE_CHANGED`                | Educador     | —                                               |
+| `MENTOR_REMOVED`                     | Educador     | `mentorId`                                      |
 | `TEAM_CREATED`                       | Participante | —                                               |
 | `PARTICIPANT_JOINED`                 | Participante | —                                               |
 | `SESSION_RECOVERED`                  | Participante | — (volvió a entrar con su nickname)             |
@@ -1048,6 +1055,7 @@ Lo usa el hook; el frontend no necesita llamarlo directo. Jugador: sin query. Ed
 | `TEAM_NOT_FOUND`            | 404  | Código de equipo inválido o regenerado                            |
 | `FILE_NOT_FOUND`            | 404  | Archivo inexistente o de otro equipo                              |
 | `ANNOUNCEMENT_NOT_FOUND`    | 404  | Aviso general inexistente o de otro evento                        |
+| `MENTOR_NOT_FOUND`          | 404  | Mentor inexistente o de otro evento                               |
 | `EMAIL_TAKEN`               | 409  | Correo ya registrado                                              |
 | `TEAM_NAME_TAKEN`           | 409  | Ya hay un equipo con ese nombre en el evento                      |
 | `TEAM_FULL`                 | 409  | El equipo llegó a `maxTeamSize`                                   |

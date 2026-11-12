@@ -160,6 +160,9 @@ export function EducadorPanel() {
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
   const [showMentores, setShowMentores] = useState(false);
+  const [confirmingMentorId, setConfirmingMentorId] = useState<string | null>(
+    null,
+  );
   const [evaluations, setEvaluations] = useState<{
     mentorCode: string | null;
     mentors: { id: string; name: string; evaluated: number }[];
@@ -421,6 +424,29 @@ export function EducadorPanel() {
       return;
     }
     void loadOverview();
+  }
+
+  async function removerMentor(mentorId: string) {
+    if (!selected) return;
+    if (confirmingMentorId !== mentorId) {
+      setConfirmingMentorId(mentorId);
+      return;
+    }
+    setConfirmingMentorId(null);
+    const res = await sendJson(
+      `/api/events/${selected.id}/mentors/${mentorId}`,
+      "DELETE",
+    );
+    if (!res.ok && res.status !== 204) {
+      const err = await readApiError(res);
+      toast("err", errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")));
+      return;
+    }
+    toast("ok", t("mentores.removido"));
+    const refreshed = await fetch(`/api/events/${selected.id}/evaluations`);
+    const body = (await refreshed.json().catch(() => null)) as
+      typeof evaluations | null;
+    if (refreshed.ok && body) setEvaluations(body);
   }
 
   async function abrirEvaluacoes() {
@@ -1291,6 +1317,82 @@ export function EducadorPanel() {
           <h3>🎓 {t("mentores.titulo")}</h3>
           <p style={{ fontSize: 11, color: "var(--t3)" }}>
             {t("mentores.mentoresCount", { count: evaluations.mentors.length })}
+          </p>
+
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--t3)",
+              marginTop: 14,
+              marginBottom: 6,
+              textTransform: "uppercase",
+              letterSpacing: ".04em",
+            }}
+          >
+            {t("mentores.listaTitulo")}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+              marginBottom: 14,
+            }}
+          >
+            {evaluations.mentors.length === 0 && (
+              <p style={{ fontSize: 12, color: "var(--t3)" }}>
+                {t("mentores.nenhumMentor")}
+              </p>
+            )}
+            {evaluations.mentors.map((mentor) => (
+              <div
+                key={mentor.id}
+                className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px]`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "8px 10px",
+                  fontSize: 12,
+                  gap: 8,
+                }}
+              >
+                <span>
+                  {mentor.name}{" "}
+                  <span style={{ color: "var(--t3)", fontSize: 11 }}>
+                    ({mentor.evaluated})
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  style={{
+                    color: "var(--prob,#ff5c5c)",
+                    whiteSpace: "nowrap",
+                  }}
+                  onClick={() => void removerMentor(mentor.id)}
+                  onBlur={() => setConfirmingMentorId(null)}
+                >
+                  {confirmingMentorId === mentor.id
+                    ? t("mentores.removerConfirmar")
+                    : t("mentores.remover")}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--t3)",
+              marginBottom: 6,
+              textTransform: "uppercase",
+              letterSpacing: ".04em",
+            }}
+          >
+            {t("resumo.equipes")}
           </p>
           <div
             style={{

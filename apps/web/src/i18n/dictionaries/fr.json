@@ -33,6 +33,7 @@
       "RESET_TOKEN_EXPIRED": "Ce lien a expiré. Demandez-en un nouveau.",
       "FILE_NOT_FOUND": "Fichier introuvable.",
       "ANNOUNCEMENT_NOT_FOUND": "Cette annonce n'existe plus.",
+      "MENTOR_NOT_FOUND": "Ce mentor n'est plus dans la session.",
       "FILE_NOT_UPLOADED": "Ce fichier n'a pas encore été envoyé.",
       "TOO_MANY_FILES": "Votre équipe a déjà atteint la limite de fichiers.",
       "TOO_MANY_MENTORS": "Cette session a déjà atteint la limite de mentors.",
@@ -223,7 +224,12 @@
       "gerar": "Générer le code",
       "regenerar": "Générer un nouveau code",
       "mentoresCount": "{count} mentor(s) en train de noter",
-      "semNota": "Pas encore noté"
+      "semNota": "Pas encore noté",
+      "listaTitulo": "Mentors actifs",
+      "nenhumMentor": "Personne n'a encore rejoint.",
+      "remover": "Retirer",
+      "removerConfirmar": "Sûr ? Retirer",
+      "removido": "Mentor retiré. Ses notes ne comptent plus."
     },
     "alertas": {
       "NO_SUBMISSION": "{team} : pas de soumission, {minutes} min restantes",

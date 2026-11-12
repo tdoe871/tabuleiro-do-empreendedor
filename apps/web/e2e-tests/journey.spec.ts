@@ -676,6 +676,39 @@ test.describe("a full event", { tag: "@db" }, () => {
     await educator.page.keyboard.press("Escape");
   });
 
+  test("the educator removes the mentor and their grade stops counting", async () => {
+    await educator.page.getByText(d.educador.sidebar.mentores).click();
+    const dialog = educator.page.getByRole("dialog");
+    const row = dialog.locator("div", { hasText: "E2E Mentora" }).last();
+    await expect(row).toBeVisible();
+    const removeButton = row.getByRole("button", {
+      name: d.educador.mentores.remover,
+    });
+    await removeButton.click();
+    await expect(
+      row.getByRole("button", { name: d.educador.mentores.removerConfirmar }),
+    ).toBeVisible();
+    await row
+      .getByRole("button", { name: d.educador.mentores.removerConfirmar })
+      .click();
+    await expect(toast(educator.page)).toHaveText(d.educador.mentores.removido);
+
+    // The mentor count drops to 0, the team's average resets: that one
+    // mentor's grade no longer counts.
+    await expect(
+      dialog.getByText(
+        d.educador.mentores.mentoresCount.replace("{count}", "0"),
+      ),
+    ).toBeVisible();
+    const teamRow = dialog.locator("div", { hasText: TEAM_NAME }).last();
+    await expect(teamRow).toContainText(d.educador.mentores.semNota);
+    await educator.page.keyboard.press("Escape");
+
+    // The removed mentor's own session is dead on their very next request.
+    const res = await mentor.page.request.get("/api/mentor");
+    expect(res.status()).toBe(401);
+  });
+
   test("the three CSV exports download with the team's data", async () => {
     const base = `/api/events/${state.eventId}/export`;
     for (const [type, mustContain] of [

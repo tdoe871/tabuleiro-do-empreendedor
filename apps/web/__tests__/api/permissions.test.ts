@@ -211,6 +211,10 @@ const STAFF_ROUTES: Route[] = [
   route("GET", "events/[id]/evaluations", E1),
   route("GET", "events/[id]/export", E1),
   route("POST", "events/[id]/mentor-code", E1),
+  route("DELETE", "events/[id]/mentors/[mentorId]", {
+    ...E1,
+    mentorId: "mentor-1",
+  }),
   route("GET", "events/[id]/overview", E1),
   { ...route("PATCH", "events/[id]/status", E1), body: { status: "PAUSED" } },
   route("PATCH", "events/[id]/switches", E1),

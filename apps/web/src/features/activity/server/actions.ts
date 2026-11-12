@@ -19,6 +19,7 @@ export const ACTION_LABEL = {
   ANNOUNCEMENT_DELETED: "Borró un aviso general",
   SWITCHES_CHANGED: "Cambió los interruptores de emergencia",
   MENTOR_CODE_CHANGED: "Creó o cambió el código de mentores",
+  MENTOR_REMOVED: "Quitó a un mentor",
   // Players
   TEAM_CREATED: "Creó el equipo",
   PARTICIPANT_JOINED: "Entró al equipo",
