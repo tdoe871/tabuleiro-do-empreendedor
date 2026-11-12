@@ -65,7 +65,8 @@
       "created": "Equipo creado",
       "createError": "No se pudo crear el equipo",
       "backendPendingJoin": "Unirse a equipo: backend en construcción — abriendo tablero en modo vista previa.",
-      "invalidCode": "Código de equipo inválido"
+      "invalidCode": "Código de equipo inválido",
+      "recovered": "Entraste como «{nickname}», que ya estaba en el equipo. Si no eres tú, sal y entra con otro nombre."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Registro de educador: backend en construcción — abriendo panel en modo vista previa.",
       "registerError": "No se pudo crear la cuenta",
       "missingFields": "Completa tu nombre y el código",
-      "mentorError": "No se pudo entrar. Revisa el código de mentores."
+      "mentorError": "No se pudo entrar. Revisa el código de mentores.",
+      "mentorRecovered": "Entraste como «{name}», que ya existía. Si no eres tú, sal y entra con tu nombre completo."
     },
     "forgot": {
       "titulo": "Recuperar contraseña",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Iniciar partida",
       "pausar": "Pausar partida",
-      "retomar": "Reanudar partida"
+      "retomar": "Reanudar partida",
+      "terminar": "Terminar partida",
+      "terminarConfirmar": "¿Terminar? No se puede deshacer"
     },
     "socializar": "Socializar",
     "sair": "Salir",
@@ -229,7 +233,7 @@
       "nenhumMentor": "Nadie se ha unido todavía.",
       "remover": "Quitar",
       "removerConfirmar": "¿Seguro? Quitar",
-      "removido": "Mentor eliminado. Sus calificaciones ya no cuentan.",
+      "removido": "Mentor eliminado. Sus calificaciones ya no cuentan y el código de mentores cambió.",
       "equiposTitulo": "Equipos"
     },
     "alertas": {
