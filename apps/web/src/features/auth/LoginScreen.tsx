@@ -139,38 +139,38 @@ export function LoginScreen() {
 
   return (
     <>
-      <div id="tela-login">
-        <div className="login-hero bg-transparent">
-          <div className="glow-prob" />
-          <div className="glow-parc" />
-          <div className="glow-opor" />
-          <div className="hero-star">
+      <div id="tela-login" className="bg-slate-50 text-slate-900">
+        <div className="login-hero bg-none bg-[#1E1B4B] text-slate-200 border-r border-indigo-950">
+          <div className="glow-prob opacity-30" />
+          <div className="glow-parc opacity-30" />
+          <div className="glow-opor opacity-30" />
+          <div className="hero-star opacity-5">
             <StarWatermark />
           </div>
           <div className="login-hero-content anim-in">
             <div className="logo-row">
-              <div className="logo-gem backdrop-blur-md transition-all duration-300 hover:shadow-glow-amber">
+              <div className="logo-gem bg-indigo-900/80 border border-indigo-400/30 shadow-sm transition-all duration-300">
                 <GemLogo />
               </div>
               <div>
-                <div className="logo-nm">{tCommon("appName")}</div>
-                <div className="logo-sb">TdoE</div>
+                <div className="logo-nm text-white">{tCommon("appName")}</div>
+                <div className="logo-sb text-indigo-200/70">TdoE</div>
               </div>
               <div style={{ marginLeft: "auto" }}>
                 <LangSwitcher />
               </div>
             </div>
             <div>
-              <div className="hero-hl">{t("heroHl")}</div>
+              <div className="hero-hl text-white">{t("heroHl")}</div>
               <div className="hero-jogo grad">{t("heroJogo")}</div>
-              <div className="hero-tag">{t("heroTag")}</div>
+              <div className="hero-tag text-indigo-200/70">{t("heroTag")}</div>
               <div className="hero-chips">
                 {KEY_IDS.map((id) => {
                   const key = tKeys.raw(id) as KeyTranslation;
                   return (
                     <div
                       key={id}
-                      className="badge backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lime"
+                      className="badge transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -185,32 +185,48 @@ export function LoginScreen() {
               <HeroConceitos />
             </div>
           </div>
-          <div className="hero-foot">© 2026 TdoE</div>
-          <div className="hero-bar" />
+          <div className="hero-foot text-indigo-200/60">© 2026 TdoE</div>
+          <div className="hero-bar bg-none bg-[#6366F1]" />
         </div>
 
-        <div className="login-panel bg-white/[0.03] backdrop-blur-xl border-l border-white/10">
-          <div className="login-tabs bg-white/5 backdrop-blur-md border border-white/10">
+        <div className="login-panel bg-none bg-slate-50 text-slate-900 border-l border-slate-200 before:hidden">
+          <div className="login-tabs bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm">
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "login" ? "on" : ""}`}
+              className={`login-tab rounded-lg transition-all duration-200 ${
+                tab === "login"
+                  ? "on !bg-[#6366F1] !text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+              }`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "cadastro" ? "on" : ""}`}
+              className={`login-tab rounded-lg transition-all duration-200 ${
+                tab === "cadastro"
+                  ? "on !bg-[#6366F1] !text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+              }`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "codigo" ? "on" : ""}`}
+              className={`login-tab rounded-lg transition-all duration-200 ${
+                tab === "codigo"
+                  ? "on !bg-[#6366F1] !text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+              }`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
             </div>
             <div
-              className={`login-tab transition-all duration-200 hover:text-white ${tab === "mentor" ? "on" : ""}`}
+              className={`login-tab rounded-lg transition-all duration-200 ${
+                tab === "mentor"
+                  ? "on !bg-[#6366F1] !text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+              }`}
               onClick={() => setTab("mentor")}
             >
               {t("tabs.mentor")}
@@ -218,23 +234,30 @@ export function LoginScreen() {
           </div>
 
           {tab === "login" && (
-            <form className="anim-in" onSubmit={handleLogin}>
-              <div className="login-title">{t("form.titleEdu")}</div>
-              <div className="login-sub">{t("form.subEdu")}</div>
+            <form
+              className="anim-in bg-white border border-slate-200 rounded-xl shadow-sm p-7 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
+              onSubmit={handleLogin}
+            >
+              <div className="login-title text-slate-900">
+                {t("form.titleEdu")}
+              </div>
+              <div className="login-sub text-slate-500">{t("form.subEdu")}</div>
               <div className="field">
-                <label>{t("form.email")}</label>
+                <label className="text-slate-500">{t("form.email")}</label>
                 <input
                   type="email"
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label>{t("form.senha")}</label>
+                <label className="text-slate-500">{t("form.senha")}</label>
                 <input
                   type="password"
                   placeholder="••••••••"
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={loginSenha}
                   onChange={(e) => setLoginSenha(e.target.value)}
                   required
@@ -243,6 +266,7 @@ export function LoginScreen() {
               <div style={{ textAlign: "right", marginBottom: 10 }}>
                 <button
                   type="button"
+                  className="text-slate-500 hover:text-[#6366F1] font-medium transition-colors"
                   onClick={() => {
                     setForgotEmail(loginEmail);
                     setForgotSent(false);
@@ -251,7 +275,6 @@ export function LoginScreen() {
                   style={{
                     background: "none",
                     border: "none",
-                    color: "var(--t3)",
                     fontSize: 11,
                     cursor: "pointer",
                     padding: 0,
@@ -260,16 +283,24 @@ export function LoginScreen() {
                   {t("form.esqueceuSenha")}
                 </button>
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all justify-center"
+              >
                 {t("form.enter")}
               </button>
             </form>
           )}
 
           {tab === "cadastro" && (
-            <form className="anim-in" onSubmit={handleCadastro}>
-              <div className="login-title">{t("form.titleCad")}</div>
-              <div className="login-sub">{t("form.subCad")}</div>
+            <form
+              className="anim-in bg-white border border-slate-200 rounded-xl shadow-sm p-7 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
+              onSubmit={handleCadastro}
+            >
+              <div className="login-title text-slate-900">
+                {t("form.titleCad")}
+              </div>
+              <div className="login-sub text-slate-500">{t("form.subCad")}</div>
               <div
                 style={{
                   display: "grid",
@@ -278,16 +309,20 @@ export function LoginScreen() {
                 }}
               >
                 <div className="field">
-                  <label>{t("form.nome")}</label>
+                  <label className="text-slate-500">{t("form.nome")}</label>
                   <input
+                    className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                     value={cadNome}
                     onChange={(e) => setCadNome(e.target.value)}
                     required
                   />
                 </div>
                 <div className="field">
-                  <label>{t("form.sobrenome")}</label>
+                  <label className="text-slate-500">
+                    {t("form.sobrenome")}
+                  </label>
                   <input
+                    className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                     value={cadSobrenome}
                     onChange={(e) => setCadSobrenome(e.target.value)}
                     required
@@ -295,9 +330,10 @@ export function LoginScreen() {
                 </div>
               </div>
               <div className="field">
-                <label>{t("form.email")}</label>
+                <label className="text-slate-500">{t("form.email")}</label>
                 <input
                   type="email"
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={cadEmail}
                   onChange={(e) => setCadEmail(e.target.value)}
                   required
@@ -311,10 +347,11 @@ export function LoginScreen() {
                 }}
               >
                 <div className="field">
-                  <label>{t("form.senha")}</label>
+                  <label className="text-slate-500">{t("form.senha")}</label>
                   <input
                     type="password"
                     placeholder="••••••••"
+                    className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                     value={cadSenha}
                     onChange={(e) => setCadSenha(e.target.value)}
                     minLength={8}
@@ -322,10 +359,13 @@ export function LoginScreen() {
                   />
                 </div>
                 <div className="field">
-                  <label>{t("form.confirmar")}</label>
+                  <label className="text-slate-500">
+                    {t("form.confirmar")}
+                  </label>
                   <input
                     type="password"
                     placeholder="••••••••"
+                    className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                     value={cadConf}
                     onChange={(e) => setCadConf(e.target.value)}
                     minLength={8}
@@ -333,29 +373,41 @@ export function LoginScreen() {
                   />
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all justify-center"
+              >
                 {t("form.criarConta")}
               </button>
             </form>
           )}
 
           {tab === "codigo" && (
-            <form className="anim-in" onSubmit={handleCodigo}>
-              <div className="login-title">{t("form.titleCod")}</div>
-              <div className="login-sub">{t("form.subCod")}</div>
+            <form
+              className="anim-in bg-white border border-slate-200 rounded-xl shadow-sm p-7 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
+              onSubmit={handleCodigo}
+            >
+              <div className="login-title text-slate-900">
+                {t("form.titleCod")}
+              </div>
+              <div className="login-sub text-slate-500">{t("form.subCod")}</div>
               <div className="field">
-                <label>{t("form.seuNome")}</label>
+                <label className="text-slate-500">{t("form.seuNome")}</label>
                 <input
                   placeholder={t("form.comoChamado")}
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={jogNome}
                   onChange={(e) => setJogNome(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label>{t("form.codigoSessao")}</label>
+                <label className="text-slate-500">
+                  {t("form.codigoSessao")}
+                </label>
                 <input
                   placeholder={t("form.codigoPlaceholder")}
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   style={{
                     textTransform: "uppercase",
                     letterSpacing: ".2em",
@@ -366,26 +418,32 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all justify-center"
+              >
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-amber">
-                  <div className="code-gem">
+                <div className="code-blk bg-none bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5">
+                  <div className="code-gem bg-indigo-50 border border-indigo-200 text-[#6366F1]">
                     <GemLogo size={20} />
                   </div>
                   <div>
                     <div
-                      className="small muted"
+                      className="small muted text-slate-900"
                       style={{
                         fontSize: 12,
                         fontWeight: 700,
-                        color: "var(--t2)",
+                        color: "#0f172a",
                       }}
                     >
                       {t("form.codeHint1")}
                     </div>
-                    <div className="small muted" style={{ marginTop: 2 }}>
+                    <div
+                      className="small muted text-slate-500"
+                      style={{ marginTop: 2 }}
+                    >
                       {t("form.codeHint2")}
                     </div>
                   </div>
@@ -395,22 +453,33 @@ export function LoginScreen() {
           )}
 
           {tab === "mentor" && (
-            <form className="anim-in" onSubmit={handleMentor}>
-              <div className="login-title">{t("form.titleMentor")}</div>
-              <div className="login-sub">{t("form.subMentor")}</div>
+            <form
+              className="anim-in bg-white border border-slate-200 rounded-xl shadow-sm p-7 transition-all duration-300 hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
+              onSubmit={handleMentor}
+            >
+              <div className="login-title text-slate-900">
+                {t("form.titleMentor")}
+              </div>
+              <div className="login-sub text-slate-500">
+                {t("form.subMentor")}
+              </div>
               <div className="field">
-                <label>{t("form.seuNome")}</label>
+                <label className="text-slate-500">{t("form.seuNome")}</label>
                 <input
                   placeholder={t("form.comoChamado")}
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={mentNome}
                   onChange={(e) => setMentNome(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label>{t("form.codigoMentores")}</label>
+                <label className="text-slate-500">
+                  {t("form.codigoMentores")}
+                </label>
                 <input
                   placeholder={t("form.codigoPlaceholder")}
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   style={{
                     textTransform: "uppercase",
                     letterSpacing: ".2em",
@@ -421,7 +490,10 @@ export function LoginScreen() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all justify-center"
+              >
                 {t("form.entrarMentor")}
               </button>
             </form>
@@ -429,11 +501,11 @@ export function LoginScreen() {
         </div>
       </div>
       <div
+        className="bg-slate-50 text-slate-500 border-t border-slate-200"
         style={{
           textAlign: "center",
           padding: "18px 20px 24px",
           fontSize: 11,
-          color: "var(--t3)",
           lineHeight: 1.6,
         }}
       >
@@ -447,27 +519,31 @@ export function LoginScreen() {
 
       {showForgot && (
         <Modal onClose={() => setShowForgot(false)} maxWidth={400}>
-          <h3>{t("forgot.titulo")}</h3>
+          <h3 className="text-slate-900">{t("forgot.titulo")}</h3>
           {forgotSent ? (
-            <p style={{ fontSize: 12, color: "var(--t2)" }}>
+            <p className="text-slate-500" style={{ fontSize: 12 }}>
               {t("forgot.enviado")}
             </p>
           ) : (
             <form onSubmit={handleForgot}>
-              <p style={{ fontSize: 12, color: "var(--t3)" }}>
+              <p className="text-slate-500" style={{ fontSize: 12 }}>
                 {t("forgot.sub")}
               </p>
               <div className="field">
-                <label>{t("form.email")}</label>
+                <label className="text-slate-500">{t("form.email")}</label>
                 <input
                   type="email"
+                  className="bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   required
                   autoFocus
                 />
               </div>
-              <button type="submit" className="btn btn-primary w100">
+              <button
+                type="submit"
+                className="btn btn-primary w100 bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all justify-center"
+              >
                 {t("forgot.enviar")}
               </button>
             </form>
