@@ -16,7 +16,7 @@ export function HeroConceitos() {
   return (
     <div className="hero-conceitos">
       <div
-        className="text-indigo-200/70"
+        className="text-[#9caec6]"
         style={{
           fontSize: 9,
           fontWeight: 700,
@@ -34,7 +34,7 @@ export function HeroConceitos() {
         return (
           <div
             key={id}
-            className={`hc-card bg-indigo-950/50 rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-md ${open ? "open" : ""}`}
+            className={`hc-card bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)] ${open ? "open" : ""}`}
             style={{
               background: `var(${KEY_COLOR_VAR[id]}-bg)`,
               borderColor: `var(${KEY_COLOR_VAR[id]}-bd)`,
@@ -65,7 +65,7 @@ export function HeroConceitos() {
               </span>
             </button>
             {open && (
-              <div className="hc-body text-indigo-100/80">
+              <div className="hc-body text-[#9caec6]">
                 {key.desc.split("\n\n").map((para, i) => (
                   <p key={i} style={{ marginBottom: i === 0 ? 10 : 0 }}>
                     {para}
