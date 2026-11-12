@@ -32,9 +32,8 @@ import {
   type KeyStatus,
 } from "./progress";
 
-// Points a team earns per completed phase. 0 until the team decides the
-// scoring; changing this number is enough to start awarding points.
-export const POINTS_PER_PHASE = 0;
+// Points a team earns per completed phase.
+export const POINTS_PER_PHASE = 10;
 
 export const MAX_ANSWER_LENGTH = 5000;
 

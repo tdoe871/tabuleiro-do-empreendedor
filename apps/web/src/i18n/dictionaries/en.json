@@ -33,6 +33,7 @@
       "RESET_TOKEN_EXPIRED": "That link expired. Ask for a new one.",
       "FILE_NOT_FOUND": "File not found.",
       "ANNOUNCEMENT_NOT_FOUND": "That announcement no longer exists.",
+      "MENTOR_NOT_FOUND": "That mentor is no longer in the session.",
       "FILE_NOT_UPLOADED": "That file hasn't been uploaded yet.",
       "TOO_MANY_FILES": "Your team already reached the file limit.",
       "TOO_MANY_MENTORS": "This session already reached the mentor limit.",
@@ -223,7 +224,13 @@
       "gerar": "Generate code",
       "regenerar": "Generate new code",
       "mentoresCount": "{count} mentor(s) scoring",
-      "semNota": "Not scored yet"
+      "semNota": "Not scored yet",
+      "listaTitulo": "Active mentors",
+      "nenhumMentor": "No one has joined yet.",
+      "remover": "Remove",
+      "removerConfirmar": "Sure? Remove",
+      "removido": "Mentor removed. Their scores no longer count.",
+      "equiposTitulo": "Teams"
     },
     "alertas": {
       "NO_SUBMISSION": "{team}: no submission, {minutes} min left",
