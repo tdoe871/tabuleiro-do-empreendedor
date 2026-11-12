@@ -65,7 +65,8 @@
       "created": "Equipe criada",
       "createError": "Não foi possível criar a equipe",
       "backendPendingJoin": "Entrar na equipe: backend em construção — abrindo tabuleiro em modo prévia.",
-      "invalidCode": "Código de equipe inválido"
+      "invalidCode": "Código de equipe inválido",
+      "recovered": "Você entrou como «{nickname}», que já estava na equipe. Se não é você, saia e entre com outro nome."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
       "registerError": "Não foi possível criar a conta",
       "missingFields": "Preencha seu nome e o código",
-      "mentorError": "Não foi possível entrar. Confira o código de mentores."
+      "mentorError": "Não foi possível entrar. Confira o código de mentores.",
+      "mentorRecovered": "Você entrou como «{name}», que já existia. Se não é você, saia e entre com seu nome completo."
     },
     "forgot": {
       "titulo": "Recuperar senha",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Iniciar sessão",
       "pausar": "Pausar sessão",
-      "retomar": "Retomar sessão"
+      "retomar": "Retomar sessão",
+      "terminar": "Encerrar sessão",
+      "terminarConfirmar": "Encerrar? Não dá para desfazer"
     },
     "socializar": "Socializar",
     "sair": "Sair",
@@ -229,7 +233,7 @@
       "nenhumMentor": "Ninguém entrou ainda.",
       "remover": "Remover",
       "removerConfirmar": "Tem certeza? Remover",
-      "removido": "Mentor removido. As notas dele não contam mais.",
+      "removido": "Mentor removido. As notas dele não contam mais e o código de mentores mudou.",
       "equiposTitulo": "Equipes"
     },
     "alertas": {
