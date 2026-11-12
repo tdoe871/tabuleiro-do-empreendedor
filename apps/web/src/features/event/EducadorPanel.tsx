@@ -1265,12 +1265,21 @@ export function EducadorPanel() {
                 style={{
                   fontSize: 11,
                   marginTop: 2,
-                  color: eventMsLeft > 0 ? "var(--t3)" : "var(--prob)",
+                  color:
+                    eventMsLeft > 0 || selected?.status === "finalizada"
+                      ? "var(--t3)"
+                      : "#EF4444",
+                  fontWeight:
+                    eventMsLeft > 0 || selected?.status === "finalizada"
+                      ? undefined
+                      : 700,
                 }}
               >
-                {eventMsLeft > 0
-                  ? t("fimEvento.restante", { tempo: fmtLeft(eventMsLeft) })
-                  : t("fimEvento.esgotado")}
+                {selected?.status === "finalizada"
+                  ? t("fimEvento.terminado")
+                  : eventMsLeft > 0
+                    ? t("fimEvento.restante", { tempo: fmtLeft(eventMsLeft) })
+                    : t("fimEvento.esgotado")}
               </div>
               {canExtend && (
                 <>

@@ -349,7 +349,8 @@
       "estender": "Estender o tempo para todos",
       "confirmar": "Adicionar {tempo} para todos? Confirmar",
       "estendido": "Foram adicionados {min} min ao evento para todas as equipes.",
-      "limite": "O evento não pode durar mais de 48 h no total desde o início."
+      "limite": "O evento não pode durar mais de 48 h no total desde o início.",
+      "terminado": "A partida terminou."
     }
   },
   "jogador": {

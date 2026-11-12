@@ -349,7 +349,8 @@
       "estender": "Prolonger pour tout le monde",
       "confirmar": "Ajouter {tempo} pour tout le monde ? Confirmer",
       "estendido": "{min} min ajoutées à l'événement pour toutes les équipes.",
-      "limite": "L'événement ne peut pas durer plus de 48 h au total depuis son début."
+      "limite": "L'événement ne peut pas durer plus de 48 h au total depuis son début.",
+      "terminado": "La partie est terminée."
     }
   },
   "jogador": {

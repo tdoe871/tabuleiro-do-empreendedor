@@ -349,7 +349,8 @@
       "estender": "Extend time for everyone",
       "confirmar": "Add {tempo} for everyone? Confirm",
       "estendido": "Added {min} min to the event for every team.",
-      "limite": "The event cannot last more than 48 h in total from its start."
+      "limite": "The event cannot last more than 48 h in total from its start.",
+      "terminado": "The game has ended."
     }
   },
   "jogador": {
