@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { GemLogo } from "@/components/ui/GemLogo";
 import { LangSwitcher } from "@/components/shared/LangSwitcher";
@@ -43,6 +43,11 @@ export interface EventDTO {
   maxTeams: number;
   maxTeamSize: number;
   mentorCode: string | null;
+  durationMinutes: number | null;
+  // Set when the educator starts the session; endsAt is when the board
+  // closes for every team (startedAt + duration, moved by "extend").
+  startedAt: string | null;
+  endsAt: string | null;
   activityTimer: { endsAt: string; seconds: number; visible: boolean } | null;
   challengeCard: { key: KeyId; text: string } | null;
   switches: { chat: boolean; submissions: boolean; joins: boolean };
@@ -121,6 +126,9 @@ const NEXT_STATUS: Partial<
 // look untouched.
 const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
+// Minutes the educator can add to the event's clock at once.
+const EXTEND_PRESETS = [15, 30, 60, 120];
+
 // Same limit as the API (MAX_TEAM_NAME_LENGTH in features/team/server/team).
 const TEAM_NAME_MAX_LENGTH = 40;
 const AG_SIDEBAR = "bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))]";
@@ -148,6 +156,7 @@ export function EducadorPanel() {
   const t = useTranslations("educador");
   const tKeys = useTranslations("keys");
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const toast = useToast();
   const router = useRouter();
 
@@ -170,6 +179,13 @@ export function EducadorPanel() {
     null,
   );
   const [savingName, setSavingName] = useState(false);
+  // Extending the event's clock: chosen minutes, second-click confirmation,
+  // and server time minus device time so "time left" ignores a wrong clock.
+  const [extendMinutes, setExtendMinutes] = useState(30);
+  const [confirmingExtend, setConfirmingExtend] = useState(false);
+  const [extending, setExtending] = useState(false);
+  const [clockOffsetMs, setClockOffsetMs] = useState(0);
+  const [nowTick, setNowTick] = useState(() => Date.now());
   const [confirmingMentorId, setConfirmingMentorId] = useState<string | null>(
     null,
   );
@@ -235,6 +251,8 @@ export function EducadorPanel() {
       setTimerLeft(
         activityTimerSecondsLeft(body.event.activityTimer, body.serverNow),
       );
+      const serverMs = Date.parse(body.serverNow);
+      if (Number.isFinite(serverMs)) setClockOffsetMs(serverMs - Date.now());
       setSessions((prev) =>
         prev.map((s) =>
           s.id === body.event.id ? eventToSession(body.event) : s,
@@ -250,6 +268,12 @@ export function EducadorPanel() {
 
   useRealtime(() => void loadOverview(), { eventId: selectedId ?? undefined });
 
+  // Refreshes the event's "time left" every 30 s.
+  useEffect(() => {
+    const interval = setInterval(() => setNowTick(Date.now()), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Counts the activity timer down between overviews.
   useEffect(() => {
     if (timerLeft === null) return;
@@ -262,6 +286,7 @@ export function EducadorPanel() {
   function selectSession(id: string) {
     setSelectedId(id);
     setConfirmingFinish(false);
+    setConfirmingExtend(false);
     setRenaming(null);
   }
 
@@ -470,6 +495,39 @@ export function EducadorPanel() {
     void loadOverview();
   }
 
+  async function estenderTempo() {
+    if (!selected || extending) return;
+    if (!confirmingExtend) {
+      setConfirmingExtend(true);
+      return;
+    }
+    setConfirmingExtend(false);
+    setExtending(true);
+    try {
+      const res = await sendJson(`/api/events/${selected.id}/extend`, "POST", {
+        minutes: extendMinutes,
+      });
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          err?.fields?.minutes === "TOO_LONG"
+            ? t("fimEvento.limite")
+            : errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")),
+        );
+        return;
+      }
+      toast("ok", t("fimEvento.estendido", { min: extendMinutes }));
+      void loadOverview();
+    } finally {
+      setExtending(false);
+    }
+  }
+
   async function salvarNomeEquipe() {
     if (!selected || !renaming || savingName) return;
     const name = renaming.name.trim();
@@ -564,6 +622,28 @@ export function EducadorPanel() {
 
   const canStart = selected?.status === "aguardando";
   const canPause = selected?.status === "ativa";
+  // The event's own clock (not the activity timer): when the board closes.
+  const eventEndsAtMs = event?.endsAt ? Date.parse(event.endsAt) : null;
+  const eventMsLeft =
+    eventEndsAtMs !== null ? eventEndsAtMs - (nowTick + clockOffsetMs) : null;
+  const canExtend =
+    eventEndsAtMs !== null &&
+    (selected?.status === "ativa" || selected?.status === "pausada");
+  function fmtEndsAt(ms: number) {
+    return new Date(ms).toLocaleString(locale, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  function fmtLeft(ms: number) {
+    const totalMin = Math.max(0, Math.floor(ms / 60_000));
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return h > 0 ? `${h} h ${String(m).padStart(2, "0")} min` : `${m} min`;
+  }
   const canResume = selected?.status === "pausada";
 
   return (
@@ -1164,6 +1244,70 @@ export function EducadorPanel() {
               🔔 {t("right.alertas")}
             </div>
           </div>
+          {eventEndsAtMs !== null && eventMsLeft !== null && (
+            <div
+              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] p-3 my-2`}
+            >
+              <div style={{ fontSize: 10, color: "var(--t3)" }}>
+                ⏳ {t("fimEvento.titulo")}
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: "var(--t1)",
+                  marginTop: 2,
+                }}
+              >
+                {fmtEndsAt(eventEndsAtMs)}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  marginTop: 2,
+                  color: eventMsLeft > 0 ? "var(--t3)" : "var(--prob)",
+                }}
+              >
+                {eventMsLeft > 0
+                  ? t("fimEvento.restante", { tempo: fmtLeft(eventMsLeft) })
+                  : t("fimEvento.esgotado")}
+              </div>
+              {canExtend && (
+                <>
+                  <div className="timer-presets" style={{ marginTop: 8 }}>
+                    {EXTEND_PRESETS.map((min) => (
+                      <button
+                        key={min}
+                        className={`timer-preset-btn ${extendMinutes === min ? "sel" : ""}`}
+                        onClick={() => {
+                          setExtendMinutes(min);
+                          setConfirmingExtend(false);
+                        }}
+                      >
+                        +{min >= 60 ? `${min / 60} h` : `${min} min`}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className={`btn btn-sm ${AG_START_BTN}`}
+                    style={{ width: "100%", marginTop: 6 }}
+                    disabled={extending}
+                    onClick={() => void estenderTempo()}
+                    onBlur={() => setConfirmingExtend(false)}
+                  >
+                    {confirmingExtend
+                      ? t("fimEvento.confirmar", {
+                          tempo:
+                            extendMinutes >= 60
+                              ? `${extendMinutes / 60} h`
+                              : `${extendMinutes} min`,
+                        })
+                      : `＋ ${t("fimEvento.estender")}`}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <div className="sidebar-divider" />
           <div className="panel-title">⏱ {t("timer.titulo")}</div>
           <div

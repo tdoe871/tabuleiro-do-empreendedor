@@ -10,6 +10,19 @@ import type { EventDTO } from "./EducadorPanel";
 // apps/web/src/features/event/server/event.ts — the backend rejects
 // anything outside this range, so the picker must not offer it.
 const TEAM_SIZE_OPTIONS = [2, 3, 4, 5];
+// Mirrors MIN/MAX_EVENT_DURATION_HOURS in the same file: how long the board
+// stays open once the educator starts the session.
+const MIN_DURATION_HOURS = 1;
+const MAX_DURATION_HOURS = 48;
+const DEFAULT_DURATION_HOURS = 24;
+
+function clampHours(value: number): number {
+  const hours = Math.round(value);
+  if (!Number.isFinite(hours) || hours < MIN_DURATION_HOURS) {
+    return DEFAULT_DURATION_HOURS;
+  }
+  return Math.min(MAX_DURATION_HOURS, hours);
+}
 
 export function CreateSessionModal({
   onClose,
@@ -28,6 +41,7 @@ export function CreateSessionModal({
   const [cenario, setCenario] = useState("");
   const [numEquipes, setNumEquipes] = useState(5);
   const [integrantes, setIntegrantes] = useState(4);
+  const [duracaoHoras, setDuracaoHoras] = useState(DEFAULT_DURATION_HOURS);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
@@ -51,6 +65,7 @@ export function CreateSessionModal({
           cenario: cenario || null,
           numEquipes,
           integrantes,
+          duracaoHoras: clampHours(duracaoHoras),
         }),
       });
       const body = (await res.json().catch(() => null)) as {
@@ -146,6 +161,19 @@ export function CreateSessionModal({
               ))}
             </select>
           </div>
+        </div>
+        <div className="field">
+          <label>{t("duracaoLabel")}</label>
+          <input
+            type="number"
+            min={MIN_DURATION_HOURS}
+            max={MAX_DURATION_HOURS}
+            step={1}
+            value={duracaoHoras}
+            onChange={(e) => setDuracaoHoras(Number(e.target.value))}
+            onBlur={(e) => setDuracaoHoras(clampHours(Number(e.target.value)))}
+          />
+          <div className="field-hint">{t("duracaoHint")}</div>
         </div>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button type="button" className="btn btn-ghost" onClick={onClose}>
