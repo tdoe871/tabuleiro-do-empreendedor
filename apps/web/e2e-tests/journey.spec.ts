@@ -568,9 +568,6 @@ test.describe("a full event", { tag: "@db" }, () => {
   });
 
   test("the saved-delivery message is up to date", async () => {
-    // KNOWN BUG: submission.saved still says the delivery was only saved
-    // locally and the backend is missing, although it is saved for real.
-    test.fail(true, "Stale 'saved locally' toast");
     expect(d.submission.saved).not.toMatch(/localmente|backend/i);
   });
 
