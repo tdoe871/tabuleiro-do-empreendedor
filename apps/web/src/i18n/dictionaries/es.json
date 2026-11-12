@@ -333,7 +333,12 @@
       "semChaveAtiva": "Sin clave activa",
       "chaves": "claves",
       "entregou": "Entregó",
-      "codigoEquipeTitle": "Código de equipo — dáselo a un estudiante que se quedó sin sesión"
+      "codigoEquipeTitle": "Código de equipo — dáselo a un estudiante que se quedó sin sesión",
+      "editarNome": "Editar nombre del equipo",
+      "salvar": "Guardar",
+      "cancelar": "Cancelar",
+      "nomeAtualizado": "Nombre del equipo actualizado.",
+      "nomeObrigatorio": "Escribe un nombre para el equipo."
     }
   },
   "jogador": {

@@ -34,6 +34,16 @@ export function sameName(a: string, b: string): boolean {
   return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
+// Whether another team of the event already uses `name` (renaming a team to
+// its own name with different case is fine).
+export function teamNameTakenBy(
+  teams: { id: string; name: string }[],
+  name: string,
+  exceptTeamId: string,
+): boolean {
+  return teams.some((t) => t.id !== exceptTeamId && sameName(t.name, name));
+}
+
 function hasEnded(event: Pick<Event, "status" | "endsAt">, now: Date): boolean {
   return (
     event.status === "FINISHED" ||

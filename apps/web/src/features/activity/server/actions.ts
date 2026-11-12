@@ -20,6 +20,7 @@ export const ACTION_LABEL = {
   SWITCHES_CHANGED: "Cambió los interruptores de emergencia",
   MENTOR_CODE_CHANGED: "Creó o cambió el código de mentores",
   MENTOR_REMOVED: "Quitó a un mentor",
+  TEAM_RENAMED: "Cambió el nombre de un equipo",
   // Players
   TEAM_CREATED: "Creó el equipo",
   PARTICIPANT_JOINED: "Entró al equipo",
@@ -86,6 +87,20 @@ function asDetails(value: unknown): ActivityDetails | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as ActivityDetails)
     : null;
+}
+
+// Each row keeps the team's name as it was then; the record shows the
+// current one so a renamed team reads the same everywhere (TEAM_RENAMED
+// keeps the old name in its details). A team that no longer exists keeps
+// its stored name.
+export function withCurrentTeamName<T extends Pick<Row, "teamId" | "teamName">>(
+  row: T,
+  currentNames: ReadonlyMap<string, string>,
+): T {
+  const current = row.teamId ? currentNames.get(row.teamId) : undefined;
+  return current === undefined || current === row.teamName
+    ? row
+    : { ...row, teamName: current };
 }
 
 export function toActivityDTO(row: Row, startedAt: Date | null): ActivityDTO {
