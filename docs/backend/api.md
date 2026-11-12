@@ -151,7 +151,8 @@ El educador crea una sesión (`CreateSessionModal`).
 
 ```json
 // request (lo que ya manda el frontend)
-{ "titulo": "Hackathon MTY", "modo": "escolar", "cenario": null, "numEquipes": 60, "integrantes": 5 }
+{ "titulo": "Hackathon MTY", "modo": "escolar", "cenario": null, "numEquipes": 60, "integrantes": 5, "duracaoHoras": 24 }
+// duracaoHoras es opcional: de 1 a 48 horas enteras, 24 si no se manda.
 // 201
 { "event": EventDTO }
 ```
@@ -618,6 +619,47 @@ Botón iniciar / pausar / retomar, y "terminar sesión".
 - Errores: `UNAUTHORIZED`, `VALIDATION_ERROR` (`status` inválido), `EVENT_NOT_FOUND` (no existe o
   es de otro educador), `INVALID_STATUS_TRANSITION` (por ejemplo, `DRAFT` → `PAUSED` o salir de
   `FINISHED`).
+
+### `POST /api/events/:id/extend` — Staff
+
+El educador da más tiempo a **todos** los equipos (botón «Extender tiempo» del panel).
+
+```json
+// request
+{ "minutes": 30 }   // entero de 1 a 720
+// 200
+{ "event": EventDTO }
+```
+
+- Solo el educador dueño del evento, con la sesión iniciada (`ACTIVE` o `PAUSED`) y el reloj
+  `GLOBAL`.
+- Suma los minutos a `endsAt`. Si el tiempo ya se había acabado, los suma **a partir de ahora**:
+  el tablero se reabre para todos.
+- El evento nunca puede durar más de **48 h** desde `startedAt`.
+- Queda en el registro de actividad como `EVENT_EXTENDED` (`{ minutes, from, to }`). Avisa por
+  tiempo real a los jugadores (`event`) y al educador (`overview`).
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`minutes: "INVALID"`,
+  `minutes: "TOO_LONG"` si pasaría de 48 h, `timerMode: "NO_GLOBAL_CLOCK"`), `EVENT_NOT_ACTIVE`
+  (todavía no inicia), `EVENT_FINISHED`.
+
+### `PATCH /api/events/:id/teams/:teamId` — Staff
+
+El educador cambia el nombre de un equipo (✏️ en la tarjeta del equipo).
+
+```json
+// request
+{ "name": "Equipo Verde" }
+// 200
+{ "team": { "id": "…", "name": "Equipo Verde" } }
+```
+
+- Solo el educador dueño del evento; los equipos y los mentores no pueden.
+- Mismas reglas que al crear un equipo: de 1 a 40 caracteres y sin repetir el nombre de otro
+  equipo del evento (sin importar mayúsculas ni espacios).
+- Queda en el registro como `TEAM_RENAMED` (`{ from, to }`); el registro y su CSV muestran el
+  nombre actual de cada equipo.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `TEAM_NOT_FOUND`, `VALIDATION_ERROR`,
+  `TEAM_NAME_TAKEN`.
 
 ### `GET /api/events/:id/overview` — Staff
 

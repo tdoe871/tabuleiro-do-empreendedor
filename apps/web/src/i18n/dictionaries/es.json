@@ -297,7 +297,9 @@
       "integrantesLabel": "Integrantes por equipo",
       "cancelar": "Cancelar",
       "criar": "Crear sesión →",
-      "numEquipesHint": "Hasta 80 equipos por sesión (sin límite de 10)."
+      "numEquipesHint": "Hasta 80 equipos por sesión (sin límite de 10).",
+      "duracaoLabel": "Duración del evento (horas)",
+      "duracaoHint": "De 1 a 48 h. Empieza a contar cuando presionas «Iniciar»; después puedes extenderla."
     },
     "toasts": {
       "selecioneSessao": "Selecciona una sesión",
@@ -339,6 +341,16 @@
       "cancelar": "Cancelar",
       "nomeAtualizado": "Nombre del equipo actualizado.",
       "nomeObrigatorio": "Escribe un nombre para el equipo."
+    },
+    "fimEvento": {
+      "titulo": "Fin del evento",
+      "restante": "Quedan {tempo}",
+      "esgotado": "Se acabó el tiempo: los equipos ya no pueden avanzar ni entregar. Extiende para reabrir.",
+      "estender": "Extender tiempo a todos",
+      "confirmar": "¿Agregar {tempo} a todos? Confirmar",
+      "estendido": "Se agregaron {min} min al evento para todos los equipos.",
+      "limite": "El evento no puede durar más de 48 h en total desde que inició.",
+      "terminado": "La partida terminó."
     }
   },
   "jogador": {

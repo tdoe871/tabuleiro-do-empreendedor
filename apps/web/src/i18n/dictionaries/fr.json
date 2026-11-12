@@ -297,7 +297,9 @@
       "integrantesLabel": "Membres par équipe",
       "cancelar": "Annuler",
       "criar": "Créer la session →",
-      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10)."
+      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10).",
+      "duracaoLabel": "Durée de l'événement (heures)",
+      "duracaoHint": "De 1 à 48 h. Le décompte commence quand vous cliquez sur « Démarrer » ; vous pourrez la prolonger."
     },
     "toasts": {
       "selecioneSessao": "Sélectionnez une session",
@@ -339,6 +341,16 @@
       "cancelar": "Annuler",
       "nomeAtualizado": "Nom de l'équipe mis à jour.",
       "nomeObrigatorio": "Saisissez un nom pour l'équipe."
+    },
+    "fimEvento": {
+      "titulo": "Fin de l'événement",
+      "restante": "Il reste {tempo}",
+      "esgotado": "Le temps est écoulé : les équipes ne peuvent plus avancer ni rendre leur projet. Prolongez pour rouvrir.",
+      "estender": "Prolonger pour tout le monde",
+      "confirmar": "Ajouter {tempo} pour tout le monde ? Confirmer",
+      "estendido": "{min} min ajoutées à l'événement pour toutes les équipes.",
+      "limite": "L'événement ne peut pas durer plus de 48 h au total depuis son début.",
+      "terminado": "La partie est terminée."
     }
   },
   "jogador": {

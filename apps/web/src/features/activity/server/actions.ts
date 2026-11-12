@@ -10,6 +10,7 @@ export const ACTION_LABEL = {
   // Educator
   EVENT_CREATED: "Creó la sesión",
   EVENT_STATUS_CHANGED: "Cambió el estado de la sesión",
+  EVENT_EXTENDED: "Extendió el tiempo de la sesión",
   ACTIVITY_TIMER_STARTED: "Inició el timer de actividad",
   ACTIVITY_TIMER_VISIBILITY_CHANGED: "Mostró u ocultó el timer de actividad",
   ACTIVITY_TIMER_STOPPED: "Detuvo el timer de actividad",

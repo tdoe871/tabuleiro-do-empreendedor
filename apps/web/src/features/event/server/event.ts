@@ -12,6 +12,12 @@ import { toSwitchesDTO, type SwitchesDTO } from "./switches";
 // can be unit-tested; the route handlers in src/app/api/events use them.
 
 export const DEFAULT_EVENT_DURATION_MINUTES = 24 * 60;
+// The educator picks the event's length in whole hours when creating it.
+export const MIN_EVENT_DURATION_HOURS = 1;
+export const MAX_EVENT_DURATION_HOURS = 48;
+// Extending a running event: at most this much per click, and the event can
+// never last longer than MAX_EVENT_DURATION_HOURS in total (from its start).
+export const MAX_EXTENSION_MINUTES = 12 * 60;
 export const MIN_TEAM_SIZE = 2;
 export const MAX_TEAM_SIZE = 5;
 export const MAX_TEAMS = 200;
@@ -92,7 +98,7 @@ function isIntInRange(value: unknown, min: number, max: number) {
 }
 
 // Body of POST /api/events, as CreateSessionModal sends it:
-// { titulo, modo, cenario, numEquipes, integrantes }.
+// { titulo, modo, cenario, numEquipes, integrantes, duracaoHoras? }.
 export function parseCreateEventBody(
   body: Record<string, unknown>,
 ): Parsed<CreateEventInput> {
@@ -125,6 +131,22 @@ export function parseCreateEventBody(
   else if (!isIntInRange(body.integrantes, MIN_TEAM_SIZE, MAX_TEAM_SIZE))
     fields.integrantes = "INVALID";
 
+  // Optional: older clients do not send it and get the default 24 h.
+  let durationMinutes = DEFAULT_EVENT_DURATION_MINUTES;
+  if (body.duracaoHoras !== undefined) {
+    if (
+      isIntInRange(
+        body.duracaoHoras,
+        MIN_EVENT_DURATION_HOURS,
+        MAX_EVENT_DURATION_HOURS,
+      )
+    ) {
+      durationMinutes = (body.duracaoHoras as number) * 60;
+    } else {
+      fields.duracaoHoras = "INVALID";
+    }
+  }
+
   if (Object.keys(fields).length > 0 || !mode) return { ok: false, fields };
   return {
     ok: true,
@@ -134,7 +156,7 @@ export function parseCreateEventBody(
       scenario,
       maxTeams: body.numEquipes as number,
       maxTeamSize: body.integrantes as number,
-      durationMinutes: DEFAULT_EVENT_DURATION_MINUTES,
+      durationMinutes,
     },
   };
 }
@@ -200,4 +222,53 @@ export function planStatusChange(
   }
 
   return { ok: false };
+}
+
+type Extension =
+  | { ok: true; endsAt: Date }
+  | {
+      ok: false;
+      error: "EVENT_FINISHED" | "EVENT_NOT_ACTIVE" | "VALIDATION_ERROR";
+      fields?: Record<string, string>;
+    };
+
+// The educator gives everyone more time on the event's clock. Adds `minutes`
+// to the end time, or to now if the time already ran out (that reopens the
+// board for every team at once). Only for a started event (ACTIVE or
+// PAUSED) with the global clock, and never past MAX_EVENT_DURATION_HOURS
+// from its start.
+export function planExtension(
+  event: Pick<Event, "status" | "startedAt" | "endsAt">,
+  minutes: unknown,
+  now: Date,
+): Extension {
+  if (!isIntInRange(minutes, 1, MAX_EXTENSION_MINUTES)) {
+    return {
+      ok: false,
+      error: "VALIDATION_ERROR",
+      fields: { minutes: "INVALID" },
+    };
+  }
+  if (event.status === "FINISHED")
+    return { ok: false, error: "EVENT_FINISHED" };
+  if (event.status === "DRAFT") return { ok: false, error: "EVENT_NOT_ACTIVE" };
+  if (!event.startedAt || !event.endsAt) {
+    return {
+      ok: false,
+      error: "VALIDATION_ERROR",
+      fields: { timerMode: "NO_GLOBAL_CLOCK" },
+    };
+  }
+
+  const base = Math.max(event.endsAt.getTime(), now.getTime());
+  const endsAt = new Date(base + (minutes as number) * 60_000);
+  const total = endsAt.getTime() - event.startedAt.getTime();
+  if (total > MAX_EVENT_DURATION_HOURS * 3_600_000) {
+    return {
+      ok: false,
+      error: "VALIDATION_ERROR",
+      fields: { minutes: "TOO_LONG" },
+    };
+  }
+  return { ok: true, endsAt };
 }

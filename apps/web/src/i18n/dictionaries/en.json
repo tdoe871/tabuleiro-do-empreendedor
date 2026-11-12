@@ -297,7 +297,9 @@
       "integrantesLabel": "Members per team",
       "cancelar": "Cancel",
       "criar": "Create session →",
-      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap)."
+      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap).",
+      "duracaoLabel": "Event length (hours)",
+      "duracaoHint": "1 to 48 h. It starts counting when you press “Start”; you can extend it later."
     },
     "toasts": {
       "selecioneSessao": "Select a session",
@@ -339,6 +341,16 @@
       "cancelar": "Cancel",
       "nomeAtualizado": "Team name updated.",
       "nomeObrigatorio": "Type a name for the team."
+    },
+    "fimEvento": {
+      "titulo": "Event ends",
+      "restante": "{tempo} left",
+      "esgotado": "Time is up: teams can no longer progress or submit. Extend to reopen.",
+      "estender": "Extend time for everyone",
+      "confirmar": "Add {tempo} for everyone? Confirm",
+      "estendido": "Added {min} min to the event for every team.",
+      "limite": "The event cannot last more than 48 h in total from its start.",
+      "terminado": "The game has ended."
     }
   },
   "jogador": {
