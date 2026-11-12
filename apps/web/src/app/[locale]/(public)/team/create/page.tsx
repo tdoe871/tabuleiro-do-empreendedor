@@ -96,12 +96,31 @@ export default function CreateTeamPage() {
             <p style={{ fontSize: 12, color: "var(--t3)", marginTop: 8 }}>
               {t("shareLink")}
             </p>
-            <div className="field" style={{ marginTop: 10 }}>
+            <div
+              className="field"
+              style={{
+                marginTop: 10,
+                flexDirection: "row",
+                display: "flex",
+                gap: 8,
+              }}
+            >
               <input
                 readOnly
                 value={shareUrl}
                 onFocus={(e) => e.target.select()}
+                style={{ flex: 1 }}
               />
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(shareUrl);
+                  toast("ok", t("linkCopied"));
+                }}
+              >
+                {t("copyLink")}
+              </button>
             </div>
             <button
               type="button"

@@ -4,7 +4,20 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build", "^generate"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "SUPABASE_URL",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_SECRET_KEY",
+        "SUPABASE_JWKS_URL",
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "DATABASE_POOL_MAX",
+        "AUTH_SECRET",
+        "REALTIME_PROVIDER",
+        "RESEND_API_KEY",
+        "MAIL_FROM"
+      ]
     },
     "dev": {
       "dependsOn": ["^generate"],
