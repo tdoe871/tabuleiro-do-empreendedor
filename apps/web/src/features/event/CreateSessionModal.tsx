@@ -77,15 +77,15 @@ export function CreateSessionModal({
 
   return (
     <Modal onClose={onClose} maxWidth={480}>
-      <h3 className="text-xl font-bold tracking-tight text-slate-900">
+      <h3 className="text-xl font-bold tracking-tight text-[#f4f0e5]">
         {t("titulo")}
       </h3>
-      <p className="text-slate-500">{t("sub")}</p>
-      <form onSubmit={handleSubmit} className="text-slate-900">
+      <p className="text-[#b8b0a3]">{t("sub")}</p>
+      <form onSubmit={handleSubmit} className="text-[#f4f0e5]">
         <div className="field">
-          <label className="text-slate-500">{t("tituloLabel")}</label>
+          <label className="text-[#b8b0a3]">{t("tituloLabel")}</label>
           <input
-            className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+            className="w-full rounded-[8px] bg-[#302d28] border border-[#464036] px-3.5 py-2.5 text-sm text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:border-[#dab979] focus:outline-none transition-all duration-300"
             placeholder={t("tituloPlaceholder")}
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
@@ -93,9 +93,9 @@ export function CreateSessionModal({
           />
         </div>
         <div className="field">
-          <label className="text-slate-500">{t("modoLabel")}</label>
+          <label className="text-[#b8b0a3]">{t("modoLabel")}</label>
           <select
-            className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+            className="w-full rounded-[8px] bg-[#302d28] border border-[#464036] px-3.5 py-2.5 text-sm text-[#f4f0e5] focus:border-[#dab979] focus:outline-none transition-all duration-300"
             value={modo}
             onChange={(e) =>
               setModo(e.target.value as "escolar" | "personalizado")
@@ -107,15 +107,15 @@ export function CreateSessionModal({
         </div>
         {modo === "personalizado" && (
           <div className="field">
-            <label className="text-slate-500">{t("contextoLabel")}</label>
+            <label className="text-[#b8b0a3]">{t("contextoLabel")}</label>
             <input
-              className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+              className="w-full rounded-[8px] bg-[#302d28] border border-[#464036] px-3.5 py-2.5 text-sm text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:border-[#dab979] focus:outline-none transition-all duration-300"
               placeholder={t("contextoPlaceholder")}
               value={cenario}
               onChange={(e) => setCenario(e.target.value)}
             />
             <div
-              className="text-slate-500"
+              className="text-[#b8b0a3]"
               style={{ fontSize: 10, marginTop: 4 }}
             >
               {t("contextoAjuda")}
@@ -126,12 +126,12 @@ export function CreateSessionModal({
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
         >
           <div className="field">
-            <label className="text-slate-500">{t("numEquipesLabel")}</label>
+            <label className="text-[#b8b0a3]">{t("numEquipesLabel")}</label>
             <input
               type="number"
               min={1}
               max={80}
-              className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+              className="w-full rounded-[8px] bg-[#302d28] border border-[#464036] px-3.5 py-2.5 text-sm text-[#f4f0e5] focus:border-[#dab979] focus:outline-none transition-all duration-300"
               value={numEquipes}
               onChange={(e) => setNumEquipes(Number(e.target.value))}
               onBlur={(e) =>
@@ -140,14 +140,14 @@ export function CreateSessionModal({
                 )
               }
             />
-            <div className="field-hint text-slate-500">
+            <div className="field-hint text-[#b8b0a3]">
               {t("numEquipesHint")}
             </div>
           </div>
           <div className="field">
-            <label className="text-slate-500">{t("integrantesLabel")}</label>
+            <label className="text-[#b8b0a3]">{t("integrantesLabel")}</label>
             <select
-              className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+              className="w-full rounded-[8px] bg-[#302d28] border border-[#464036] px-3.5 py-2.5 text-sm text-[#f4f0e5] focus:border-[#dab979] focus:outline-none transition-all duration-300"
               value={integrantes}
               onChange={(e) => setIntegrantes(Number(e.target.value))}
             >
@@ -162,14 +162,14 @@ export function CreateSessionModal({
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button
             type="button"
-            className="btn btn-ghost bg-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg shadow-sm transition-all"
+            className="btn btn-ghost bg-none bg-[#302d28] hover:bg-[#383126] border border-[#464036] text-[#b8b0a3] hover:text-[#f4f0e5] rounded-[8px] transition-all duration-300 active:scale-95"
             onClick={onClose}
           >
             {t("cancelar")}
           </button>
           <button
             type="submit"
-            className="btn btn-primary bg-none bg-[#6366F1] hover:bg-[#4F46E5] text-white font-medium rounded-lg shadow-sm active:scale-95 transition-all"
+            className="btn btn-primary bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300"
             disabled={submitting}
           >
             {t("criar")}

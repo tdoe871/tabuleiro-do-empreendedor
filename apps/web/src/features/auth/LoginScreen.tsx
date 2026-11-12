@@ -139,8 +139,8 @@ export function LoginScreen() {
 
   return (
     <>
-      <div id="tela-login" className="bg-[#0b1321] text-[#f1f6ff]">
-        <div className="login-hero bg-none bg-[#0b1321] text-[#f1f6ff] border-r border-[#2a3b52]">
+      <div id="tela-login" className="bg-[#151411] text-[#f4f0e5]">
+        <div className="login-hero bg-none bg-[#151411] text-[#f4f0e5] border-r border-[#464036]">
           <div className="glow-prob" />
           <div className="glow-parc" />
           <div className="glow-opor" />
@@ -149,30 +149,30 @@ export function LoginScreen() {
           </div>
           <div className="login-hero-content anim-in">
             <div className="logo-row">
-              <div className="logo-gem bg-[#202f54] border border-[#8b9fff] rounded-[10px] shadow-[0_0_18px_rgba(139,159,255,0.2)] transition-all duration-300">
+              <div className="logo-gem bg-[#383126] border border-[#dab979] rounded-[8px] shadow-[0_0_18px_rgba(218,185,121,0.16)] transition-all duration-300">
                 <GemLogo />
               </div>
               <div>
-                <div className="logo-nm text-[#f1f6ff]">
+                <div className="logo-nm text-[#f4f0e5]">
                   {tCommon("appName")}
                 </div>
-                <div className="logo-sb text-[#9caec6]">TdoE</div>
+                <div className="logo-sb text-[#b8b0a3]">TdoE</div>
               </div>
               <div style={{ marginLeft: "auto" }}>
                 <LangSwitcher />
               </div>
             </div>
             <div>
-              <div className="hero-hl text-[#f1f6ff]">{t("heroHl")}</div>
+              <div className="hero-hl text-[#f4f0e5]">{t("heroHl")}</div>
               <div className="hero-jogo grad">{t("heroJogo")}</div>
-              <div className="hero-tag text-[#9caec6]">{t("heroTag")}</div>
+              <div className="hero-tag text-[#b8b0a3]">{t("heroTag")}</div>
               <div className="hero-chips">
                 {KEY_IDS.map((id) => {
                   const key = tKeys.raw(id) as KeyTranslation;
                   return (
                     <div
                       key={id}
-                      className="badge transition-all duration-300 hover:border-[#8b9fff] hover:shadow-[0_0_16px_rgba(139,159,255,0.2)]"
+                      className="badge transition-all duration-300 hover:border-[#dab979] hover:shadow-[0_0_16px_rgba(218,185,121,0.16)]"
                       style={{
                         background: `var(${KEY_COLOR_VAR[id]}-bg)`,
                         color: `var(${KEY_COLOR_VAR[id]})`,
@@ -187,47 +187,47 @@ export function LoginScreen() {
               <HeroConceitos />
             </div>
           </div>
-          <div className="hero-foot text-[#9caec6]">© 2026 TdoE</div>
-          <div className="hero-bar bg-none bg-[#8b9fff]" />
+          <div className="hero-foot text-[#b8b0a3]">© 2026 TdoE</div>
+          <div className="hero-bar bg-none bg-[#dab979]" />
         </div>
 
-        <div className="login-panel bg-none bg-[#0f1a2c] text-[#f1f6ff] border-l border-[#2a3b52]">
-          <div className="login-tabs bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl p-1.5 shadow-[0_0_22px_rgba(8,15,28,0.45)]">
+        <div className="login-panel bg-none bg-[#191816] text-[#f4f0e5] border-l border-[#464036]">
+          <div className="login-tabs bg-[#24221f]/90 backdrop-blur-xl border border-[#464036] rounded-xl p-1.5 shadow-[0_0_22px_rgba(0,0,0,0.45)]">
             <div
-              className={`login-tab rounded-[9px] transition-all duration-200 ${
+              className={`login-tab rounded-[8px] transition-all duration-300 active:scale-95 ${
                 tab === "login"
-                  ? "on !bg-[#202f54] !text-[#8b9fff] border border-[#8b9fff] shadow-[0_0_14px_rgba(139,159,255,0.2)]"
-                  : "text-[#9caec6] hover:text-[#f1f6ff] hover:bg-[#1a2940]"
+                  ? "on !bg-[#383126] !text-[#dab979] border border-[#dab979] shadow-[0_0_14px_rgba(218,185,121,0.16)]"
+                  : "text-[#b8b0a3] hover:text-[#f4f0e5] hover:bg-[#302d28]"
               }`}
               onClick={() => setTab("login")}
             >
               {t("tabs.login")}
             </div>
             <div
-              className={`login-tab rounded-[9px] transition-all duration-200 ${
+              className={`login-tab rounded-[8px] transition-all duration-300 active:scale-95 ${
                 tab === "cadastro"
-                  ? "on !bg-[#202f54] !text-[#8b9fff] border border-[#8b9fff] shadow-[0_0_14px_rgba(139,159,255,0.2)]"
-                  : "text-[#9caec6] hover:text-[#f1f6ff] hover:bg-[#1a2940]"
+                  ? "on !bg-[#383126] !text-[#dab979] border border-[#dab979] shadow-[0_0_14px_rgba(218,185,121,0.16)]"
+                  : "text-[#b8b0a3] hover:text-[#f4f0e5] hover:bg-[#302d28]"
               }`}
               onClick={() => setTab("cadastro")}
             >
               {t("tabs.cadastro")}
             </div>
             <div
-              className={`login-tab rounded-[9px] transition-all duration-200 ${
+              className={`login-tab rounded-[8px] transition-all duration-300 active:scale-95 ${
                 tab === "codigo"
-                  ? "on !bg-[#202f54] !text-[#8b9fff] border border-[#8b9fff] shadow-[0_0_14px_rgba(139,159,255,0.2)]"
-                  : "text-[#9caec6] hover:text-[#f1f6ff] hover:bg-[#1a2940]"
+                  ? "on !bg-[#383126] !text-[#dab979] border border-[#dab979] shadow-[0_0_14px_rgba(218,185,121,0.16)]"
+                  : "text-[#b8b0a3] hover:text-[#f4f0e5] hover:bg-[#302d28]"
               }`}
               onClick={() => setTab("codigo")}
             >
               {t("tabs.codigo")}
             </div>
             <div
-              className={`login-tab rounded-[9px] transition-all duration-200 ${
+              className={`login-tab rounded-[8px] transition-all duration-300 active:scale-95 ${
                 tab === "mentor"
-                  ? "on !bg-[#202f54] !text-[#8b9fff] border border-[#8b9fff] shadow-[0_0_14px_rgba(139,159,255,0.2)]"
-                  : "text-[#9caec6] hover:text-[#f1f6ff] hover:bg-[#1a2940]"
+                  ? "on !bg-[#383126] !text-[#dab979] border border-[#dab979] shadow-[0_0_14px_rgba(218,185,121,0.16)]"
+                  : "text-[#b8b0a3] hover:text-[#f4f0e5] hover:bg-[#302d28]"
               }`}
               onClick={() => setTab("mentor")}
             >
@@ -237,29 +237,29 @@ export function LoginScreen() {
 
           {tab === "login" && (
             <form
-              className="anim-in bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl p-7 transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)]"
+              className="anim-in bg-[#24221f]/90 backdrop-blur-xl border border-[#464036] rounded-xl p-7 transition-all duration-300 hover:bg-[#383126] hover:border-[#dab979] hover:shadow-[0_0_22px_rgba(218,185,121,0.16)]"
               onSubmit={handleLogin}
             >
-              <div className="login-title text-[#f1f6ff]">
+              <div className="login-title text-[#f4f0e5]">
                 {t("form.titleEdu")}
               </div>
-              <div className="login-sub text-[#9caec6]">{t("form.subEdu")}</div>
+              <div className="login-sub text-[#b8b0a3]">{t("form.subEdu")}</div>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.email")}</label>
+                <label className="text-[#b8b0a3]">{t("form.email")}</label>
                 <input
                   type="email"
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.senha")}</label>
+                <label className="text-[#b8b0a3]">{t("form.senha")}</label>
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={loginSenha}
                   onChange={(e) => setLoginSenha(e.target.value)}
                   required
@@ -268,7 +268,7 @@ export function LoginScreen() {
               <div style={{ textAlign: "right", marginBottom: 10 }}>
                 <button
                   type="button"
-                  className="text-[#9caec6] hover:text-[#8b9fff] font-medium transition-colors"
+                  className="text-[#b8b0a3] hover:text-[#dab979] font-medium transition-colors"
                   onClick={() => {
                     setForgotEmail(loginEmail);
                     setForgotSent(false);
@@ -287,7 +287,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-none bg-[#8b9fff] hover:bg-[#9baeff] border border-[#8b9fff] text-[#0c1226] font-semibold rounded-[9px] shadow-[0_0_18px_rgba(139,159,255,0.28)] active:scale-95 transition-all justify-center"
+                className="btn btn-primary w100 bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300 justify-center"
               >
                 {t("form.enter")}
               </button>
@@ -296,13 +296,13 @@ export function LoginScreen() {
 
           {tab === "cadastro" && (
             <form
-              className="anim-in bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl p-7 transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)]"
+              className="anim-in bg-[#24221f]/90 backdrop-blur-xl border border-[#464036] rounded-xl p-7 transition-all duration-300 hover:bg-[#383126] hover:border-[#dab979] hover:shadow-[0_0_22px_rgba(218,185,121,0.16)]"
               onSubmit={handleCadastro}
             >
-              <div className="login-title text-[#f1f6ff]">
+              <div className="login-title text-[#f4f0e5]">
                 {t("form.titleCad")}
               </div>
-              <div className="login-sub text-[#9caec6]">{t("form.subCad")}</div>
+              <div className="login-sub text-[#b8b0a3]">{t("form.subCad")}</div>
               <div
                 style={{
                   display: "grid",
@@ -311,20 +311,20 @@ export function LoginScreen() {
                 }}
               >
                 <div className="field">
-                  <label className="text-[#9caec6]">{t("form.nome")}</label>
+                  <label className="text-[#b8b0a3]">{t("form.nome")}</label>
                   <input
-                    className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                    className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                     value={cadNome}
                     onChange={(e) => setCadNome(e.target.value)}
                     required
                   />
                 </div>
                 <div className="field">
-                  <label className="text-[#9caec6]">
+                  <label className="text-[#b8b0a3]">
                     {t("form.sobrenome")}
                   </label>
                   <input
-                    className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                    className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                     value={cadSobrenome}
                     onChange={(e) => setCadSobrenome(e.target.value)}
                     required
@@ -332,10 +332,10 @@ export function LoginScreen() {
                 </div>
               </div>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.email")}</label>
+                <label className="text-[#b8b0a3]">{t("form.email")}</label>
                 <input
                   type="email"
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={cadEmail}
                   onChange={(e) => setCadEmail(e.target.value)}
                   required
@@ -349,11 +349,11 @@ export function LoginScreen() {
                 }}
               >
                 <div className="field">
-                  <label className="text-[#9caec6]">{t("form.senha")}</label>
+                  <label className="text-[#b8b0a3]">{t("form.senha")}</label>
                   <input
                     type="password"
                     placeholder="••••••••"
-                    className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                    className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                     value={cadSenha}
                     onChange={(e) => setCadSenha(e.target.value)}
                     minLength={8}
@@ -361,13 +361,13 @@ export function LoginScreen() {
                   />
                 </div>
                 <div className="field">
-                  <label className="text-[#9caec6]">
+                  <label className="text-[#b8b0a3]">
                     {t("form.confirmar")}
                   </label>
                   <input
                     type="password"
                     placeholder="••••••••"
-                    className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                    className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                     value={cadConf}
                     onChange={(e) => setCadConf(e.target.value)}
                     minLength={8}
@@ -377,7 +377,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-none bg-[#8b9fff] hover:bg-[#9baeff] border border-[#8b9fff] text-[#0c1226] font-semibold rounded-[9px] shadow-[0_0_18px_rgba(139,159,255,0.28)] active:scale-95 transition-all justify-center"
+                className="btn btn-primary w100 bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300 justify-center"
               >
                 {t("form.criarConta")}
               </button>
@@ -386,30 +386,30 @@ export function LoginScreen() {
 
           {tab === "codigo" && (
             <form
-              className="anim-in bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl p-7 transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)]"
+              className="anim-in bg-[#24221f]/90 backdrop-blur-xl border border-[#464036] rounded-xl p-7 transition-all duration-300 hover:bg-[#383126] hover:border-[#dab979] hover:shadow-[0_0_22px_rgba(218,185,121,0.16)]"
               onSubmit={handleCodigo}
             >
-              <div className="login-title text-[#f1f6ff]">
+              <div className="login-title text-[#f4f0e5]">
                 {t("form.titleCod")}
               </div>
-              <div className="login-sub text-[#9caec6]">{t("form.subCod")}</div>
+              <div className="login-sub text-[#b8b0a3]">{t("form.subCod")}</div>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.seuNome")}</label>
+                <label className="text-[#b8b0a3]">{t("form.seuNome")}</label>
                 <input
                   placeholder={t("form.comoChamado")}
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={jogNome}
                   onChange={(e) => setJogNome(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label className="text-[#9caec6]">
+                <label className="text-[#b8b0a3]">
                   {t("form.codigoSessao")}
                 </label>
                 <input
                   placeholder={t("form.codigoPlaceholder")}
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   style={{
                     textTransform: "uppercase",
                     letterSpacing: ".2em",
@@ -422,28 +422,28 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-none bg-[#8b9fff] hover:bg-[#9baeff] border border-[#8b9fff] text-[#0c1226] font-semibold rounded-[9px] shadow-[0_0_18px_rgba(139,159,255,0.28)] active:scale-95 transition-all justify-center"
+                className="btn btn-primary w100 bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300 justify-center"
               >
                 {t("form.entrarJogo")}
               </button>
               <div style={{ marginTop: 12 }}>
-                <div className="code-blk bg-none bg-[#172744] border border-[#2a3b52] rounded-2xl transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)]">
-                  <div className="code-gem bg-[#202f54] border border-[#8b9fff] text-[#8b9fff]">
+                <div className="code-blk bg-none bg-[#383126] border border-[#464036] rounded-xl transition-all duration-300 hover:bg-[#383126] hover:border-[#dab979] hover:shadow-[0_0_22px_rgba(218,185,121,0.16)]">
+                  <div className="code-gem bg-[#383126] border border-[#dab979] text-[#dab979]">
                     <GemLogo size={20} />
                   </div>
                   <div>
                     <div
-                      className="small muted text-[#f1f6ff]"
+                      className="small muted text-[#f4f0e5]"
                       style={{
                         fontSize: 12,
                         fontWeight: 700,
-                        color: "#f1f6ff",
+                        color: "#f4f0e5",
                       }}
                     >
                       {t("form.codeHint1")}
                     </div>
                     <div
-                      className="small muted text-[#9caec6]"
+                      className="small muted text-[#b8b0a3]"
                       style={{ marginTop: 2 }}
                     >
                       {t("form.codeHint2")}
@@ -456,32 +456,32 @@ export function LoginScreen() {
 
           {tab === "mentor" && (
             <form
-              className="anim-in bg-[#121e30]/90 backdrop-blur-xl border border-[#2a3b52] rounded-2xl p-7 transition-all duration-300 hover:bg-[#1a2644] hover:border-[#8b9fff] hover:shadow-[0_0_22px_rgba(139,159,255,0.2)]"
+              className="anim-in bg-[#24221f]/90 backdrop-blur-xl border border-[#464036] rounded-xl p-7 transition-all duration-300 hover:bg-[#383126] hover:border-[#dab979] hover:shadow-[0_0_22px_rgba(218,185,121,0.16)]"
               onSubmit={handleMentor}
             >
-              <div className="login-title text-[#f1f6ff]">
+              <div className="login-title text-[#f4f0e5]">
                 {t("form.titleMentor")}
               </div>
-              <div className="login-sub text-[#9caec6]">
+              <div className="login-sub text-[#b8b0a3]">
                 {t("form.subMentor")}
               </div>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.seuNome")}</label>
+                <label className="text-[#b8b0a3]">{t("form.seuNome")}</label>
                 <input
                   placeholder={t("form.comoChamado")}
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={mentNome}
                   onChange={(e) => setMentNome(e.target.value)}
                   required
                 />
               </div>
               <div className="field">
-                <label className="text-[#9caec6]">
+                <label className="text-[#b8b0a3]">
                   {t("form.codigoMentores")}
                 </label>
                 <input
                   placeholder={t("form.codigoPlaceholder")}
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   style={{
                     textTransform: "uppercase",
                     letterSpacing: ".2em",
@@ -494,7 +494,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-none bg-[#8b9fff] hover:bg-[#9baeff] border border-[#8b9fff] text-[#0c1226] font-semibold rounded-[9px] shadow-[0_0_18px_rgba(139,159,255,0.28)] active:scale-95 transition-all justify-center"
+                className="btn btn-primary w100 bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300 justify-center"
               >
                 {t("form.entrarMentor")}
               </button>
@@ -503,7 +503,7 @@ export function LoginScreen() {
         </div>
       </div>
       <div
-        className="bg-[#0b1321] text-[#9caec6] border-t border-[#2a3b52]"
+        className="bg-[#151411] text-[#b8b0a3] border-t border-[#464036]"
         style={{
           textAlign: "center",
           padding: "18px 20px 24px",
@@ -521,21 +521,21 @@ export function LoginScreen() {
 
       {showForgot && (
         <Modal onClose={() => setShowForgot(false)} maxWidth={400}>
-          <h3 className="text-[#f1f6ff]">{t("forgot.titulo")}</h3>
+          <h3 className="text-[#f4f0e5]">{t("forgot.titulo")}</h3>
           {forgotSent ? (
-            <p className="text-[#9caec6]" style={{ fontSize: 12 }}>
+            <p className="text-[#b8b0a3]" style={{ fontSize: 12 }}>
               {t("forgot.enviado")}
             </p>
           ) : (
             <form onSubmit={handleForgot}>
-              <p className="text-[#9caec6]" style={{ fontSize: 12 }}>
+              <p className="text-[#b8b0a3]" style={{ fontSize: 12 }}>
                 {t("forgot.sub")}
               </p>
               <div className="field">
-                <label className="text-[#9caec6]">{t("form.email")}</label>
+                <label className="text-[#b8b0a3]">{t("form.email")}</label>
                 <input
                   type="email"
-                  className="bg-[#1a2940] border border-[#2a3b52] rounded-[8px] text-[#f1f6ff] placeholder:text-[#8594b0] focus:bg-[#202f54] focus:border-[#8b9fff] focus:ring-2 focus:ring-[#8b9fff]/20 transition-all"
+                  className="bg-[#302d28] border border-[#464036] rounded-[8px] text-[#f4f0e5] placeholder:text-[#b8b0a3]/60 focus:bg-[#383126] focus:border-[#dab979] focus:ring-2 focus:ring-[#dab979]/20 transition-all duration-300"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   required
@@ -544,7 +544,7 @@ export function LoginScreen() {
               </div>
               <button
                 type="submit"
-                className="btn btn-primary w100 bg-none bg-[#8b9fff] hover:bg-[#9baeff] border border-[#8b9fff] text-[#0c1226] font-semibold rounded-[9px] shadow-[0_0_18px_rgba(139,159,255,0.28)] active:scale-95 transition-all justify-center"
+                className="btn btn-primary w100 bg-none bg-[#dab979] hover:bg-[#e4c98f] border border-[#dab979] text-[#211d13] font-semibold rounded-[8px] shadow-[0_0_15px_rgba(218,185,121,0.25)] active:scale-95 transition-all duration-300 justify-center"
               >
                 {t("forgot.enviar")}
               </button>

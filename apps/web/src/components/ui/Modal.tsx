@@ -21,7 +21,7 @@ export function Modal({
 
   return (
     <div
-      className="modal-overlay bg-slate-900/40 backdrop-blur-sm"
+      className="modal-overlay bg-black/60 backdrop-blur-md"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -29,7 +29,7 @@ export function Modal({
       <div
         role="dialog"
         aria-modal="true"
-        className="modal bg-none bg-white border border-slate-200 rounded-xl text-slate-900 shadow-xl transition-all duration-300"
+        className="modal bg-none bg-[#24221f] border border-[#464036] rounded-xl text-[#f4f0e5] shadow-[0_0_40px_rgba(0,0,0,0.8)] transition-all duration-300"
         style={{ maxWidth }}
       >
         {children}
