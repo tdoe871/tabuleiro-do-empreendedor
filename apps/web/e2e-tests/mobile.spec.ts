@@ -75,13 +75,6 @@ for (const [phone, device] of Object.entries(phones)) {
       test(`${locale}: no sideways scroll and no clipped text`, async ({
         page,
       }) => {
-        // KNOWN BUG: at 320 px the French tab labels widen .login-panel and
-        // .login-hero to 325 px (5 px sideways scroll). Remove this line once
-        // fixed; Playwright reports it when the test starts passing.
-        test.fail(
-          phone === "iPhone SE (320 px)" && locale === "fr",
-          "French login overflows at 320 px",
-        );
         await page.goto(`/${locale}`);
         await expect(page.locator(".login-tab").first()).toBeVisible();
         for (const tabName of Object.values(d.login.tabs)) {
@@ -120,10 +113,6 @@ for (const [phone, device] of Object.entries(phones)) {
     test("inputs use at least 16px text so iPhones do not zoom in on focus", async ({
       page,
     }) => {
-      // KNOWN BUG: login inputs use 13px text, so Safari on iPhone zooms the
-      // page in when a player taps the name or event code field. Remove this
-      // line once fixed; Playwright reports it when the test starts passing.
-      test.fail(true, "Login inputs are 13px");
       await page.goto("/pt-BR");
       const small: string[] = [];
       for (const tabName of Object.values(ptBR.login.tabs)) {
