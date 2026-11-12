@@ -2346,6 +2346,18 @@
     .login-panel {
       padding: 36px 24px;
     }
+    .login-panel::before {
+      /* divider between hero/panel columns only makes sense side-by-side */
+      display: none;
+    }
+    .login-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .login-tab {
+      padding: 10px 4px;
+    }
     .hero-hl {
       font-size: 36px;
     }
