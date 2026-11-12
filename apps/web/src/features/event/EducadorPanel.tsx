@@ -73,6 +73,7 @@ type OverviewKeyStatus = "ativa" | "concluida" | "bloqueada";
 interface OverviewTeam {
   id: string;
   name: string;
+  joinCode: string;
   memberCount: number;
   score: number;
   keys: Record<KeyId, OverviewKeyStatus>;
@@ -935,6 +936,17 @@ export function EducadorPanel() {
                         }}
                       >
                         👤 {team.memberCount}
+                      </div>
+                      <div
+                        className="badge tiny"
+                        style={{
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
+                          color: "var(--t3)",
+                          borderColor: "var(--border)",
+                        }}
+                        title={t("equipeCard.codigoEquipeTitle")}
+                      >
+                        🔑 {team.joinCode}
                       </div>
                       {team.submission && (
                         <div

@@ -332,7 +332,8 @@
     "equipeCard": {
       "semChaveAtiva": "No active key",
       "chaves": "keys",
-      "entregou": "Submitted"
+      "entregou": "Submitted",
+      "codigoEquipeTitle": "Team join code — give it to a student who got logged out"
     }
   },
   "jogador": {
@@ -364,7 +365,8 @@
     },
     "cenario": {
       "titulo": "Investigation session",
-      "sub": "You are a change agent."
+      "sub": "You are a change agent.",
+      "codigoEquipe": "Team code: {codigo} (keep it — if you get logged out, use it to rejoin)"
     },
     "membros": {
       "titulo": "Team members",

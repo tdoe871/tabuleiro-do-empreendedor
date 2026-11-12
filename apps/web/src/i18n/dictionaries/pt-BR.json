@@ -332,7 +332,8 @@
     "equipeCard": {
       "semChaveAtiva": "Sem chave ativa",
       "chaves": "chaves",
-      "entregou": "Entregou"
+      "entregou": "Entregou",
+      "codigoEquipeTitle": "Código da equipe — dê para um estudante que perdeu a sessão"
     }
   },
   "jogador": {
@@ -364,7 +365,8 @@
     },
     "cenario": {
       "titulo": "Sessão de investigação",
-      "sub": "Você é um agente de transformação."
+      "sub": "Você é um agente de transformação.",
+      "codigoEquipe": "Código da equipe: {codigo} (guarde — se perder a sessão, ele serve para voltar a entrar)"
     },
     "membros": {
       "titulo": "Membros da equipe",

@@ -332,7 +332,8 @@
     "equipeCard": {
       "semChaveAtiva": "Aucune clé active",
       "chaves": "clés",
-      "entregou": "Soumis"
+      "entregou": "Soumis",
+      "codigoEquipeTitle": "Code d'équipe — donnez-le à un élève déconnecté"
     }
   },
   "jogador": {
@@ -364,7 +365,8 @@
     },
     "cenario": {
       "titulo": "Session d'investigation",
-      "sub": "Vous êtes un agent de transformation."
+      "sub": "Vous êtes un agent de transformation.",
+      "codigoEquipe": "Code d'équipe : {codigo} (gardez-le — si vous êtes déconnecté, il vous permet de revenir)"
     },
     "membros": {
       "titulo": "Membres de l'équipe",
