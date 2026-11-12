@@ -33,6 +33,7 @@
       "RESET_TOKEN_EXPIRED": "Esse link venceu. Peça um novo.",
       "FILE_NOT_FOUND": "Arquivo não encontrado.",
       "ANNOUNCEMENT_NOT_FOUND": "Esse aviso não existe mais.",
+      "MENTOR_NOT_FOUND": "Esse mentor não está mais na sessão.",
       "FILE_NOT_UPLOADED": "Esse arquivo ainda não foi enviado.",
       "TOO_MANY_FILES": "Sua equipe já chegou no limite de arquivos.",
       "TOO_MANY_MENTORS": "Essa sessão já chegou no limite de mentores.",
@@ -223,7 +224,13 @@
       "gerar": "Gerar código",
       "regenerar": "Gerar novo código",
       "mentoresCount": "{count} mentor(es) avaliando",
-      "semNota": "Sem nota"
+      "semNota": "Sem nota",
+      "listaTitulo": "Mentores ativos",
+      "nenhumMentor": "Ninguém entrou ainda.",
+      "remover": "Remover",
+      "removerConfirmar": "Tem certeza? Remover",
+      "removido": "Mentor removido. As notas dele não contam mais.",
+      "equiposTitulo": "Equipes"
     },
     "alertas": {
       "NO_SUBMISSION": "{team}: sem entrega e faltam {minutes} min",
