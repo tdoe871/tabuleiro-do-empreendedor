@@ -2358,6 +2358,17 @@
     .login-tab {
       padding: 10px 4px;
     }
+    .topbar {
+      height: auto;
+      min-height: 52px;
+      flex-wrap: wrap;
+      row-gap: 6px;
+      padding: 8px 16px;
+    }
+    .tb-right {
+      flex-wrap: wrap;
+      row-gap: 6px;
+    }
     .hero-hl {
       font-size: 36px;
     }
