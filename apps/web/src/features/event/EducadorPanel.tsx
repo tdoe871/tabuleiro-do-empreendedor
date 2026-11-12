@@ -15,6 +15,7 @@ import {
   type KeyId,
   type KeyTranslation,
 } from "@/features/event/keys";
+import { activityTimerSecondsLeft } from "./activityTimer";
 import { CreateSessionModal } from "./CreateSessionModal";
 
 export type SessionStatus = "aguardando" | "ativa" | "pausada" | "finalizada";
@@ -72,6 +73,7 @@ type OverviewKeyStatus = "ativa" | "concluida" | "bloqueada";
 interface OverviewTeam {
   id: string;
   name: string;
+  joinCode: string;
   memberCount: number;
   score: number;
   keys: Record<KeyId, OverviewKeyStatus>;
@@ -94,6 +96,7 @@ interface Announcement {
 }
 
 interface Overview {
+  serverNow: string;
   event: EventDTO;
   metrics: { activeTeams: number; participants: number; keysCompleted: number };
   teams: OverviewTeam[];
@@ -174,6 +177,10 @@ export function EducadorPanel() {
   } | null>(null);
   const [announcementInput, setAnnouncementInput] = useState("");
   const [activityMinutes, setActivityMinutes] = useState(15);
+  // Seconds left on the activity timer, re-synced on every overview.
+  const [timerLeft, setTimerLeft] = useState<number | null>(null);
+  // Finishing cannot be undone, so the button asks for a second click.
+  const [confirmingFinish, setConfirmingFinish] = useState(false);
 
   const selected = sessions.find((s) => s.id === selectedId) ?? null;
   const event = overview?.event ?? null;
@@ -218,6 +225,9 @@ export function EducadorPanel() {
     const body = (await res.json().catch(() => null)) as Overview | null;
     if (res.ok && body) {
       setOverviewState({ ...body, sessionId: selectedId });
+      setTimerLeft(
+        activityTimerSecondsLeft(body.event.activityTimer, body.serverNow),
+      );
       setSessions((prev) =>
         prev.map((s) =>
           s.id === body.event.id ? eventToSession(body.event) : s,
@@ -233,8 +243,34 @@ export function EducadorPanel() {
 
   useRealtime(() => void loadOverview(), { eventId: selectedId ?? undefined });
 
+  // Counts the activity timer down between overviews.
+  useEffect(() => {
+    if (timerLeft === null) return;
+    const interval = setInterval(() => {
+      setTimerLeft((s) => (s === null || s <= 0 ? 0 : s - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timerLeft === null]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function selectSession(id: string) {
     setSelectedId(id);
+    setConfirmingFinish(false);
+  }
+
+  function handleFinish() {
+    if (!confirmingFinish) {
+      setConfirmingFinish(true);
+      return;
+    }
+    setConfirmingFinish(false);
+    void changeStatus("FINISHED");
+  }
+
+  async function sair() {
+    // Ends the session for real, so the next person on a shared computer
+    // cannot reopen the panel.
+    await sendJson("/api/auth/logout", "POST").catch(() => null);
+    router.push("/");
   }
 
   async function changeStatus(target: "ACTIVE" | "PAUSED" | "FINISHED") {
@@ -443,6 +479,8 @@ export function EducadorPanel() {
       return;
     }
     toast("ok", t("mentores.removido"));
+    // Removing a mentor also replaces the mentor code: show the new one.
+    void loadOverview();
     const refreshed = await fetch(`/api/events/${selected.id}/evaluations`);
     const body = (await refreshed.json().catch(() => null)) as
       typeof evaluations | null;
@@ -532,6 +570,24 @@ export function EducadorPanel() {
               ▶ {t(`acao.${NEXT_STATUS[selected.status]?.actionKey}`)}
             </button>
           )}
+          {selected &&
+            (selected.status === "ativa" || selected.status === "pausada") && (
+              <button
+                className="btn btn-ghost btn-sm"
+                style={{
+                  color: "var(--prob)",
+                  borderColor: "var(--prob-bd)",
+                  background: confirmingFinish ? "var(--prob-bg)" : undefined,
+                }}
+                onClick={handleFinish}
+                onBlur={() => setConfirmingFinish(false)}
+              >
+                ■{" "}
+                {confirmingFinish
+                  ? t("acao.terminarConfirmar")
+                  : t("acao.terminar")}
+              </button>
+            )}
           <button
             className="btn btn-sm"
             style={{
@@ -542,10 +598,7 @@ export function EducadorPanel() {
           >
             ↗ {t("socializar")}
           </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => router.push("/")}
-          >
+          <button className="btn btn-ghost btn-sm" onClick={() => void sair()}>
             {t("sair")}
           </button>
         </div>
@@ -639,7 +692,7 @@ export function EducadorPanel() {
           </div>
           <div
             className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
-            onClick={() => router.push("/")}
+            onClick={() => void sair()}
           >
             ← {t("sair")}
           </div>
@@ -884,6 +937,17 @@ export function EducadorPanel() {
                       >
                         👤 {team.memberCount}
                       </div>
+                      <div
+                        className="badge tiny"
+                        style={{
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
+                          color: "var(--t3)",
+                          borderColor: "var(--border)",
+                        }}
+                        title={t("equipeCard.codigoEquipeTitle")}
+                      >
+                        🔑 {team.joinCode}
+                      </div>
                       {team.submission && (
                         <div
                           className="badge tiny"
@@ -1018,8 +1082,8 @@ export function EducadorPanel() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              {event?.activityTimer
-                ? fmtClock(event.activityTimer.seconds)
+              {event?.activityTimer && timerLeft !== null
+                ? fmtClock(timerLeft)
                 : "—"}
             </div>
             <div className="timer-ctrl-row">

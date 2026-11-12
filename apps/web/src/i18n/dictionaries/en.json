@@ -65,7 +65,8 @@
       "created": "Team created",
       "createError": "Couldn't create the team",
       "backendPendingJoin": "Join team: backend under construction — opening the board in preview mode.",
-      "invalidCode": "Invalid team code"
+      "invalidCode": "Invalid team code",
+      "recovered": "You joined as “{nickname}”, who was already on the team. If that is not you, sign out and join with another name."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Educator sign-up: backend under construction — opening the panel in preview mode.",
       "registerError": "Couldn't create the account",
       "missingFields": "Fill in your name and the code",
-      "mentorError": "Couldn't sign in. Check the mentor code."
+      "mentorError": "Couldn't sign in. Check the mentor code.",
+      "mentorRecovered": "You joined as “{name}”, who already existed. If that is not you, sign out and join with your full name."
     },
     "forgot": {
       "titulo": "Reset password",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Start session",
       "pausar": "Pause session",
-      "retomar": "Resume session"
+      "retomar": "Resume session",
+      "terminar": "Finish session",
+      "terminarConfirmar": "Finish? This cannot be undone"
     },
     "socializar": "Socialize",
     "sair": "Sign out",
@@ -229,7 +233,7 @@
       "nenhumMentor": "No one has joined yet.",
       "remover": "Remove",
       "removerConfirmar": "Sure? Remove",
-      "removido": "Mentor removed. Their scores no longer count.",
+      "removido": "Mentor removed. Their scores no longer count and the mentor code changed.",
       "equiposTitulo": "Teams"
     },
     "alertas": {
@@ -328,7 +332,8 @@
     "equipeCard": {
       "semChaveAtiva": "No active key",
       "chaves": "keys",
-      "entregou": "Submitted"
+      "entregou": "Submitted",
+      "codigoEquipeTitle": "Team join code — give it to a student who got logged out"
     }
   },
   "jogador": {
@@ -360,7 +365,8 @@
     },
     "cenario": {
       "titulo": "Investigation session",
-      "sub": "You are a change agent."
+      "sub": "You are a change agent.",
+      "codigoEquipe": "Team code: {codigo} (keep it — if you get logged out, use it to rejoin)"
     },
     "membros": {
       "titulo": "Team members",

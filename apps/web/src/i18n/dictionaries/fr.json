@@ -65,7 +65,8 @@
       "created": "Équipe créée",
       "createError": "Impossible de créer l'équipe",
       "backendPendingJoin": "Rejoindre l'équipe : backend en construction — ouverture du plateau en mode aperçu.",
-      "invalidCode": "Code d'équipe invalide"
+      "invalidCode": "Code d'équipe invalide",
+      "recovered": "Vous êtes entré en tant que « {nickname} », qui était déjà dans l’équipe. Si ce n’est pas vous, déconnectez-vous et entrez avec un autre nom."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Inscription formateur : backend en construction — ouverture du panneau en mode aperçu.",
       "registerError": "Impossible de créer le compte",
       "missingFields": "Renseignez votre nom et le code",
-      "mentorError": "Connexion impossible. Vérifiez le code mentor."
+      "mentorError": "Connexion impossible. Vérifiez le code mentor.",
+      "mentorRecovered": "Vous êtes entré en tant que « {name} », qui existait déjà. Si ce n’est pas vous, déconnectez-vous et entrez avec votre nom complet."
     },
     "forgot": {
       "titulo": "Réinitialiser le mot de passe",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Démarrer la session",
       "pausar": "Mettre en pause",
-      "retomar": "Reprendre la session"
+      "retomar": "Reprendre la session",
+      "terminar": "Terminer la session",
+      "terminarConfirmar": "Terminer ? Action irréversible"
     },
     "socializar": "Partager",
     "sair": "Se déconnecter",
@@ -229,7 +233,7 @@
       "nenhumMentor": "Personne n'a encore rejoint.",
       "remover": "Retirer",
       "removerConfirmar": "Sûr ? Retirer",
-      "removido": "Mentor retiré. Ses notes ne comptent plus.",
+      "removido": "Mentor retiré. Ses notes ne comptent plus et le code mentor a changé.",
       "equiposTitulo": "Équipes"
     },
     "alertas": {
@@ -328,7 +332,8 @@
     "equipeCard": {
       "semChaveAtiva": "Aucune clé active",
       "chaves": "clés",
-      "entregou": "Soumis"
+      "entregou": "Soumis",
+      "codigoEquipeTitle": "Code d'équipe — donnez-le à un élève déconnecté"
     }
   },
   "jogador": {
@@ -360,7 +365,8 @@
     },
     "cenario": {
       "titulo": "Session d'investigation",
-      "sub": "Vous êtes un agent de transformation."
+      "sub": "Vous êtes un agent de transformation.",
+      "codigoEquipe": "Code d'équipe : {codigo} (gardez-le — si vous êtes déconnecté, il vous permet de revenir)"
     },
     "membros": {
       "titulo": "Membres de l'équipe",
