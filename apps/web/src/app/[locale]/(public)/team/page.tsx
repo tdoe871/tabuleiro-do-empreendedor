@@ -9,6 +9,10 @@ export default function ChooseTeamActionPage() {
   const t = useTranslations("team");
   const params = useSearchParams();
   const qs = params.toString();
+  // `code` here is the event code. The join form's `code` is the team's own
+  // code (the leader's invite link uses it), so only the nickname goes on.
+  const nickname = params.get("nickname");
+  const joinQs = nickname ? new URLSearchParams({ nickname }).toString() : "";
 
   return (
     <div
@@ -60,7 +64,7 @@ export default function ChooseTeamActionPage() {
               {t("createTeam")}
             </Link>
             <Link
-              href={`/team/join?${qs}`}
+              href={`/team/join?${joinQs}`}
               className="btn btn-ghost"
               style={{ flex: 1, minWidth: 160, justifyContent: "center" }}
             >

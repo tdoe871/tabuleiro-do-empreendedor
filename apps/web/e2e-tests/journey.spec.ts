@@ -724,9 +724,6 @@ test.describe("a full event", { tag: "@db" }, () => {
   });
 
   test("the educator can finish the session from the panel", async () => {
-    // KNOWN GAP: the API supports FINISHED, but neither the educator panel
-    // nor the mural has a button to end the session.
-    test.fail(true, "No 'finish session' button");
     await expect(
       educator.page.getByRole("button", {
         name: /encerrar|finalizar|terminar/i,
@@ -746,10 +743,6 @@ test.describe("a full event", { tag: "@db" }, () => {
   });
 
   test("'Sair' really logs the educator out", async () => {
-    // KNOWN BUG: the panel's "Sair" only navigates to "/" and never calls
-    // /api/auth/logout, so on a shared computer the next person can reopen
-    // the educator panel.
-    test.fail(true, "'Sair' keeps the educator session");
     const { page } = educator;
     await page.getByRole("button", { name: d.educador.sair }).first().click();
     await expect(page).toHaveURL(/\/pt-BR\/?$/);
