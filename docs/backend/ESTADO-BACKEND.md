@@ -540,3 +540,28 @@ Conclusiones:
   capacidad bajó un poco (42 → 38.5 req/s), sin errores. Junto a la base no debería notarse.
 - **`DATABASE_POOL_MAX`:** en Vercel 3-5 por instancia (el pooler de Supabase acepta ~200 conexiones
   de cliente en los planes chicos y cada instancia abre las suyas); en una VM, 10-20.
+
+---
+
+## 11. Actualización 12 nov (Brandon + Claude, después de la entrega de Eddy)
+
+> Esta sección la agrega Brandon (con Claude) sobre el backend ya entregado por Eddy en la sección
+> 1-10. No reemplaza nada de arriba; documenta dos correcciones puntuales encontradas y resueltas
+> la noche del 11-12 nov, ya en producción. Detalle completo en `docs/prs/PR-32.md` y
+> `docs/prs/PR-33.md`.
+
+- **`POINTS_PER_PHASE` estaba en 0** (tabla de la sección 7, fila "Puntos por fase" — seguía siendo
+  el default documentado el 10 nov, nunca se confirmó un valor final). Un equipo podía completar
+  las 8 fases del evento y terminar con 0 puntos. Se cambió a **10** por fase (`board.ts`),
+  verificado en vivo (`GET /api/board` → `score: 10` tras completar una fase) y en producción con
+  una petición HTTP real. PR #32, mergeado a `main` el 12 nov 07:37 UTC.
+- **Hueco de seguridad en el flujo de mentores**, encontrado por Brandon al revisar la sección 7
+  ("Mentores: acceso — código + nombre, sin contraseña"): cualquiera con el código de mentor podía
+  entrar con un nombre inventado y calificar equipos, sin que hubiera forma de revertirlo. Se
+  agregó `DELETE /api/events/:id/mentors/:mentorId` (el educador quita al mentor; por la cascada
+  `Evaluation → Mentor` sus calificaciones desaparecen con él; su sesión muere en la siguiente
+  petición porque `getMentorFromToken` revisa la fila en la base en cada llamada, no solo la firma
+  del JWT). **No se agregó aprobación previa para que un mentor pueda entrar** — se decidió, por
+  tiempo, solo la opción de quitarlo después. PR #33, mergeado a `main` el 12 nov 07:37 UTC.
+- Ambos fixes se probaron end-to-end contra la base real de Supabase (no solo con pruebas
+  automatizadas) la noche del 12 nov. Ver `docs/testing/QA-2026-11-12.md`.
