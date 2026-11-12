@@ -471,7 +471,7 @@ export function EducadorPanel() {
           </span>
         </div>
         <div className="tb-sep bg-slate-200" />
-        <span className="tb-sub text-slate-500">
+        <span className="tb-sub text-slate-700 font-medium">
           {selected ? selected.titulo : t("painelTitulo")}
         </span>
         <div className="tb-right">
@@ -519,13 +519,13 @@ export function EducadorPanel() {
 
       <div className="edu-layout bg-slate-50 text-slate-900">
         <div className={`sidebar ${AG_SIDEBAR} border-r border-indigo-950`}>
-          <div className="sidebar-sec text-indigo-200/70">
+          <div className="sidebar-sec text-slate-400 font-semibold uppercase tracking-wider">
             {t("sidebar.sessoes")}
           </div>
           <div>
             {sessions.length === 0 && (
               <div
-                className="text-indigo-200/70"
+                className="text-slate-400"
                 style={{
                   fontSize: 11,
                   padding: "6px 14px",
@@ -554,7 +554,7 @@ export function EducadorPanel() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="eq-nm text-white">{s.titulo}</div>
-                  <div className="eq-st text-indigo-200/70">
+                  <div className="eq-st text-slate-400">
                     {t(`status.${s.status}`)} · {s.codigo}
                   </div>
                 </div>
@@ -562,57 +562,57 @@ export function EducadorPanel() {
             ))}
           </div>
           <div className="sidebar-divider bg-indigo-800/40" />
-          <div className="sidebar-sec text-indigo-200/70">
+          <div className="sidebar-sec text-slate-400 font-semibold uppercase tracking-wider">
             {t("sidebar.acoes")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => setShowCreate(true)}
           >
             ＋ {t("sidebar.novaSessao")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={handleVerificarAlertas}
           >
             🔔 {t("sidebar.verificarAlertas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={handleSocializar}
           >
             ↗ {t("socializar")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => void abrirEvaluacoes()}
           >
             🎓 {t("sidebar.mentores")}
           </div>
           <div className="sidebar-divider bg-indigo-800/40" />
-          <div className="sidebar-sec text-indigo-200/70">
+          <div className="sidebar-sec text-slate-400 font-semibold uppercase tracking-wider">
             {t("sidebar.exportar")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("report")}
           >
             📋 {t("sidebar.relatorio")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("proposals")}
           >
             📄 {t("sidebar.exportarPropostas")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => exportar("activity")}
           >
             🗒 {t("sidebar.exportarAtividade")}
           </div>
           <div
-            className="sidebar-action rounded-lg mx-1.5 text-indigo-200/70 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
+            className="sidebar-action rounded-lg mx-1.5 text-slate-300 transition-all duration-200 hover:bg-indigo-900/50 hover:text-white hover:translate-x-0.5"
             onClick={() => router.push("/")}
           >
             ← {t("sair")}
@@ -632,10 +632,10 @@ export function EducadorPanel() {
                   background: "var(--prob)",
                 }}
               />
-              <div className="m-val" style={{ color: "var(--prob)" }}>
+              <div className="m-val text-slate-800">
                 {selected ? (overview?.metrics.activeTeams ?? "…") : "—"}
               </div>
-              <div className="m-lbl text-slate-500">
+              <div className="m-lbl text-slate-700 font-semibold">
                 {t("metrics.equipesAtivas")}
               </div>
             </div>
@@ -653,7 +653,7 @@ export function EducadorPanel() {
               <div className="m-val text-slate-900">
                 {selected ? (overview?.metrics.participants ?? "…") : "0"}
               </div>
-              <div className="m-lbl text-slate-500">
+              <div className="m-lbl text-slate-700 font-semibold">
                 {t("metrics.participantes")}
               </div>
             </div>
@@ -668,10 +668,10 @@ export function EducadorPanel() {
                   background: "var(--parc)",
                 }}
               />
-              <div className="m-val" style={{ color: "var(--sol)" }}>
+              <div className="m-val text-slate-800">
                 {selected ? (overview?.metrics.keysCompleted ?? "…") : "0"}
               </div>
-              <div className="m-lbl text-slate-500">
+              <div className="m-lbl text-slate-700 font-semibold">
                 {t("metrics.chavesConcluidas")}
               </div>
             </div>
@@ -686,10 +686,10 @@ export function EducadorPanel() {
                   background: "var(--opor)",
                 }}
               />
-              <div className="m-val text-[#6366F1]" style={{ fontSize: 20 }}>
+              <div className="m-val text-slate-800" style={{ fontSize: 20 }}>
                 {selected ? selected.codigo : "—"}
               </div>
-              <div className="m-lbl text-slate-500">
+              <div className="m-lbl text-slate-700 font-semibold">
                 {t("metrics.codigoAcesso")}
               </div>
             </div>
@@ -731,7 +731,7 @@ export function EducadorPanel() {
                     >
                       {key.name}
                     </div>
-                    <div className="pc-ct text-slate-500">
+                    <div className="pc-ct text-slate-700 font-semibold">
                       {completed}/{teams.length}
                     </div>
                   </div>
@@ -751,7 +751,10 @@ export function EducadorPanel() {
 
           <div className="equipes-grid">
             {!selected && (
-              <div className="text-slate-500" style={{ fontSize: 11 }}>
+              <div
+                className="text-slate-700 font-medium"
+                style={{ fontSize: 12 }}
+              >
                 {t("toasts.selecioneSessao")}
               </div>
             )}
@@ -868,11 +871,14 @@ export function EducadorPanel() {
         </div>
 
         <div className="edu-right bg-slate-50 border-l border-slate-200 text-slate-900">
-          <div className="panel-title text-slate-500">
+          <div className="panel-title text-slate-700 font-bold uppercase tracking-wider">
             {t("right.alertasMediacao")}
           </div>
           {!overview || overview.alerts.length === 0 ? (
-            <div className="text-slate-500" style={{ fontSize: 11 }}>
+            <div
+              className="text-slate-700 font-medium"
+              style={{ fontSize: 12 }}
+            >
               {t("right.nenhumAlerta")}
             </div>
           ) : (
@@ -925,43 +931,43 @@ export function EducadorPanel() {
             </div>
           )}
           <div className="sidebar-divider bg-slate-200" />
-          <div className="panel-title text-slate-500">
+          <div className="panel-title text-slate-700 font-bold uppercase tracking-wider">
             {t("right.controlesSessao")}
           </div>
           <div className="ctrl-grid">
             <div
-              className={`ctrl-btn ${AG_START_BTN} ${!canStart ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn ${AG_START_BTN} ${!canStart ? "opacity-50 pointer-events-none" : ""}`}
               onClick={() => canStart && changeStatus("ACTIVE")}
             >
               ▶ {t("right.iniciar")}
             </div>
             <div
-              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all ${!canPause ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-semibold hover:border-purple-300 shadow-sm transition-all ${!canPause ? "opacity-50 pointer-events-none" : ""}`}
               onClick={() => canPause && changeStatus("PAUSED")}
             >
               ⏸ {t("right.pausar")}
             </div>
             <div
-              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all ${!canResume ? "opacity-45 pointer-events-none" : ""}`}
+              className={`ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-semibold hover:border-purple-300 shadow-sm transition-all ${!canResume ? "opacity-50 pointer-events-none" : ""}`}
               onClick={() => canResume && changeStatus("ACTIVE")}
             >
               ↺ {t("right.retomar")}
             </div>
             <div
-              className="ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:border-purple-300 shadow-sm transition-all"
+              className="ctrl-btn bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-semibold hover:border-purple-300 shadow-sm transition-all"
               onClick={handleVerificarAlertas}
             >
               🔔 {t("right.alertas")}
             </div>
           </div>
           <div className="sidebar-divider bg-slate-200" />
-          <div className="panel-title text-slate-500">
+          <div className="panel-title text-slate-700 font-bold uppercase tracking-wider">
             ⏱ {t("timer.titulo")}
           </div>
           <div className={`timer-edu-block ${AG_CARD} p-3.5 my-2`}>
             <div
-              className="text-slate-500"
-              style={{ fontSize: 10, marginBottom: 4 }}
+              className="text-slate-700 font-semibold"
+              style={{ fontSize: 11, marginBottom: 4 }}
             >
               {t("timer.duracao")}
             </div>
@@ -972,7 +978,7 @@ export function EducadorPanel() {
                   className={`timer-preset-btn rounded-lg transition-all ${
                     activityMinutes === min
                       ? "sel !bg-[#6366F1] !border-[#6366F1] !text-white shadow-sm"
-                      : "bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600"
+                      : "bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium"
                   }`}
                   onClick={() => setActivityMinutes(min)}
                 >
@@ -1010,7 +1016,7 @@ export function EducadorPanel() {
               </button>
             </div>
             <div className="timer-toggle-row bg-slate-50 border border-slate-200 rounded-lg">
-              <span className="timer-toggle-lbl text-slate-600">
+              <span className="timer-toggle-lbl text-slate-700 font-medium">
                 {t("timer.mostrarEstudantes")}
               </span>
               <label className="toggle-sw">
@@ -1025,7 +1031,7 @@ export function EducadorPanel() {
             </div>
           </div>
           <div className="sidebar-divider bg-slate-200" />
-          <div className="panel-title text-slate-500">
+          <div className="panel-title text-slate-700 font-bold uppercase tracking-wider">
             🃏 {t("carta.titulo")}
           </div>
           <div className="carta-launcher">
@@ -1047,7 +1053,7 @@ export function EducadorPanel() {
                     <div className="carta-launcher-nm text-slate-900">
                       {key.name}
                     </div>
-                    <div className="carta-launcher-sub text-slate-500">
+                    <div className="carta-launcher-sub text-slate-600 font-medium">
                       {t(`carta.launcherSub.${id}`)}
                     </div>
                   </div>
