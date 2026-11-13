@@ -340,7 +340,9 @@
       "salvar": "Save",
       "cancelar": "Cancel",
       "nomeAtualizado": "Team name updated.",
-      "nomeObrigatorio": "Type a name for the team."
+      "nomeObrigatorio": "Type a name for the team.",
+      "abrirLink": "Open the delivery link",
+      "baixarArquivo": "Download file"
     },
     "fimEvento": {
       "titulo": "Event ends",
