@@ -340,7 +340,9 @@
       "salvar": "Enregistrer",
       "cancelar": "Annuler",
       "nomeAtualizado": "Nom de l'équipe mis à jour.",
-      "nomeObrigatorio": "Saisissez un nom pour l'équipe."
+      "nomeObrigatorio": "Saisissez un nom pour l'équipe.",
+      "abrirLink": "Ouvrir le lien du rendu",
+      "baixarArquivo": "Télécharger le fichier"
     },
     "fimEvento": {
       "titulo": "Fin de l'événement",

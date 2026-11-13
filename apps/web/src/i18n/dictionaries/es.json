@@ -340,7 +340,9 @@
       "salvar": "Guardar",
       "cancelar": "Cancelar",
       "nomeAtualizado": "Nombre del equipo actualizado.",
-      "nomeObrigatorio": "Escribe un nombre para el equipo."
+      "nomeObrigatorio": "Escribe un nombre para el equipo.",
+      "abrirLink": "Abrir el link de la entrega",
+      "baixarArquivo": "Descargar archivo"
     },
     "fimEvento": {
       "titulo": "Fin del evento",

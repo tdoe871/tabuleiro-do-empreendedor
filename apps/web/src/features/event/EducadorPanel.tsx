@@ -82,7 +82,14 @@ interface OverviewTeam {
   memberCount: number;
   score: number;
   keys: Record<KeyId, OverviewKeyStatus>;
-  submission: { type: string } | null;
+  // The team's delivery (null until it saves one) and the files it uploaded;
+  // each file's downloadUrl redirects to a short-lived signed URL.
+  submission: {
+    type: string;
+    url: string | null;
+    links?: string[];
+  } | null;
+  files?: { id: string; fileName: string; downloadUrl: string }[];
 }
 
 interface OverviewAlert {
@@ -1153,6 +1160,63 @@ export function EducadorPanel() {
                         </div>
                       )}
                     </div>
+                    {/* What the team delivered: its links (https, checked by
+                        the API) and the files it uploaded, to open or
+                        download from here. */}
+                    {(() => {
+                      const links = team.submission
+                        ? [
+                            team.submission.url,
+                            ...(team.submission.links ?? []),
+                          ].filter((link): link is string => Boolean(link))
+                        : [];
+                      const files = team.files ?? [];
+                      if (links.length === 0 && files.length === 0) return null;
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 3,
+                            marginTop: 8,
+                            minWidth: 0,
+                          }}
+                        >
+                          {links.map((link, i) => (
+                            <a
+                              key={`l-${i}-${link}`}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("equipeCard.abrirLink")}
+                              style={{
+                                fontSize: 11,
+                                color: "var(--parc)",
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              🔗 {link}
+                            </a>
+                          ))}
+                          {files.map((file) => (
+                            <a
+                              key={file.id}
+                              href={file.downloadUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("equipeCard.baixarArquivo")}
+                              style={{
+                                fontSize: 11,
+                                color: "var(--parc)",
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              📎 {file.fileName}
+                            </a>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
