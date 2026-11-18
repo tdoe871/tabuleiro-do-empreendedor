@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { GemLogo } from "@/components/ui/GemLogo";
 import { LangSwitcher } from "@/components/shared/LangSwitcher";
@@ -43,6 +43,11 @@ export interface EventDTO {
   maxTeams: number;
   maxTeamSize: number;
   mentorCode: string | null;
+  durationMinutes: number | null;
+  // Set when the educator starts the session; endsAt is when the board
+  // closes for every team (startedAt + duration, moved by "extend").
+  startedAt: string | null;
+  endsAt: string | null;
   activityTimer: { endsAt: string; seconds: number; visible: boolean } | null;
   challengeCard: { key: KeyId; text: string } | null;
   switches: { chat: boolean; submissions: boolean; joins: boolean };
@@ -73,10 +78,18 @@ type OverviewKeyStatus = "ativa" | "concluida" | "bloqueada";
 interface OverviewTeam {
   id: string;
   name: string;
+  joinCode: string;
   memberCount: number;
   score: number;
   keys: Record<KeyId, OverviewKeyStatus>;
-  submission: { type: string } | null;
+  // The team's delivery (null until it saves one) and the files it uploaded;
+  // each file's downloadUrl redirects to a short-lived signed URL.
+  submission: {
+    type: string;
+    url: string | null;
+    links?: string[];
+  } | null;
+  files?: { id: string; fileName: string; downloadUrl: string }[];
 }
 
 interface OverviewAlert {
@@ -120,6 +133,11 @@ const NEXT_STATUS: Partial<
 // look untouched.
 const AVATAR_COLORS = ["#00F5D4", "#00BBF9", "#2DD4BF", "#38BDF8", "#FBBF24"];
 const ACTIVITY_PRESETS = [5, 15, 20, 30];
+// Minutes the educator can add to the event's clock at once.
+const EXTEND_PRESETS = [15, 30, 60, 120];
+
+// Same limit as the API (MAX_TEAM_NAME_LENGTH in features/team/server/team).
+const TEAM_NAME_MAX_LENGTH = 40;
 const AG_SIDEBAR = "bg-[var(--ag-color-sidebar,rgba(6,26,38,0.90))]";
 const AG_BORDER = "border-[var(--ag-color-border,rgba(45,212,191,0.24))]";
 const AG_SURFACE = "bg-[var(--ag-color-surface,rgba(10,38,54,0.78))]";
@@ -145,6 +163,7 @@ export function EducadorPanel() {
   const t = useTranslations("educador");
   const tKeys = useTranslations("keys");
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const toast = useToast();
   const router = useRouter();
 
@@ -159,9 +178,24 @@ export function EducadorPanel() {
       : null;
   const [showCreate, setShowCreate] = useState(false);
   const [showExtensoes, setShowExtensoes] = useState(false);
+  // PDF team report: "all" (every team in one file) or one team's id.
+  const [showPdf, setShowPdf] = useState(false);
+  const [pdfTeam, setPdfTeam] = useState<string>("all");
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
   const [showMentores, setShowMentores] = useState(false);
+  // The team whose name the educator is editing, and the draft name.
+  const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const [savingName, setSavingName] = useState(false);
+  // Extending the event's clock: chosen minutes, second-click confirmation,
+  // and server time minus device time so "time left" ignores a wrong clock.
+  const [extendMinutes, setExtendMinutes] = useState(30);
+  const [confirmingExtend, setConfirmingExtend] = useState(false);
+  const [extending, setExtending] = useState(false);
+  const [clockOffsetMs, setClockOffsetMs] = useState(0);
+  const [nowTick, setNowTick] = useState(() => Date.now());
   const [confirmingMentorId, setConfirmingMentorId] = useState<string | null>(
     null,
   );
@@ -227,6 +261,8 @@ export function EducadorPanel() {
       setTimerLeft(
         activityTimerSecondsLeft(body.event.activityTimer, body.serverNow),
       );
+      const serverMs = Date.parse(body.serverNow);
+      if (Number.isFinite(serverMs)) setClockOffsetMs(serverMs - Date.now());
       setSessions((prev) =>
         prev.map((s) =>
           s.id === body.event.id ? eventToSession(body.event) : s,
@@ -242,6 +278,12 @@ export function EducadorPanel() {
 
   useRealtime(() => void loadOverview(), { eventId: selectedId ?? undefined });
 
+  // Refreshes the event's "time left" every 30 s.
+  useEffect(() => {
+    const interval = setInterval(() => setNowTick(Date.now()), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Counts the activity timer down between overviews.
   useEffect(() => {
     if (timerLeft === null) return;
@@ -254,6 +296,8 @@ export function EducadorPanel() {
   function selectSession(id: string) {
     setSelectedId(id);
     setConfirmingFinish(false);
+    setConfirmingExtend(false);
+    setRenaming(null);
   }
 
   function handleFinish() {
@@ -461,6 +505,73 @@ export function EducadorPanel() {
     void loadOverview();
   }
 
+  async function estenderTempo() {
+    if (!selected || extending) return;
+    if (!confirmingExtend) {
+      setConfirmingExtend(true);
+      return;
+    }
+    setConfirmingExtend(false);
+    setExtending(true);
+    try {
+      const res = await sendJson(`/api/events/${selected.id}/extend`, "POST", {
+        minutes: extendMinutes,
+      });
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          err?.fields?.minutes === "TOO_LONG"
+            ? t("fimEvento.limite")
+            : errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")),
+        );
+        return;
+      }
+      toast("ok", t("fimEvento.estendido", { min: extendMinutes }));
+      void loadOverview();
+    } finally {
+      setExtending(false);
+    }
+  }
+
+  async function salvarNomeEquipe() {
+    if (!selected || !renaming || savingName) return;
+    const name = renaming.name.trim();
+    if (!name) {
+      toast("err", t("equipeCard.nomeObrigatorio"));
+      return;
+    }
+    setSavingName(true);
+    try {
+      const res = await sendJson(
+        `/api/events/${selected.id}/teams/${renaming.id}`,
+        "PATCH",
+        { name },
+      );
+      if (res.status === 401) {
+        router.push("/");
+        return;
+      }
+      if (!res.ok) {
+        const err = await readApiError(res);
+        toast(
+          "err",
+          errorMessage(err?.error, tCommon("errors.INTERNAL_ERROR")),
+        );
+        return;
+      }
+      setRenaming(null);
+      toast("ok", t("equipeCard.nomeAtualizado"));
+      void loadOverview();
+    } finally {
+      setSavingName(false);
+    }
+  }
+
   async function removerMentor(mentorId: string) {
     if (!selected) return;
     if (confirmingMentorId !== mentorId) {
@@ -496,6 +607,29 @@ export function EducadorPanel() {
     }
   }
 
+  function abrirPdf() {
+    if (!selected) {
+      toast("err", t("toasts.selecioneSessao"));
+      return;
+    }
+    setPdfTeam("all");
+    setShowPdf(true);
+  }
+
+  function baixarPdf() {
+    if (!selected) return;
+    let tz = "";
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
+    } catch {
+      tz = "";
+    }
+    const params = new URLSearchParams({ team: pdfTeam });
+    if (tz) params.set("tz", tz);
+    window.open(`/api/events/${selected.id}/report?${params}`, "_blank");
+    setShowPdf(false);
+  }
+
   function exportar(type: "report" | "proposals" | "activity") {
     if (!selected) {
       toast("err", t("toasts.selecioneSessao"));
@@ -521,6 +655,28 @@ export function EducadorPanel() {
 
   const canStart = selected?.status === "aguardando";
   const canPause = selected?.status === "ativa";
+  // The event's own clock (not the activity timer): when the board closes.
+  const eventEndsAtMs = event?.endsAt ? Date.parse(event.endsAt) : null;
+  const eventMsLeft =
+    eventEndsAtMs !== null ? eventEndsAtMs - (nowTick + clockOffsetMs) : null;
+  const canExtend =
+    eventEndsAtMs !== null &&
+    (selected?.status === "ativa" || selected?.status === "pausada");
+  function fmtEndsAt(ms: number) {
+    return new Date(ms).toLocaleString(locale, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  function fmtLeft(ms: number) {
+    const totalMin = Math.max(0, Math.floor(ms / 60_000));
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return h > 0 ? `${h} h ${String(m).padStart(2, "0")} min` : `${m} min`;
+  }
   const canResume = selected?.status === "pausada";
 
   return (
@@ -671,6 +827,13 @@ export function EducadorPanel() {
           </div>
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
+          <div
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            style={{ color: "var(--t1)", fontWeight: 700 }}
+            onClick={abrirPdf}
+          >
+            📑 {t("sidebar.relatorioPdf")}
+          </div>
           <div
             className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => exportar("report")}
@@ -867,8 +1030,78 @@ export function EducadorPanel() {
                       >
                         E{i + 1}
                       </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div className="eq-card-nm">{team.name}</div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        {renaming?.id === team.id ? (
+                          <form
+                            style={{ display: "flex", gap: 4 }}
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              void salvarNomeEquipe();
+                            }}
+                          >
+                            <input
+                              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[8px] ${AG_TEXT}`}
+                              autoFocus
+                              value={renaming.name}
+                              maxLength={TEAM_NAME_MAX_LENGTH}
+                              aria-label={t("equipeCard.editarNome")}
+                              onChange={(e) =>
+                                setRenaming({
+                                  id: team.id,
+                                  name: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Escape") setRenaming(null);
+                              }}
+                              style={{
+                                flex: 1,
+                                minWidth: 0,
+                                fontSize: 14,
+                                padding: "2px 8px",
+                              }}
+                            />
+                            <button
+                              type="submit"
+                              className="btn btn-sm"
+                              disabled={savingName}
+                              title={t("equipeCard.salvar")}
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => setRenaming(null)}
+                              title={t("equipeCard.cancelar")}
+                            >
+                              ✕
+                            </button>
+                          </form>
+                        ) : (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              minWidth: 0,
+                            }}
+                          >
+                            <div className="eq-card-nm">{team.name}</div>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              style={{ padding: "0 4px", flexShrink: 0 }}
+                              onClick={() =>
+                                setRenaming({ id: team.id, name: team.name })
+                              }
+                              title={t("equipeCard.editarNome")}
+                              aria-label={t("equipeCard.editarNome")}
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                        )}
                         <div className="eq-card-st">
                           {activeKey
                             ? (tKeys.raw(activeKey) as KeyTranslation).name
@@ -936,6 +1169,17 @@ export function EducadorPanel() {
                       >
                         👤 {team.memberCount}
                       </div>
+                      <div
+                        className="badge tiny"
+                        style={{
+                          background: "var(--ag-color-surface-solid, #0c2d40)",
+                          color: "var(--t3)",
+                          borderColor: "var(--border)",
+                        }}
+                        title={t("equipeCard.codigoEquipeTitle")}
+                      >
+                        🔑 {team.joinCode}
+                      </div>
                       {team.submission && (
                         <div
                           className="badge tiny"
@@ -949,6 +1193,63 @@ export function EducadorPanel() {
                         </div>
                       )}
                     </div>
+                    {/* What the team delivered: its links (https, checked by
+                        the API) and the files it uploaded, to open or
+                        download from here. */}
+                    {(() => {
+                      const links = team.submission
+                        ? [
+                            team.submission.url,
+                            ...(team.submission.links ?? []),
+                          ].filter((link): link is string => Boolean(link))
+                        : [];
+                      const files = team.files ?? [];
+                      if (links.length === 0 && files.length === 0) return null;
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 3,
+                            marginTop: 8,
+                            minWidth: 0,
+                          }}
+                        >
+                          {links.map((link, i) => (
+                            <a
+                              key={`l-${i}-${link}`}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("equipeCard.abrirLink")}
+                              style={{
+                                fontSize: 11,
+                                color: "var(--parc)",
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              🔗 {link}
+                            </a>
+                          ))}
+                          {files.map((file) => (
+                            <a
+                              key={file.id}
+                              href={file.downloadUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("equipeCard.baixarArquivo")}
+                              style={{
+                                fontSize: 11,
+                                color: "var(--parc)",
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              📎 {file.fileName}
+                            </a>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
@@ -1040,6 +1341,79 @@ export function EducadorPanel() {
               🔔 {t("right.alertas")}
             </div>
           </div>
+          {eventEndsAtMs !== null && eventMsLeft !== null && (
+            <div
+              className={`${AG_SURFACE_SOLID} border ${AG_BORDER} rounded-[12px] p-3 my-2`}
+            >
+              <div style={{ fontSize: 10, color: "var(--t3)" }}>
+                ⏳ {t("fimEvento.titulo")}
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: "var(--t1)",
+                  marginTop: 2,
+                }}
+              >
+                {fmtEndsAt(eventEndsAtMs)}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  marginTop: 2,
+                  color:
+                    eventMsLeft > 0 || selected?.status === "finalizada"
+                      ? "var(--t3)"
+                      : "#EF4444",
+                  fontWeight:
+                    eventMsLeft > 0 || selected?.status === "finalizada"
+                      ? undefined
+                      : 700,
+                }}
+              >
+                {selected?.status === "finalizada"
+                  ? t("fimEvento.terminado")
+                  : eventMsLeft > 0
+                    ? t("fimEvento.restante", { tempo: fmtLeft(eventMsLeft) })
+                    : t("fimEvento.esgotado")}
+              </div>
+              {canExtend && (
+                <>
+                  <div className="timer-presets" style={{ marginTop: 8 }}>
+                    {EXTEND_PRESETS.map((min) => (
+                      <button
+                        key={min}
+                        className={`timer-preset-btn ${extendMinutes === min ? "sel" : ""}`}
+                        onClick={() => {
+                          setExtendMinutes(min);
+                          setConfirmingExtend(false);
+                        }}
+                      >
+                        +{min >= 60 ? `${min / 60} h` : `${min} min`}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className={`btn btn-sm ${AG_START_BTN}`}
+                    style={{ width: "100%", marginTop: 6 }}
+                    disabled={extending}
+                    onClick={() => void estenderTempo()}
+                    onBlur={() => setConfirmingExtend(false)}
+                  >
+                    {confirmingExtend
+                      ? t("fimEvento.confirmar", {
+                          tempo:
+                            extendMinutes >= 60
+                              ? `${extendMinutes / 60} h`
+                              : `${extendMinutes} min`,
+                        })
+                      : `＋ ${t("fimEvento.estender")}`}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <div className="sidebar-divider" />
           <div className="panel-title">⏱ {t("timer.titulo")}</div>
           <div
@@ -1479,6 +1853,56 @@ export function EducadorPanel() {
                 </span>
               </div>
             ))}
+          </div>
+        </Modal>
+      )}
+
+      {showPdf && selected && (
+        <Modal onClose={() => setShowPdf(false)} maxWidth={480}>
+          <h3>📑 {t("pdfModal.titulo")}</h3>
+          <p>{t("pdfModal.sub")}</p>
+          <div className="field">
+            <label htmlFor="pdf-team">{t("pdfModal.equipeLabel")}</label>
+            <select
+              id="pdf-team"
+              value={pdfTeam}
+              onChange={(e) => setPdfTeam(e.target.value)}
+            >
+              <option value="all">{t("pdfModal.todos")}</option>
+              {[...(overview?.teams ?? [])]
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--t3)",
+              lineHeight: 1.5,
+              marginBottom: 14,
+            }}
+          >
+            {t("pdfModal.inclui")}
+          </div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setShowPdf(false)}
+            >
+              {t("pdfModal.cancelar")}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={baixarPdf}
+            >
+              ⬇ {t("pdfModal.baixar")}
+            </button>
           </div>
         </Modal>
       )}

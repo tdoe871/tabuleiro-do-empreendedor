@@ -151,7 +151,8 @@ El educador crea una sesión (`CreateSessionModal`).
 
 ```json
 // request (lo que ya manda el frontend)
-{ "titulo": "Hackathon MTY", "modo": "escolar", "cenario": null, "numEquipes": 60, "integrantes": 5 }
+{ "titulo": "Hackathon MTY", "modo": "escolar", "cenario": null, "numEquipes": 60, "integrantes": 5, "duracaoHoras": 24 }
+// duracaoHoras es opcional: de 1 a 48 horas enteras, 24 si no se manda.
 // 201
 { "event": EventDTO }
 ```
@@ -619,6 +620,47 @@ Botón iniciar / pausar / retomar, y "terminar sesión".
   es de otro educador), `INVALID_STATUS_TRANSITION` (por ejemplo, `DRAFT` → `PAUSED` o salir de
   `FINISHED`).
 
+### `POST /api/events/:id/extend` — Staff
+
+El educador da más tiempo a **todos** los equipos (botón «Extender tiempo» del panel).
+
+```json
+// request
+{ "minutes": 30 }   // entero de 1 a 720
+// 200
+{ "event": EventDTO }
+```
+
+- Solo el educador dueño del evento, con la sesión iniciada (`ACTIVE` o `PAUSED`) y el reloj
+  `GLOBAL`.
+- Suma los minutos a `endsAt`. Si el tiempo ya se había acabado, los suma **a partir de ahora**:
+  el tablero se reabre para todos.
+- El evento nunca puede durar más de **48 h** desde `startedAt`.
+- Queda en el registro de actividad como `EVENT_EXTENDED` (`{ minutes, from, to }`). Avisa por
+  tiempo real a los jugadores (`event`) y al educador (`overview`).
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`minutes: "INVALID"`,
+  `minutes: "TOO_LONG"` si pasaría de 48 h, `timerMode: "NO_GLOBAL_CLOCK"`), `EVENT_NOT_ACTIVE`
+  (todavía no inicia), `EVENT_FINISHED`.
+
+### `PATCH /api/events/:id/teams/:teamId` — Staff
+
+El educador cambia el nombre de un equipo (✏️ en la tarjeta del equipo).
+
+```json
+// request
+{ "name": "Equipo Verde" }
+// 200
+{ "team": { "id": "…", "name": "Equipo Verde" } }
+```
+
+- Solo el educador dueño del evento; los equipos y los mentores no pueden.
+- Mismas reglas que al crear un equipo: de 1 a 40 caracteres y sin repetir el nombre de otro
+  equipo del evento (sin importar mayúsculas ni espacios).
+- Queda en el registro como `TEAM_RENAMED` (`{ from, to }`); el registro y su CSV muestran el
+  nombre actual de cada equipo.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `TEAM_NOT_FOUND`, `VALIDATION_ERROR`,
+  `TEAM_NAME_TAKEN`.
+
 ### `GET /api/events/:id/overview` — Staff
 
 Métricas, equipos y alertas para `EducadorPanel` y `SocializacaoPanel`, en una sola consulta
@@ -901,6 +943,21 @@ resumen.
 - Las celdas que empiezan con `=`, `+`, `-` o `@` se guardan con un `'` adelante para que Excel no
   las ejecute como fórmula (los números, también los negativos, quedan como números).
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
+
+### Reporte PDF por equipo — Staff
+
+`GET /api/events/:id/report?team=<teamId>|all&tz=<zona IANA>` descarga un PDF (A4) para el educador
+dueño del evento. Botón «Reporte PDF por equipo» en Exportar, que deja elegir un equipo o todos.
+
+- `team` omitido o `all`: un solo PDF con portada (datos del evento, resumen, tabla de posiciones) y una
+  sección por equipo en orden de posición. Con un id: solo ese equipo.
+- Cada equipo: datos generales, integrantes, avance por clave, respuesta de cada fase (con quién y cuándo),
+  entrega (tipo, links clicables, archivos, descripción) y calificaciones de los jueces (promedio, por
+  criterio, por juez y comentarios).
+- Posiciones: promedio de los jueces (sin calificar al final), luego fases concluidas, puntos y nombre.
+- Fechas en `tz` (la zona del navegador); si falta o no existe, `America/Mexico_City`.
+- Funciona en cualquier estado, también con el tiempo acabado o la partida terminada.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador), `TEAM_NOT_FOUND`.
 
 ### Registro de actividad — Staff
 

@@ -595,6 +595,9 @@ export function PlayerBoard() {
               <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
                 {board.team.name} · {board.event.name}
               </div>
+              <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 4 }}>
+                {t("cenario.codigoEquipe", { codigo: board.team.joinCode })}
+              </div>
             </div>
           </div>
 

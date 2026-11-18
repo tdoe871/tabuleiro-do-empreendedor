@@ -205,9 +205,10 @@
       "verificarAlertas": "Check alerts",
       "mentores": "View mentor scores",
       "exportar": "Export",
-      "relatorio": "Interaction report",
-      "exportarPropostas": "Export proposals",
-      "exportarAtividade": "Export activity"
+      "relatorio": "Interaction report (CSV)",
+      "exportarPropostas": "Export proposals (CSV)",
+      "exportarAtividade": "Export activity (CSV)",
+      "relatorioPdf": "PDF report by team"
     },
     "avisos": {
       "titulo": "Announcements",
@@ -297,7 +298,9 @@
       "integrantesLabel": "Members per team",
       "cancelar": "Cancel",
       "criar": "Create session →",
-      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap)."
+      "numEquipesHint": "Up to 80 teams per session (no more 10-team cap).",
+      "duracaoLabel": "Event length (hours)",
+      "duracaoHint": "1 to 48 h. It starts counting when you press “Start”; you can extend it later."
     },
     "toasts": {
       "selecioneSessao": "Select a session",
@@ -332,7 +335,34 @@
     "equipeCard": {
       "semChaveAtiva": "No active key",
       "chaves": "keys",
-      "entregou": "Submitted"
+      "entregou": "Submitted",
+      "codigoEquipeTitle": "Team join code — give it to a student who got logged out",
+      "editarNome": "Edit team name",
+      "salvar": "Save",
+      "cancelar": "Cancel",
+      "nomeAtualizado": "Team name updated.",
+      "nomeObrigatorio": "Type a name for the team.",
+      "abrirLink": "Open the delivery link",
+      "baixarArquivo": "Download file"
+    },
+    "fimEvento": {
+      "titulo": "Event ends",
+      "restante": "{tempo} left",
+      "esgotado": "Time is up: teams can no longer progress or submit. Extend to reopen.",
+      "estender": "Extend time for everyone",
+      "confirmar": "Add {tempo} for everyone? Confirm",
+      "estendido": "Added {min} min to the event for every team.",
+      "limite": "The event cannot last more than 48 h in total from its start.",
+      "terminado": "The game has ended."
+    },
+    "pdfModal": {
+      "titulo": "PDF report",
+      "sub": "Download one PDF with every team, or a single team's.",
+      "equipeLabel": "Which team?",
+      "todos": "All teams (one PDF)",
+      "inclui": "Includes: event details, ranking, members, progress per key, answers to each phase, delivery with its links and files, and the judges' grades and comments.",
+      "cancelar": "Cancel",
+      "baixar": "Download PDF"
     }
   },
   "jogador": {
@@ -364,7 +394,8 @@
     },
     "cenario": {
       "titulo": "Investigation session",
-      "sub": "You are a change agent."
+      "sub": "You are a change agent.",
+      "codigoEquipe": "Team code: {codigo} (keep it — if you get logged out, use it to rejoin)"
     },
     "membros": {
       "titulo": "Team members",
