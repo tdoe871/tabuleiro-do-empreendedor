@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
           mode: toEventDTO(event).mode,
           maxTeams: event.maxTeams,
           maxTeamSize: event.maxTeamSize,
+          durationMinutes: event.durationMinutes,
         },
       });
       return NextResponse.json({ event: toEventDTO(event) }, { status: 201 });

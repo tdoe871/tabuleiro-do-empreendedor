@@ -65,7 +65,8 @@
       "created": "Equipe criada",
       "createError": "Não foi possível criar a equipe",
       "backendPendingJoin": "Entrar na equipe: backend em construção — abrindo tabuleiro em modo prévia.",
-      "invalidCode": "Código de equipe inválido"
+      "invalidCode": "Código de equipe inválido",
+      "recovered": "Você entrou como «{nickname}», que já estava na equipe. Se não é você, saia e entre com outro nome."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Cadastro de educador: backend em construção — abrindo painel em modo de visualização.",
       "registerError": "Não foi possível criar a conta",
       "missingFields": "Preencha seu nome e o código",
-      "mentorError": "Não foi possível entrar. Confira o código de mentores."
+      "mentorError": "Não foi possível entrar. Confira o código de mentores.",
+      "mentorRecovered": "Você entrou como «{name}», que já existia. Se não é você, saia e entre com seu nome completo."
     },
     "forgot": {
       "titulo": "Recuperar senha",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Iniciar sessão",
       "pausar": "Pausar sessão",
-      "retomar": "Retomar sessão"
+      "retomar": "Retomar sessão",
+      "terminar": "Encerrar sessão",
+      "terminarConfirmar": "Encerrar? Não dá para desfazer"
     },
     "socializar": "Socializar",
     "sair": "Sair",
@@ -201,9 +205,10 @@
       "verificarAlertas": "Verificar alertas",
       "mentores": "Ver notas dos mentores",
       "exportar": "Exportar",
-      "relatorio": "Relatório de interação",
-      "exportarPropostas": "Exportar propostas",
-      "exportarAtividade": "Exportar atividade"
+      "relatorio": "Relatório de interação (CSV)",
+      "exportarPropostas": "Exportar propostas (CSV)",
+      "exportarAtividade": "Exportar atividade (CSV)",
+      "relatorioPdf": "Relatório PDF por equipe"
     },
     "avisos": {
       "titulo": "Avisos gerais",
@@ -229,7 +234,7 @@
       "nenhumMentor": "Ninguém entrou ainda.",
       "remover": "Remover",
       "removerConfirmar": "Tem certeza? Remover",
-      "removido": "Mentor removido. As notas dele não contam mais.",
+      "removido": "Mentor removido. As notas dele não contam mais e o código de mentores mudou.",
       "equiposTitulo": "Equipes"
     },
     "alertas": {
@@ -293,7 +298,9 @@
       "integrantesLabel": "Integrantes por equipe",
       "cancelar": "Cancelar",
       "criar": "Criar sessão →",
-      "numEquipesHint": "Até 80 equipes por sessão (sem limite de 10)."
+      "numEquipesHint": "Até 80 equipes por sessão (sem limite de 10).",
+      "duracaoLabel": "Duração do evento (horas)",
+      "duracaoHint": "De 1 a 48 h. Começa a contar quando você clica em «Iniciar»; depois dá para estender."
     },
     "toasts": {
       "selecioneSessao": "Selecione uma sessão",
@@ -328,7 +335,34 @@
     "equipeCard": {
       "semChaveAtiva": "Sem chave ativa",
       "chaves": "chaves",
-      "entregou": "Entregou"
+      "entregou": "Entregou",
+      "codigoEquipeTitle": "Código da equipe — dê para um estudante que perdeu a sessão",
+      "editarNome": "Editar nome da equipe",
+      "salvar": "Salvar",
+      "cancelar": "Cancelar",
+      "nomeAtualizado": "Nome da equipe atualizado.",
+      "nomeObrigatorio": "Digite um nome para a equipe.",
+      "abrirLink": "Abrir o link da entrega",
+      "baixarArquivo": "Baixar arquivo"
+    },
+    "fimEvento": {
+      "titulo": "Fim do evento",
+      "restante": "Faltam {tempo}",
+      "esgotado": "O tempo acabou: as equipes não podem mais avançar nem entregar. Estenda para reabrir.",
+      "estender": "Estender o tempo para todos",
+      "confirmar": "Adicionar {tempo} para todos? Confirmar",
+      "estendido": "Foram adicionados {min} min ao evento para todas as equipes.",
+      "limite": "O evento não pode durar mais de 48 h no total desde o início.",
+      "terminado": "A partida terminou."
+    },
+    "pdfModal": {
+      "titulo": "Relatório PDF",
+      "sub": "Baixe um PDF com todas as equipes ou só o de uma equipe.",
+      "equipeLabel": "De qual equipe?",
+      "todos": "Todas as equipes (um único PDF)",
+      "inclui": "Inclui: dados do evento, classificação, integrantes, avanço por chave, respostas de cada fase, entrega com links e arquivos, e as notas e comentários dos jurados.",
+      "cancelar": "Cancelar",
+      "baixar": "Baixar PDF"
     }
   },
   "jogador": {
@@ -360,7 +394,8 @@
     },
     "cenario": {
       "titulo": "Sessão de investigação",
-      "sub": "Você é um agente de transformação."
+      "sub": "Você é um agente de transformação.",
+      "codigoEquipe": "Código da equipe: {codigo} (guarde — se perder a sessão, ele serve para voltar a entrar)"
     },
     "membros": {
       "titulo": "Membros da equipe",

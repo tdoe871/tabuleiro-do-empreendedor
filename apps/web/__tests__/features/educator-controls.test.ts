@@ -15,6 +15,7 @@ import {
   toActivityTimerDTO,
   toChallengeCardDTO,
 } from "@/features/event/server/controls";
+import { activityTimerSecondsLeft } from "@/features/event/activityTimer";
 import { toCsv } from "@/lib/csv";
 
 const minutes = (n: number) => n * 60_000;
@@ -42,6 +43,23 @@ describe("activity timer", () => {
       ok: false,
       fields: { visible: "INVALID" },
     });
+  });
+
+  it("counts the time left from the server clock, not the full length", () => {
+    const timer = { endsAt: "2026-11-12T15:15:00.000Z", seconds: 900 };
+    // Started at 15:00 for 15 minutes; at 15:10, 5 are left, whatever
+    // `seconds` (the full length) says.
+    expect(activityTimerSecondsLeft(timer, "2026-11-12T15:10:00.000Z")).toBe(
+      300,
+    );
+    // Partial seconds round up, so it never shows 0:00 too early.
+    expect(activityTimerSecondsLeft(timer, "2026-11-12T15:14:59.500Z")).toBe(1);
+    // Over: stays at 0.
+    expect(activityTimerSecondsLeft(timer, "2026-11-12T16:00:00.000Z")).toBe(0);
+    expect(activityTimerSecondsLeft(null, "2026-11-12T15:05:00.000Z")).toBe(
+      null,
+    );
+    expect(activityTimerSecondsLeft(timer, "not a date")).toBe(null);
   });
 
   it("builds the DTO only while it runs", () => {

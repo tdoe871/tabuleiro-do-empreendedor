@@ -35,6 +35,20 @@ export default function JoinTeamPage() {
         );
         return;
       }
+      // Same nickname as someone already on the team: the API logs into
+      // that participant. Say so, in case it is someone else with that name.
+      const joined = (await res.json().catch(() => null)) as {
+        participant?: { nickname?: string };
+        recovered?: boolean;
+      } | null;
+      if (joined?.recovered) {
+        toast(
+          "err",
+          t("toasts.recovered", {
+            nickname: joined.participant?.nickname ?? nickname.trim(),
+          }),
+        );
+      }
       router.push("/jogador/dashboard");
     } finally {
       setSubmitting(false);

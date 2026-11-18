@@ -65,7 +65,8 @@
       "created": "Équipe créée",
       "createError": "Impossible de créer l'équipe",
       "backendPendingJoin": "Rejoindre l'équipe : backend en construction — ouverture du plateau en mode aperçu.",
-      "invalidCode": "Code d'équipe invalide"
+      "invalidCode": "Code d'équipe invalide",
+      "recovered": "Vous êtes entré en tant que « {nickname} », qui était déjà dans l’équipe. Si ce n’est pas vous, déconnectez-vous et entrez avec un autre nom."
     }
   },
   "submission": {
@@ -168,7 +169,8 @@
       "backendPendingRegister": "Inscription formateur : backend en construction — ouverture du panneau en mode aperçu.",
       "registerError": "Impossible de créer le compte",
       "missingFields": "Renseignez votre nom et le code",
-      "mentorError": "Connexion impossible. Vérifiez le code mentor."
+      "mentorError": "Connexion impossible. Vérifiez le code mentor.",
+      "mentorRecovered": "Vous êtes entré en tant que « {name} », qui existait déjà. Si ce n’est pas vous, déconnectez-vous et entrez avec votre nom complet."
     },
     "forgot": {
       "titulo": "Réinitialiser le mot de passe",
@@ -189,7 +191,9 @@
     "acao": {
       "iniciar": "Démarrer la session",
       "pausar": "Mettre en pause",
-      "retomar": "Reprendre la session"
+      "retomar": "Reprendre la session",
+      "terminar": "Terminer la session",
+      "terminarConfirmar": "Terminer ? Action irréversible"
     },
     "socializar": "Partager",
     "sair": "Se déconnecter",
@@ -201,9 +205,10 @@
       "verificarAlertas": "Vérifier les alertes",
       "mentores": "Voir les notes des mentors",
       "exportar": "Exporter",
-      "relatorio": "Rapport d'interaction",
-      "exportarPropostas": "Exporter les propositions",
-      "exportarAtividade": "Exporter l'activité"
+      "relatorio": "Rapport d'interaction (CSV)",
+      "exportarPropostas": "Exporter les propositions (CSV)",
+      "exportarAtividade": "Exporter l'activité (CSV)",
+      "relatorioPdf": "Rapport PDF par équipe"
     },
     "avisos": {
       "titulo": "Annonces",
@@ -229,7 +234,7 @@
       "nenhumMentor": "Personne n'a encore rejoint.",
       "remover": "Retirer",
       "removerConfirmar": "Sûr ? Retirer",
-      "removido": "Mentor retiré. Ses notes ne comptent plus.",
+      "removido": "Mentor retiré. Ses notes ne comptent plus et le code mentor a changé.",
       "equiposTitulo": "Équipes"
     },
     "alertas": {
@@ -293,7 +298,9 @@
       "integrantesLabel": "Membres par équipe",
       "cancelar": "Annuler",
       "criar": "Créer la session →",
-      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10)."
+      "numEquipesHint": "Jusqu'à 80 équipes par session (sans limite de 10).",
+      "duracaoLabel": "Durée de l'événement (heures)",
+      "duracaoHint": "De 1 à 48 h. Le décompte commence quand vous cliquez sur « Démarrer » ; vous pourrez la prolonger."
     },
     "toasts": {
       "selecioneSessao": "Sélectionnez une session",
@@ -328,7 +335,34 @@
     "equipeCard": {
       "semChaveAtiva": "Aucune clé active",
       "chaves": "clés",
-      "entregou": "Soumis"
+      "entregou": "Soumis",
+      "codigoEquipeTitle": "Code d'équipe — donnez-le à un élève déconnecté",
+      "editarNome": "Modifier le nom de l'équipe",
+      "salvar": "Enregistrer",
+      "cancelar": "Annuler",
+      "nomeAtualizado": "Nom de l'équipe mis à jour.",
+      "nomeObrigatorio": "Saisissez un nom pour l'équipe.",
+      "abrirLink": "Ouvrir le lien du rendu",
+      "baixarArquivo": "Télécharger le fichier"
+    },
+    "fimEvento": {
+      "titulo": "Fin de l'événement",
+      "restante": "Il reste {tempo}",
+      "esgotado": "Le temps est écoulé : les équipes ne peuvent plus avancer ni rendre leur projet. Prolongez pour rouvrir.",
+      "estender": "Prolonger pour tout le monde",
+      "confirmar": "Ajouter {tempo} pour tout le monde ? Confirmer",
+      "estendido": "{min} min ajoutées à l'événement pour toutes les équipes.",
+      "limite": "L'événement ne peut pas durer plus de 48 h au total depuis son début.",
+      "terminado": "La partie est terminée."
+    },
+    "pdfModal": {
+      "titulo": "Rapport PDF",
+      "sub": "Téléchargez un PDF avec toutes les équipes ou celui d'une seule équipe.",
+      "equipeLabel": "Quelle équipe ?",
+      "todos": "Toutes les équipes (un seul PDF)",
+      "inclui": "Inclut : informations de l'événement, classement, membres, avancement par clé, réponses à chaque phase, rendu avec ses liens et fichiers, et les notes et commentaires du jury.",
+      "cancelar": "Annuler",
+      "baixar": "Télécharger le PDF"
     }
   },
   "jogador": {
@@ -360,7 +394,8 @@
     },
     "cenario": {
       "titulo": "Session d'investigation",
-      "sub": "Vous êtes un agent de transformation."
+      "sub": "Vous êtes un agent de transformation.",
+      "codigoEquipe": "Code d'équipe : {codigo} (gardez-le — si vous êtes déconnecté, il vous permet de revenir)"
     },
     "membros": {
       "titulo": "Membres de l'équipe",
