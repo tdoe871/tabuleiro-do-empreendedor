@@ -178,6 +178,9 @@ export function EducadorPanel() {
       : null;
   const [showCreate, setShowCreate] = useState(false);
   const [showExtensoes, setShowExtensoes] = useState(false);
+  // PDF team report: "all" (every team in one file) or one team's id.
+  const [showPdf, setShowPdf] = useState(false);
+  const [pdfTeam, setPdfTeam] = useState<string>("all");
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [previewText, setPreviewText] = useState("");
   const [showMentores, setShowMentores] = useState(false);
@@ -604,6 +607,29 @@ export function EducadorPanel() {
     }
   }
 
+  function abrirPdf() {
+    if (!selected) {
+      toast("err", t("toasts.selecioneSessao"));
+      return;
+    }
+    setPdfTeam("all");
+    setShowPdf(true);
+  }
+
+  function baixarPdf() {
+    if (!selected) return;
+    let tz = "";
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
+    } catch {
+      tz = "";
+    }
+    const params = new URLSearchParams({ team: pdfTeam });
+    if (tz) params.set("tz", tz);
+    window.open(`/api/events/${selected.id}/report?${params}`, "_blank");
+    setShowPdf(false);
+  }
+
   function exportar(type: "report" | "proposals" | "activity") {
     if (!selected) {
       toast("err", t("toasts.selecioneSessao"));
@@ -801,6 +827,13 @@ export function EducadorPanel() {
           </div>
           <div className="sidebar-divider" />
           <div className="sidebar-sec">{t("sidebar.exportar")}</div>
+          <div
+            className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
+            style={{ color: "var(--t1)", fontWeight: 700 }}
+            onClick={abrirPdf}
+          >
+            📑 {t("sidebar.relatorioPdf")}
+          </div>
           <div
             className={`sidebar-action rounded-[12px] mx-1.5 transition-all duration-200 ${AG_HOVER} hover:text-[#00F5D4] hover:translate-x-0.5`}
             onClick={() => exportar("report")}
@@ -1820,6 +1853,56 @@ export function EducadorPanel() {
                 </span>
               </div>
             ))}
+          </div>
+        </Modal>
+      )}
+
+      {showPdf && selected && (
+        <Modal onClose={() => setShowPdf(false)} maxWidth={480}>
+          <h3>📑 {t("pdfModal.titulo")}</h3>
+          <p>{t("pdfModal.sub")}</p>
+          <div className="field">
+            <label htmlFor="pdf-team">{t("pdfModal.equipeLabel")}</label>
+            <select
+              id="pdf-team"
+              value={pdfTeam}
+              onChange={(e) => setPdfTeam(e.target.value)}
+            >
+              <option value="all">{t("pdfModal.todos")}</option>
+              {[...(overview?.teams ?? [])]
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--t3)",
+              lineHeight: 1.5,
+              marginBottom: 14,
+            }}
+          >
+            {t("pdfModal.inclui")}
+          </div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setShowPdf(false)}
+            >
+              {t("pdfModal.cancelar")}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={baixarPdf}
+            >
+              ⬇ {t("pdfModal.baixar")}
+            </button>
           </div>
         </Modal>
       )}

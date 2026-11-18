@@ -944,6 +944,21 @@ resumen.
   las ejecute como fórmula (los números, también los negativos, quedan como números).
 - Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND`, `VALIDATION_ERROR` (`type` → `INVALID`).
 
+### Reporte PDF por equipo — Staff
+
+`GET /api/events/:id/report?team=<teamId>|all&tz=<zona IANA>` descarga un PDF (A4) para el educador
+dueño del evento. Botón «Reporte PDF por equipo» en Exportar, que deja elegir un equipo o todos.
+
+- `team` omitido o `all`: un solo PDF con portada (datos del evento, resumen, tabla de posiciones) y una
+  sección por equipo en orden de posición. Con un id: solo ese equipo.
+- Cada equipo: datos generales, integrantes, avance por clave, respuesta de cada fase (con quién y cuándo),
+  entrega (tipo, links clicables, archivos, descripción) y calificaciones de los jueces (promedio, por
+  criterio, por juez y comentarios).
+- Posiciones: promedio de los jueces (sin calificar al final), luego fases concluidas, puntos y nombre.
+- Fechas en `tz` (la zona del navegador); si falta o no existe, `America/Mexico_City`.
+- Funciona en cualquier estado, también con el tiempo acabado o la partida terminada.
+- Errores: `UNAUTHORIZED`, `EVENT_NOT_FOUND` (no existe o es de otro educador), `TEAM_NOT_FOUND`.
+
 ### Registro de actividad — Staff
 
 **Implementado.** Para la investigación: quién hizo qué y cuándo en el evento. El backend lo

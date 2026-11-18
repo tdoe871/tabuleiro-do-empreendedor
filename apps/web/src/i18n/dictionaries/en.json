@@ -205,9 +205,10 @@
       "verificarAlertas": "Check alerts",
       "mentores": "View mentor scores",
       "exportar": "Export",
-      "relatorio": "Interaction report",
-      "exportarPropostas": "Export proposals",
-      "exportarAtividade": "Export activity"
+      "relatorio": "Interaction report (CSV)",
+      "exportarPropostas": "Export proposals (CSV)",
+      "exportarAtividade": "Export activity (CSV)",
+      "relatorioPdf": "PDF report by team"
     },
     "avisos": {
       "titulo": "Announcements",
@@ -353,6 +354,15 @@
       "estendido": "Added {min} min to the event for every team.",
       "limite": "The event cannot last more than 48 h in total from its start.",
       "terminado": "The game has ended."
+    },
+    "pdfModal": {
+      "titulo": "PDF report",
+      "sub": "Download one PDF with every team, or a single team's.",
+      "equipeLabel": "Which team?",
+      "todos": "All teams (one PDF)",
+      "inclui": "Includes: event details, ranking, members, progress per key, answers to each phase, delivery with its links and files, and the judges' grades and comments.",
+      "cancelar": "Cancel",
+      "baixar": "Download PDF"
     }
   },
   "jogador": {

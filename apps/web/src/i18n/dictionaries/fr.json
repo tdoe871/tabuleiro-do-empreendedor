@@ -205,9 +205,10 @@
       "verificarAlertas": "Vérifier les alertes",
       "mentores": "Voir les notes des mentors",
       "exportar": "Exporter",
-      "relatorio": "Rapport d'interaction",
-      "exportarPropostas": "Exporter les propositions",
-      "exportarAtividade": "Exporter l'activité"
+      "relatorio": "Rapport d'interaction (CSV)",
+      "exportarPropostas": "Exporter les propositions (CSV)",
+      "exportarAtividade": "Exporter l'activité (CSV)",
+      "relatorioPdf": "Rapport PDF par équipe"
     },
     "avisos": {
       "titulo": "Annonces",
@@ -353,6 +354,15 @@
       "estendido": "{min} min ajoutées à l'événement pour toutes les équipes.",
       "limite": "L'événement ne peut pas durer plus de 48 h au total depuis son début.",
       "terminado": "La partie est terminée."
+    },
+    "pdfModal": {
+      "titulo": "Rapport PDF",
+      "sub": "Téléchargez un PDF avec toutes les équipes ou celui d'une seule équipe.",
+      "equipeLabel": "Quelle équipe ?",
+      "todos": "Toutes les équipes (un seul PDF)",
+      "inclui": "Inclut : informations de l'événement, classement, membres, avancement par clé, réponses à chaque phase, rendu avec ses liens et fichiers, et les notes et commentaires du jury.",
+      "cancelar": "Annuler",
+      "baixar": "Télécharger le PDF"
     }
   },
   "jogador": {
