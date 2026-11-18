@@ -126,6 +126,20 @@ export function LoginScreen() {
       name: mentNome.trim(),
     });
     if (res.ok) {
+      // Same name as a mentor already in: the API logs into that mentor.
+      // Say so, in case it is someone else with the same name.
+      const joined = (await res.json().catch(() => null)) as {
+        mentor?: { name?: string };
+        recovered?: boolean;
+      } | null;
+      if (joined?.recovered) {
+        toast(
+          "err",
+          t("toasts.mentorRecovered", {
+            name: joined.mentor?.name ?? mentNome.trim(),
+          }),
+        );
+      }
       router.push("/mentor/dashboard");
       return;
     }

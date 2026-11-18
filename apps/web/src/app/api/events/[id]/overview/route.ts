@@ -35,6 +35,7 @@ export async function GET(
           select: {
             id: true,
             name: true,
+            joinCode: true,
             score: true,
             createdAt: true,
             _count: { select: { participants: true } },
@@ -84,6 +85,7 @@ export async function GET(
       return {
         id: team.id,
         name: team.name,
+        joinCode: team.joinCode,
         memberCount: team._count.participants,
         score: team.score,
         keys,

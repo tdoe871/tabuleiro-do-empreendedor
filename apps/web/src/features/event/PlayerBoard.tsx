@@ -21,6 +21,7 @@ import {
   type KeyId,
   type KeyTranslation,
 } from "@/features/event/keys";
+import { activityTimerSecondsLeft } from "./activityTimer";
 import { RolePickerModal } from "./RolePickerModal";
 import { SubmissionModal } from "./SubmissionModal";
 import {
@@ -184,7 +185,9 @@ export function PlayerBoard() {
         }
         return body;
       });
-      setActivitySeconds(body.event.activityTimer?.seconds ?? null);
+      setActivitySeconds(
+        activityTimerSecondsLeft(body.event.activityTimer, body.serverNow),
+      );
     }
     setLoading(false);
   }, [router]);
@@ -236,8 +239,8 @@ export function PlayerBoard() {
   }, {});
 
   // Countdown for the activity timer, re-synced every time the board is
-  // reloaded (it carries `seconds` as of `serverNow`, never trusting the
-  // device clock for the starting point).
+  // reloaded (time left = endsAt - serverNow, never trusting the device
+  // clock for the starting point).
   useEffect(() => {
     if (activitySeconds === null) return;
     const interval = setInterval(() => {
@@ -344,7 +347,9 @@ export function PlayerBoard() {
       }
       const next = (await res.json()) as Board;
       setBoard(next);
-      setActivitySeconds(next.event.activityTimer?.seconds ?? null);
+      setActivitySeconds(
+        activityTimerSecondsLeft(next.event.activityTimer, next.serverNow),
+      );
 
       const chaveConcluida =
         !wasConcluida && next.keys[keyId].status === "concluida";
@@ -589,6 +594,9 @@ export function PlayerBoard() {
               </div>
               <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
                 {board.team.name} · {board.event.name}
+              </div>
+              <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 4 }}>
+                {t("cenario.codigoEquipe", { codigo: board.team.joinCode })}
               </div>
             </div>
           </div>
